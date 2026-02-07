@@ -1,0 +1,232 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <div class="logo-mark">C</div>
+      <span class="logo-text">Catch<span>IQ</span></span>
+    </div>
+
+    <div class="nav-search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Search freelancers or services...">
+    </div>
+
+    <div class="nav-actions">
+      <div class="icon-btn-wrapper">
+        <button class="nav-icon-btn"><i class="fa fa-comment-dots"></i></button>
+      </div>
+      <div class="icon-btn-wrapper">
+        <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
+        <span class="badge">3</span>
+      </div>
+      <div class="nav-divider"></div>
+     <div class="user-profile-menu" routerLink="/ClientProfil">
+  <img src="https://placehold.co/40x40/198754/white?text=A" alt="Profile">
+  <div class="user-text">
+    <span class="name">Acme Corp</span>
+    <span class="role">Client</span>
+  </div>
+  <i class="fa fa-chevron-down"></i>
+</div>
+    </div>
+  </div>
+</nav>
+
+<div class="main-layout">
+  
+  <aside class="sidebar-left">
+    <div class="card profile-card">
+      <div class="profile-bg"></div>
+      <div class="profile-content">
+        <img src="https://placehold.co/70x70/198754/white?text=A" class="main-avatar">
+        <h3>Acme Corp</h3>
+        <p class="verified"><i class="fa fa-check-circle"></i> Verified Client</p>
+      </div>
+      <div class="profile-metrics">
+        <div><strong>12</strong><small>Jobs</small></div>
+        <div><strong>$45k</strong><small>Spent</small></div>
+        <div><strong>4.9</strong><small>Rating</small></div>
+      </div>
+    </div>
+
+    <nav class="side-menu">
+      <a routerLink="/ClientDashboard" class="menu-item active"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a href="#" class="menu-item"><i class="fa fa-file-alt"></i> My Postings</a>
+      <a href="#" class="menu-item"><i class="fa fa-users"></i> Hired Talent</a>
+      <a href="#" class="menu-item"><i class="fa fa-file-invoice"></i> Invoices</a>
+      <a href="#" class="menu-item"><i class="fa fa-cog"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="feed-center">
+    
+    <div class="card create-trigger">
+      <div class="trigger-row">
+        <img src="https://placehold.co/40x40/198754/white?text=A" class="sm-avatar">
+        <button class="trigger-btn" (click)="openModal()">
+          <span>Post a new project opportunity...</span>
+        </button>
+      </div>
+      <div class="trigger-actions">
+        <button (click)="openModal()"><i class="fa fa-laptop-code"></i> IT & Dev</button>
+        <button (click)="openModal()"><i class="fa fa-pen-nib"></i> Design</button>
+        <button (click)="openModal()"><i class="fa fa-bullhorn"></i> Marketing</button>
+      </div>
+    </div>
+
+    <div class="feed-stream">
+      <article class="card project-post">
+        <div class="post-header">
+          <img src="https://placehold.co/48x48/198754/white?text=A" class="sm-avatar">
+          <div class="meta">
+            <h4>Acme Corp <i class="fa fa-check-circle verified-icon"></i></h4>
+            <span>Posted 2 hours ago • Global</span>
+          </div>
+          <button class="options-btn"><i class="fa fa-ellipsis-h"></i></button>
+        </div>
+        
+        <div class="post-body">
+          <h2 class="title">Senior Angular Developer for SaaS Dashboard</h2>
+          <p class="desc">
+            We are looking for an expert to refactor our existing dashboard. 
+            Must be proficient in <strong>RxJS</strong>, <strong>NgRx</strong>, and <strong>TailwindCSS</strong>.
+          </p>
+          <div class="tags">
+            <span class="tag-pill">Development</span>
+            <span class="tag-pill">Remote</span>
+            <span class="tag-pill green">$45 - $60 / hr</span>
+          </div>
+        </div>
+
+        <div class="post-footer">
+          <div class="applicants">
+            <div class="avatars">
+              <img src="https://i.pravatar.cc/150?u=1">
+              <img src="https://i.pravatar.cc/150?u=2">
+              <img src="https://i.pravatar.cc/150?u=3">
+            </div>
+            <span>8 Proposals received</span>
+          </div>
+          <button class="btn-primary-outline" routerLink="/ProjectDetails">View Details</button>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <aside class="sidebar-right">
+    <div class="card widget-card">
+      <div class="widget-header">
+        <h4>Recommended Talent</h4>
+        <a href="#">See All</a>
+      </div>
+
+      <div class="talent-row">
+        <div class="talent-img-wrapper">
+          <img src="https://i.pravatar.cc/150?u=10" alt="User">
+          <div class="status-dot online"></div>
+        </div>
+        <div class="talent-info">
+          <h5>Kenneth Silva</h5>
+          <p>Senior Fullstack Dev</p>
+          <div class="rating">
+            <i class="fa fa-star filled"></i> <strong>5.0</strong> (24 jobs)
+          </div>
+        </div>
+        <button class="btn-icon-add" title="Invite to Job"><i class="fa fa-user-plus"></i></button>
+      </div>
+
+      <div class="talent-row">
+        <div class="talent-img-wrapper">
+          <img src="https://i.pravatar.cc/150?u=20" alt="User">
+        </div>
+        <div class="talent-info">
+          <h5>Sarah Jenkins</h5>
+          <p>UI/UX Specialist</p>
+          <div class="rating">
+            <i class="fa fa-star filled"></i> <strong>4.9</strong> (12 jobs)
+          </div>
+        </div>
+        <button class="btn-icon-add" title="Invite to Job"><i class="fa fa-user-plus"></i></button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div class="modal-overlay" [class.active]="isModalOpen">
+  <div class="modal-card">
+    
+    <div class="modal-header">
+      <div class="header-content">
+        <h2>Post a Project</h2>
+        <p>Fill in the details to attract top talent.</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Project Title</label>
+        <input type="text" class="form-control" placeholder="e.g. Build an E-commerce App for IOS">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control">
+            <option>Web Development</option>
+            <option>Mobile Apps</option>
+            <option>UI/UX Design</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Experience Level</label>
+          <select class="form-control">
+            <option>Entry Level</option>
+            <option>Intermediate</option>
+            <option>Expert</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control text-area" placeholder="Describe deliverables, timeline, and requirements..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Required Skills (Comma separated)</label>
+        <input type="text" class="form-control" placeholder="Angular, Node.js, Figma...">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Project Type</label>
+          <div class="radio-group">
+            <label class="radio-btn"><input type="radio" name="type" checked> Hourly</label>
+            <label class="radio-btn"><input type="radio" name="type"> Fixed</label>
+          </div>
+        </div>
+        <div class="form-group budget-group">
+          <label>Budget Range ($)</label>
+          <div class="dual-input">
+            <input type="number" placeholder="Min" class="form-control">
+            <span class="dash">-</span>
+            <input type="number" placeholder="Max" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-area">
+        <i class="fa fa-cloud-upload-alt"></i>
+        <p><strong>Click to upload</strong> or drag and drop</p>
+        <small>PDF, DOCX, PNG up to 10MB</small>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Save Draft</button>
+      <button class="btn-publish">Publish Project</button>
+    </div>
+
+  </div>
+</div>

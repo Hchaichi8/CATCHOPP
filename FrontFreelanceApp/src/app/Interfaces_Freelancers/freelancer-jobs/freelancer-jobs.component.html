@@ -1,0 +1,149 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+      <div class="logo-mark">C</div><span class="logo-text">Catch<span>IQ</span></span>
+    </div>
+    <div class="nav-actions">
+      <a routerLink="/freelancer-jobs" class="nav-link active"><i class="fa fa-briefcase"></i> My Jobs</a>
+      <a href="#" class="nav-link"><i class="fa fa-comments"></i> Messages</a>
+      <div class="nav-divider"></div>
+      <div class="user-profile-menu">
+        <img src="https://i.pravatar.cc/150?u=10" alt="Kenneth">
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="main-layout">
+
+  <aside class="sidebar-left">
+    <div class="card earnings-card">
+      <h3>Earnings available</h3>
+      <div class="balance">$1,240.50</div>
+      <p class="pending">Pending: $450.00</p>
+      <button class="btn-withdraw">Withdraw Funds</button>
+    </div>
+
+    <nav class="side-menu">
+      <a href="#" class="menu-item active"><i class="fa fa-folder-open"></i> All Contracts</a>
+      <a href="#" class="menu-item"><i class="fa fa-file-signature"></i> Proposals (5)</a>
+      <a href="#" class="menu-item"><i class="fa fa-clock"></i> Time Tracker</a>
+      <a href="#" class="menu-item"><i class="fa fa-chart-line"></i> Reports</a>
+    </nav>
+  </aside>
+
+  <main class="content-area">
+    
+    <div class="page-header">
+      <h1>My Jobs</h1>
+      <button class="btn-primary" routerLink="/freelancer-feed">Find New Work</button>
+    </div>
+
+    <div class="tabs-container">
+      <button class="tab-btn" [class.active]="activeTab === 'active'" (click)="setActiveTab('active')">
+        Active Contracts
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'proposals'" (click)="setActiveTab('proposals')">
+        Proposals <span class="badge-count">3</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'completed'" (click)="setActiveTab('completed')">
+        Completed
+      </button>
+    </div>
+
+    <div class="job-list" *ngIf="activeTab === 'active'">
+      
+      <div class="card contract-card">
+        <div class="card-status in-progress">In Progress</div>
+        <div class="card-body">
+          <div class="job-main">
+            <h3><a href="#">SaaS Dashboard Refactoring</a></h3>
+            <span class="client-name">Client: Acme Corp</span>
+            <div class="job-meta">
+              <span><i class="fa fa-clock"></i> Hourly: $55.00/hr</span>
+              <span><i class="fa fa-calendar-alt"></i> Started Oct 20</span>
+            </div>
+          </div>
+          <div class="earnings-box">
+            <small>This Week</small>
+            <strong>$825.00</strong>
+            <span>15:00 hrs</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn-action primary"><i class="fa fa-clock"></i> Log Time</button>
+          <button class="btn-action secondary"><i class="fa fa-envelope"></i> Message</button>
+          <button class="btn-action secondary">View Contract</button>
+        </div>
+      </div>
+
+      <div class="card contract-card">
+        <div class="card-status in-progress">In Progress</div>
+        <div class="card-body">
+          <div class="job-main">
+            <h3><a href="#">Mobile App API Integration</a></h3>
+            <span class="client-name">Client: TechStart LLC</span>
+            <div class="job-meta">
+              <span><i class="fa fa-tag"></i> Fixed Price: $1,200</span>
+              <span><i class="fa fa-calendar-alt"></i> Due Nov 15</span>
+            </div>
+          </div>
+          <div class="earnings-box">
+            <small>Milestone 1</small>
+            <strong>$600.00</strong>
+            <span class="status-funded">Funded</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn-action primary"><i class="fa fa-upload"></i> Submit Work</button>
+          <button class="btn-action secondary"><i class="fa fa-envelope"></i> Message</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="proposal-list" *ngIf="activeTab === 'proposals'">
+      
+      <div class="card proposal-card">
+        <div class="prop-header">
+          <div class="prop-title">
+            <h3>E-commerce Website Redesign</h3>
+            <small>Submitted 2 days ago</small>
+          </div>
+          <div class="prop-status viewed">
+            <i class="fa fa-eye"></i> Client viewed your proposal
+          </div>
+        </div>
+        <div class="prop-details">
+          <span><strong>Bid:</strong> $55.00 / hr</span>
+          <span><strong>Cover Letter:</strong> "Hi, I have extensive experience..."</span>
+        </div>
+        <div class="prop-actions">
+          <button class="btn-link">View Job</button>
+          <button class="btn-link danger">Withdraw Proposal</button>
+        </div>
+      </div>
+
+      <div class="card proposal-card">
+        <div class="prop-header">
+          <div class="prop-title">
+            <h3>Python Script for Data Scraping</h3>
+            <small>Submitted 5 hours ago</small>
+          </div>
+          <div class="prop-status submitted">
+            <i class="fa fa-paper-plane"></i> Submitted
+          </div>
+        </div>
+        <div class="prop-details">
+          <span><strong>Bid:</strong> $400 Fixed</span>
+        </div>
+        <div class="prop-actions">
+          <button class="btn-link">View Job</button>
+          <button class="btn-link danger">Withdraw Proposal</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
