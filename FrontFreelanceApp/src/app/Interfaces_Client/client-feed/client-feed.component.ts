@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component , ElementRef,HostListener} from '@angular/core';
 
 @Component({
   selector: 'app-client-feed',
@@ -6,16 +6,36 @@ import { Component } from '@angular/core';
   styleUrl: './client-feed.component.css'
 })
 export class ClientFeedComponent {
-isModalOpen: boolean = false;
+// State for Create Project Modal
+  isProjectModalOpen: boolean = false;
 
-  openModal() {
-    this.isModalOpen = true;
+  // State for Messages Dropdown
+  isMessagesOpen: boolean = false;
+
+  constructor(private eRef: ElementRef) {}
+
+  // --- Project Modal Logic ---
+  openProjectModal() {
+    this.isProjectModalOpen = true;
     document.body.style.overflow = 'hidden'; // Lock background scroll
   }
 
-  closeModal() {
-    this.isModalOpen = false;
+  closeProjectModal() {
+    this.isProjectModalOpen = false;
     document.body.style.overflow = 'auto'; // Unlock background scroll
+  }
+
+  // --- Messages Dropdown Logic ---
+  toggleMessages() {
+    this.isMessagesOpen = !this.isMessagesOpen;
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.isMessagesOpen = false;
+    }
   }
 
 }

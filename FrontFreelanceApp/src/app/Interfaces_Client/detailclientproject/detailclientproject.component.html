@@ -1,0 +1,224 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <div class="logo-mark">C</div>
+      <span class="logo-text">Catch<span>IQ</span></span>
+    </div>
+    <div class="nav-search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Search freelancers or services...">
+    </div>
+    <div class="nav-actions">
+      <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
+      <div class="nav-divider"></div>
+      <div class="user-profile-menu">
+        <img src="https://placehold.co/40x40/198754/white?text=Me" alt="Profile">
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="details-layout">
+  
+  <div class="back-row">
+    <a routerLink="/ClientFeed" class="back-link"><i class="fa fa-arrow-left"></i> Back to My Jobs</a>
+    <div class="status-indicator open">
+    <br>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    
+    <main class="main-details">
+      <div class="card detail-card">
+        
+        <div class="project-header">
+          <div class="header-top">
+            <span class="category-badge">Web Development</span>
+            <span class="time-badge">Posted 2 hours ago</span>
+          </div>
+          <div class="title-row">
+             <h1>Senior Angular Developer for SaaS Dashboard Refactoring</h1>
+             <button class="btn-icon-edit" title="Edit Title"><i class="fa fa-pen"></i></button>
+          </div>
+          <div class="project-meta">
+            <span><i class="fa fa-globe-americas"></i> Worldwide</span>
+            <span class="separator">•</span>
+            <span><i class="fa fa-clock"></i> Hourly Project</span>
+            <span class="separator">•</span>
+            <span><i class="fa fa-layer-group"></i> Intermediate Level</span>
+          </div>
+        </div>
+
+        <div class="tabs-row">
+          <button class="tab-btn" [class.active]="currentTab === 'details'" (click)="setTab('details')">View Job Post</button>
+          <button class="tab-btn" [class.active]="currentTab === 'proposals'" (click)="setTab('proposals')">Review Proposals <span class="badge">8</span></button>
+          <button class="tab-btn" [class.active]="currentTab === 'invite'" (click)="setTab('invite')">Invite Talent <span class="badge">0</span></button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div *ngIf="currentTab === 'details'" class="tab-content fade-in">
+            <div class="section description-section">
+              <h3>Project Description</h3>
+              <p>
+                We are a fintech startup looking for an experienced Angular Developer to help us refactor our main client dashboard. 
+                The current codebase is built on Angular 14, and we are upgrading to Angular 18 with standalone components.
+              </p>
+              <p><strong>Key Responsibilities:</strong></p>
+              <ul>
+                <li>Migrate legacy modules to standalone components.</li>
+                <li>Implement NgRx for better state management.</li>
+                <li>Optimize load times and fix existing UI bugs using TailwindCSS.</li>
+              </ul>
+            </div>
+            <div class="divider"></div>
+            <div class="section skills-section">
+              <h3>Skills & Expertise</h3>
+              <div class="tags-container">
+                <span class="skill-tag">Angular</span><span class="skill-tag">RxJS</span><span class="skill-tag">Tailwind CSS</span>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="section screening-section">
+                <h3>Screening Questions</h3>
+                <ul class="question-list">
+                    <li>1. Have you worked with Angular 17+ Standalone components?</li>
+                    <li>2. Please share a link to a dashboard you have built recently.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div *ngIf="currentTab === 'proposals'" class="tab-content fade-in">
+            <div class="filter-bar">
+                <span class="filter-label">Sort by:</span>
+                <select class="filter-select"><option>Best Match</option><option>Newest</option><option>Lowest Rate</option></select>
+            </div>
+
+            <div class="applicant-card">
+                <div class="applicant-header">
+                    <div class="app-avatar"><img src="https://placehold.co/50x50/3b82f6/ffffff?text=SJ"></div>
+                    <div class="app-info">
+                        <h4>Sarah Jenkins <span class="badge-top-rated"><i class="fa fa-medal"></i> Top Rated</span></h4>
+                        <p>Senior Angular Specialist</p>
+                        <div class="app-meta">Tunisia • 100% Job Success</div>
+                    </div>
+                    <div class="app-bid">
+                        <div class="bid-amount">$55.00 <span>/hr</span></div>
+                        <div class="bid-actions">
+                            <button class="btn-sm btn-outline">Message</button>
+                            <button class="btn-sm btn-primary" (click)="setTab('hire')">Hire</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-cover">
+                    <p>
+                        "Hi there! I have extensive experience migrating Angular 14 apps to 18. I recently completed a similar migration for a banking app. I am an expert in NgRx and standalone components..."
+                        <a href="#" class="read-more">more</a>
+                    </p>
+                </div>
+                <div class="app-skills">
+                    <span>Angular 18</span><span>NgRx</span><span>Migration</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="applicant-card">
+                <div class="applicant-header">
+                    <div class="app-avatar"><img src="https://placehold.co/50x50/f59e0b/ffffff?text=DK"></div>
+                    <div class="app-info">
+                        <h4>David Kim</h4>
+                        <p>Full Stack Developer</p>
+                        <div class="app-meta">Canada • 95% Job Success</div>
+                    </div>
+                    <div class="app-bid">
+                        <div class="bid-amount">$50.00 <span>/hr</span></div>
+                        <div class="bid-actions">
+                            <button class="btn-sm btn-outline">Message</button>
+                            <button class="btn-sm btn-primary" (click)="setTab('hire')">Hire</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-cover">
+                    <p>"Hello, I am interested in your project. I have worked with Angular for 5 years..."</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="currentTab === 'invite'" class="tab-content fade-in">
+            <div class="invite-search-bar">
+                <input type="text" placeholder="Search for skills (e.g. Angular, RxJS)...">
+                <button><i class="fa fa-search"></i></button>
+            </div>
+
+            <h4 class="section-title">Recommended for you</h4>
+            
+            <div class="freelancer-row">
+                <div class="f-avatar"><img src="https://placehold.co/60x60/8b5cf6/ffffff?text=EL"></div>
+                <div class="f-details">
+                    <div class="f-top">
+                        <h5>Elena Lou <span class="badge-top-rated"><i class="fa fa-medal"></i> Top Rated</span></h5>
+                        <span class="f-rate">$65/hr</span>
+                    </div>
+                    <p class="f-title">UI/UX Engineer & Angular Expert</p>
+                    <p class="f-bio">Specializing in high-performance dashboards and data visualization.</p>
+                    <div class="f-tags"><span>Angular</span><span>D3.js</span></div>
+                </div>
+                <div class="f-action">
+                    <button class="btn-invite">Invite to Job</button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="freelancer-row">
+                <div class="f-avatar"><img src="https://placehold.co/60x60/ec4899/ffffff?text=MJ"></div>
+                <div class="f-details">
+                    <div class="f-top">
+                        <h5>Mark Jones</h5>
+                        <span class="f-rate">$45/hr</span>
+                    </div>
+                    <p class="f-title">Frontend Developer</p>
+                    <p class="f-bio">Passionate about clean code and modern UI frameworks.</p>
+                    <div class="f-tags"><span>Angular</span><span>Tailwind</span></div>
+                </div>
+                <div class="f-action">
+                    <button class="btn-invite invited"><i class="fa fa-check"></i> Invited</button>
+                </div>
+            </div>
+        </div>
+  
+
+      </div>
+    </main>
+
+    <aside class="sidebar-details">
+      <div class="card action-widget">
+        <h4>Manage Posting</h4>
+        <div class="budget-display">
+          <small>Hourly Range</small>
+          <h2>$45.00 - $60.00</h2>
+        </div>
+        <div class="action-buttons">
+          <button class="btn-primary-full"><i class="fa fa-pen"></i> Edit Posting</button>
+          <button class="btn-outline-full" (click)="setTab('invite')"><i class="fa fa-user-plus"></i> Invite Freelancers</button>
+          <button class="btn-danger-outline"><i class="fa fa-ban"></i> Close Job</button>
+        </div>
+        <div class="visibility-row">
+            <i class="fa fa-eye"></i> Visibility: <strong>Public</strong>
+        </div>
+      </div>
+
+      <div class="card stats-widget">
+        <h4>Applicant Statistics</h4>
+        <ul class="stats-list">
+          <li><div class="stat-row"><span>Proposals</span><strong>8</strong></div><div class="progress-mini"><div class="fill" style="width: 20%"></div></div></li>
+          <li><div class="stat-row"><span>Interviews</span><strong>1</strong></div></li>
+          <li><div class="stat-row"><span>Invites Sent</span><strong>4</strong></div></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>

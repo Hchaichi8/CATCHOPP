@@ -7,4 +7,12 @@ import { Component } from '@angular/core';
 })
 export class ClientProfileComponent {
 
+
+  currentTab: string = 'about'; 
+
+  // Function to switch tabs
+  setTab(tabName: string) {
+    this.currentTab = tabName;
+  }
+
 }

@@ -1,22 +1,34 @@
-<div class="dashboard-layout">
-  
-  <aside class="sidebar-left">
-    <div class="logo-area">
-      <h2 href="/ClientFeed">Catch<span>IQ</span></h2>
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
     </div>
-    <nav class="side-menu">
-      <a href="/ClientDashboard"><i class="fa fa-th-large"></i> Dashboard</a>
-      <a href="#" class="active"><i class="fa fa-users"></i> Proposals</a>
-      <a href="#"><i class="fa fa-comment-dots"></i> Messages</a>
-      <a href="#"><i class="fa fa-cog"></i> Settings</a>
-    </nav>
-  </aside>
+
+    <div class="nav-menu">
+      <a routerLink="/ClientFeed" routerLinkActive="active"><i class="fa fa-stream"></i> Feed</a>
+      <a routerLink="/ClientDashboard" routerLinkActive="active"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a routerLink="/ClientProfileManager" routerLinkActive="active"><i class="fa fa-user-circle"></i> Profile</a>
+      <a routerLink="/AllProjects" routerLinkActive="active" class="active-link"><i class="fa fa-folder-open"></i> Projects</a>
+      <a routerLink="/Messages" routerLinkActive="active"><i class="fa fa-comment-dots"></i> Messages</a>
+      <a routerLink="/ClientWallet" routerLinkActive="active"><i class="fa fa-wallet"></i> Payments</a>
+    </div>
+
+    <div class="nav-actions">
+        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
+        <div class="user-profile">
+            <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
 
   <main class="main-content">
     
     <header class="top-header">
       <div class="header-left">
-        <a routerLink="/ClientDashboard" class="back-link"><i class="fa fa-arrow-left"></i> Back</a>
+        <a routerLink="/AllProjects" class="back-link"><i class="fa fa-arrow-left"></i> Back to Projects</a>
         <h1>Manage Proposals</h1>
         <p>Project: <strong>Senior Angular Developer for SaaS Dashboard</strong></p>
       </div>
@@ -29,6 +41,10 @@
         <div class="stat-pill">
           <span class="label">Avg Bid</span>
           <span class="value">$51/hr</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Shortlisted</span>
+          <span class="value">2</span>
         </div>
       </div>
     </header>
@@ -72,12 +88,12 @@
             <i class="fa fa-times"></i> Refuse
           </button>
           <button class="btn-accept" (click)="updateStatus(p.id, 'accepted')">
-            <i class="fa fa-check"></i> Accept
+            <i class="fa fa-check"></i> Accept / Interview
           </button>
         </div>
 
-        <div class="card-footer" *ngIf="p.status !== 'pending'">
-          <button class="btn-view">View Profile</button>
+        <div class="card-footer">
+          <button class="btn-view" routerLink="/FreelancerProfil">View Full Profile</button>
         </div>
 
       </div>

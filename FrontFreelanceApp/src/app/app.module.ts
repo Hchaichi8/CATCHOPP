@@ -11,7 +11,7 @@ import { LoginClientComponent } from './Interfaces_Authentification/login-client
 import { RegisterFreelancerComponent } from './Interfaces_Authentification/register-freelancer/register-freelancer.component';
 import { RegisterClientComponent } from './Interfaces_Authentification/register-client/register-client.component';
 import { ClientFeedComponent } from './Interfaces_Client/client-feed/client-feed.component';
-import { ProjectDetailsComponent } from './Interfaces_Client/project-details/project-details.component';
+import { ProjectDetailsComponent } from './Interfaces_Freelancers/project-details/project-details.component';
 import { ClientDashboardComponent } from './Interfaces_Client/client-dashboard/client-dashboard.component';
 import { ProjectProposalsComponent } from './Interfaces_Client/project-proposals/project-proposals.component';
 import { AllProjectsComponent } from './Interfaces_Client/all-projects/all-projects.component';
@@ -20,6 +20,16 @@ import { CommonModule } from '@angular/common';
 import { VirtualContractComponent } from './Interfaces_Client/virtual-contract/virtual-contract.component';
 import { FreelancerFeedComponent } from './Interfaces_Freelancers/freelancer-feed/freelancer-feed.component';
 import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-jobs/freelancer-jobs.component';
+import { FreelancerProfilComponent } from './Interfaces_Freelancers/freelancer-profil/freelancer-profil.component';
+import { DetailclientprojectComponent } from './Interfaces_Client/detailclientproject/detailclientproject.component';
+import { ProfileManagerComponent } from './Interfaces_Freelancers/profile-manager/profile-manager.component';
+import { LeaderboardFreelancerComponent } from './Interfaces_Freelancers/leaderboard-freelancer/leaderboard-freelancer.component';
+import { ClientWalletComponent } from './Interfaces_Client/client-wallet/client-wallet.component';
+import { ClientProfilManagerComponent } from './Interfaces_Client/client-profil-manager/client-profil-manager.component';
+import { DashboardFreelancerComponent } from './Interfaces_Freelancers/dashboard-freelancer/dashboard-freelancer.component';
+import { FreelancerWalletComponent } from './Interfaces_Freelancers/freelancer-wallet/freelancer-wallet.component';
+import { MessengerComponent } from './interface_communication/messenger/messenger.component';
+import { TechnicalSupportComponent } from './interface_communication/technical-support/technical-support.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +51,16 @@ import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-job
         VirtualContractComponent,
         FreelancerFeedComponent,
         FreelancerJobsComponent,
+        FreelancerProfilComponent,
+        DetailclientprojectComponent,
+        ProfileManagerComponent,
+        LeaderboardFreelancerComponent,
+        ClientWalletComponent,
+        ClientProfilManagerComponent,
+        DashboardFreelancerComponent,
+        FreelancerWalletComponent,
+        MessengerComponent,
+        TechnicalSupportComponent,
         
   ],
   imports: [
