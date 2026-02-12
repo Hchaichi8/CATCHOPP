@@ -1,0 +1,170 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/AdminDashboard">
+      <img src="assets/logo.png" alt="CatchIQ Admin" class="logo-img">
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+    <div class="nav-menu">
+      <a routerLink="/AdminDashboard" routerLinkActive="active"><i class="fa fa-chart-line"></i> Overview</a>
+      <a routerLink="/AdminUsers" routerLinkActive="active"><i class="fa fa-users-cog"></i> Users</a>
+      <a routerLink="/AdminJobs" routerLinkActive="active"><i class="fa fa-briefcase"></i> Jobs</a>
+      <a routerLink="/AdminFinance" routerLinkActive="active"><i class="fa fa-wallet"></i> Finance</a>
+      <a routerLink="/AdminDisputes" routerLinkActive="active" class="active-link"><i class="fa fa-gavel"></i> Disputes</a>
+    </div>
+
+    <div class="nav-actions">
+        <div class="user-profile">
+            <img src="https://placehold.co/40x40/1f2937/ffffff?text=AD" alt="Admin">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
+  <main class="main-content">
+    
+    <header class="page-header">
+      <div class="header-text">
+        <h1>Dispute Resolution Center</h1>
+        <p> mediate conflicts and manage escrow releases.</p>
+      </div>
+      <div class="header-stats-mini">
+          <div class="stat-bubble warning"><strong>4</strong> Open</div>
+          <div class="stat-bubble"><strong>$3,450</strong> At Risk</div>
+      </div>
+    </header>
+
+    <div class="dispute-layout">
+        
+        <aside class="dispute-list-panel">
+            <div class="panel-header">
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search ID or User...">
+                </div>
+                <button class="btn-icon-filter"><i class="fa fa-filter"></i></button>
+            </div>
+
+            <div class="list-scroll">
+                
+                <div class="dispute-item active">
+                    <div class="item-top">
+                        <span class="d-id">#DSP-9921</span>
+                        <span class="d-time">2h ago</span>
+                    </div>
+                    <h4>SaaS Dashboard Refactoring</h4>
+                    <div class="item-parties">
+                        <small>Client: Acme Corp</small>
+                        <i class="fa fa-arrow-right"></i>
+                        <small>Freelancer: Kenneth</small>
+                    </div>
+                    <div class="item-footer">
+                        <span class="badge warning">Escalated</span>
+                        <span class="amount">$2,500</span>
+                    </div>
+                </div>
+
+                <div class="dispute-item">
+                    <div class="item-top">
+                        <span class="d-id">#DSP-8812</span>
+                        <span class="d-time">1d ago</span>
+                    </div>
+                    <h4>Mobile App UI Design</h4>
+                    <div class="item-parties">
+                        <small>Client: TechStart</small>
+                        <i class="fa fa-arrow-right"></i>
+                        <small>Freelancer: Sarah</small>
+                    </div>
+                    <div class="item-footer">
+                        <span class="badge info">Investigating</span>
+                        <span class="amount">$800</span>
+                    </div>
+                </div>
+
+                <div class="dispute-item">
+                    <div class="item-top">
+                        <span class="d-id">#DSP-7741</span>
+                        <span class="d-time">3d ago</span>
+                    </div>
+                    <h4>Logo Design</h4>
+                    <div class="item-parties">
+                        <small>Client: BrandInc</small>
+                        <i class="fa fa-arrow-right"></i>
+                        <small>Freelancer: John</small>
+                    </div>
+                    <div class="item-footer">
+                        <span class="badge info">Evidence Pending</span>
+                        <span class="amount">$150</span>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <div class="dispute-detail-panel">
+            
+            <div class="detail-header">
+                <div class="dh-left">
+                    <h2>#DSP-9921: Non-Delivery of Work</h2>
+                    <span class="status-pill warning">Escalated to Admin</span>
+                </div>
+                <div class="dh-right">
+                    <div class="escrow-box">
+                        <small>Held in Escrow</small>
+                        <strong>$2,500.00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="evidence-container">
+                
+                <div class="system-message">
+                    <span>Dispute created by <strong>Acme Corp</strong> on Feb 12, 2026. Reason: "Deadlines missed, code not working."</span>
+                </div>
+
+                <div class="msg-row client">
+                    <img src="https://placehold.co/40x40/198754/ffffff?text=AC" class="avatar">
+                    <div class="msg-bubble">
+                        <div class="msg-meta">Acme Corp (Client)</div>
+                        <p>We established a deadline for Feb 10th. The freelancer has not delivered the final build and is unresponsive. We want a full refund.</p>
+                        <div class="attachment"><i class="fa fa-file-pdf"></i> contract_terms.pdf</div>
+                    </div>
+                </div>
+
+                <div class="msg-row freelancer">
+                    <div class="msg-bubble">
+                        <div class="msg-meta">Kenneth Silva (Freelancer)</div>
+                        <p>The client changed requirements last minute (see attached email). I have completed 80% of the work and deployed it to the staging server.</p>
+                        <div class="attachment"><i class="fa fa-link"></i> staging.catchiq.com/demo</div>
+                    </div>
+                    <img src="https://i.pravatar.cc/150?u=10" class="avatar">
+                </div>
+
+                <div class="system-message">
+                    <span><strong>Admin Note:</strong> Reviewing staging link provided by Freelancer. Code appears functional but UI incomplete.</span>
+                </div>
+
+            </div>
+
+            <div class="action-footer">
+                <div class="footer-title">Admin Decision</div>
+                <div class="footer-btns">
+                    <button class="btn-action refund">
+                        <i class="fa fa-undo"></i> Refund Client (100%)
+                    </button>
+                    <button class="btn-action split">
+                        <i class="fa fa-handshake"></i> Split Funds
+                    </button>
+                    <button class="btn-action release">
+                        <i class="fa fa-check"></i> Release to Freelancer
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+  </main>
+</div>

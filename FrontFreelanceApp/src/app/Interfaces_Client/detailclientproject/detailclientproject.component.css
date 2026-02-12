@@ -13,10 +13,8 @@
 /* --- Common Navbar & Layout Styles (Same as before) --- */
 .navbar { position: sticky; top: 0; z-index: 1000; background: var(--surface); border-bottom: 1px solid var(--border); height: 64px; }
 .nav-container { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
-.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
-.logo-mark { width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-.logo-text { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
-.logo-text span { color: var(--primary); }
+.nav-brand { display: flex; align-items: center; cursor: pointer; height: 100%; }
+.logo-img { height: 50px; width: auto; object-fit: contain; }
 .nav-search { flex: 0 1 400px; position: relative; }
 .nav-search i { position: absolute; left: 12px; top: 10px; color: var(--text-muted); }
 .nav-search input { width: 100%; padding: 10px 10px 10px 38px; border-radius: 8px; border: 1px solid var(--border); background: #f9fafb; outline: none; }

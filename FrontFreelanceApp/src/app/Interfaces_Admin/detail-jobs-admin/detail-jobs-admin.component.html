@@ -1,0 +1,177 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/AdminDashboard">
+      <img src="assets/logo.png" alt="CatchIQ Admin" class="logo-img">
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+    <div class="nav-menu">
+      <a routerLink="/AdminDashboard" routerLinkActive="active"><i class="fa fa-chart-line"></i> Overview</a>
+      <a routerLink="/AdminUsers" routerLinkActive="active"><i class="fa fa-users-cog"></i> Users</a>
+      <a routerLink="/AdminJobs" routerLinkActive="active" class="active-link"><i class="fa fa-briefcase"></i> Jobs</a>
+      <a routerLink="/AdminFinance" routerLinkActive="active"><i class="fa fa-wallet"></i> Finance</a>
+      <a routerLink="/AdminDisputes" routerLinkActive="active"><i class="fa fa-gavel"></i> Disputes</a>
+    </div>
+
+    <div class="nav-actions">
+        <div class="user-profile">
+            <img src="https://placehold.co/40x40/1f2937/ffffff?text=AD" alt="Admin">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
+  <main class="main-content">
+    
+    <header class="page-header">
+      <div class="header-left">
+        <a routerLink="/AdminJobs" class="back-link"><i class="fa fa-arrow-left"></i> Back to Jobs List</a>
+        <div class="title-row">
+            <h1>SaaS Dashboard Refactoring</h1>
+            <span class="status-badge active">In Progress</span>
+        </div>
+        <p class="job-id">Job ID: #JOB-9921 • Posted on Feb 10, 2026</p>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn-outline-danger"><i class="fa fa-ban"></i> Suspend Job</button>
+        <button class="btn-primary"><i class="fa fa-file-invoice"></i> View Invoice</button>
+      </div>
+    </header>
+
+    <div class="detail-grid">
+      
+      <div class="col-main">
+        
+        <div class="card content-card">
+            <h3>Description</h3>
+            <div class="description-text">
+                <p>We are looking for an expert Angular developer to refactor our existing legacy dashboard. The goal is to modernize the codebase, implement NgRx for state management, and improve load times by 40%.</p>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>Deep knowledge of Angular 16+ and RxJS</li>
+                    <li>Experience with large-scale SaaS applications</li>
+                    <li>Ability to work in EST timezone overlap</li>
+                </ul>
+            </div>
+            
+            <div class="skills-row">
+                <span class="skill-tag">Angular</span>
+                <span class="skill-tag">TypeScript</span>
+                <span class="skill-tag">SaaS</span>
+                <span class="skill-tag">NgRx</span>
+            </div>
+        </div>
+
+        <div class="card content-card">
+            <h3><i class="fa fa-shield-alt"></i> Financial & Escrow Status</h3>
+            
+            <div class="escrow-grid">
+                <div class="escrow-item">
+                    <span class="label">Total Budget</span>
+                    <span class="amount">$5,500.00</span>
+                </div>
+                <div class="escrow-item">
+                    <span class="label">In Escrow (Locked)</span>
+                    <span class="amount locked">$2,500.00</span>
+                </div>
+                <div class="escrow-item">
+                    <span class="label">Released / Paid</span>
+                    <span class="amount paid">$3,000.00</span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="fill" style="width: 55%"></div>
+                </div>
+                <small>55% of budget released</small>
+            </div>
+        </div>
+
+        <div class="card content-card">
+            <h3>Activity Log</h3>
+            <ul class="timeline">
+                <li class="timeline-item">
+                    <div class="time-marker"></div>
+                    <div class="time-content">
+                        <strong>Milestone 2 Released</strong>
+                        <p>Client released $1,500.00 from escrow.</p>
+                        <span class="time">Today, 10:30 AM</span>
+                    </div>
+                </li>
+                <li class="timeline-item">
+                    <div class="time-marker"></div>
+                    <div class="time-content">
+                        <strong>Contract Started</strong>
+                        <p>Offer accepted by Freelancer (Kenneth Silva).</p>
+                        <span class="time">Feb 12, 2026</span>
+                    </div>
+                </li>
+                <li class="timeline-item">
+                    <div class="time-marker"></div>
+                    <div class="time-content">
+                        <strong>Job Posted</strong>
+                        <p>Job created by Client (Acme Corp).</p>
+                        <span class="time">Feb 10, 2026</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+      </div>
+
+      <aside class="col-side">
+        
+        <div class="card side-card">
+            <div class="card-head">
+                <h4>Client</h4>
+                <a href="#">View Profile</a>
+            </div>
+            <div class="user-row">
+                <img src="https://placehold.co/50x50/198754/ffffff?text=AC" class="avatar">
+                <div>
+                    <h5>Acme Corp</h5>
+                    <span class="meta-text">United States</span>
+                </div>
+            </div>
+            <div class="stats-mini">
+                <div><strong>$45k</strong> Spent</div>
+                <div><strong>4.9</strong> Rating</div>
+            </div>
+        </div>
+
+        <div class="card side-card">
+            <div class="card-head">
+                <h4>Freelancer (Hired)</h4>
+                <a href="#">View Profile</a>
+            </div>
+            <div class="user-row">
+                <img src="https://i.pravatar.cc/150?u=10" class="avatar">
+                <div>
+                    <h5>Kenneth Silva</h5>
+                    <span class="meta-text">Tunisia</span>
+                </div>
+            </div>
+            <div class="stats-mini">
+                <div><strong>$12k</strong> Earned</div>
+                <div><strong>5.0</strong> Rating</div>
+            </div>
+        </div>
+
+        <div class="card side-card admin-tools">
+            <h4>Admin Actions</h4>
+            <div class="tool-list">
+                <button class="tool-btn"><i class="fa fa-flag"></i> View Reports (0)</button>
+                <button class="tool-btn"><i class="fa fa-history"></i> Change Log</button>
+                <button class="tool-btn text-red"><i class="fa fa-trash-alt"></i> Delete Job</button>
+            </div>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </main>
+</div>

@@ -30,6 +30,11 @@ import { DashboardFreelancerComponent } from './Interfaces_Freelancers/dashboard
 import { FreelancerWalletComponent } from './Interfaces_Freelancers/freelancer-wallet/freelancer-wallet.component';
 import { MessengerComponent } from './interface_communication/messenger/messenger.component';
 import { TechnicalSupportComponent } from './interface_communication/technical-support/technical-support.component';
+import { DashboardAdminComponent } from './Interfaces_Admin/dashboard-admin/dashboard-admin.component';
+import { UserAdminComponent } from './Interfaces_Admin/user-admin/user-admin.component';
+import { JobsAdminComponent } from './Interfaces_Admin/jobs-admin/jobs-admin.component';
+import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/detail-jobs-admin.component';
+import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
 
 @NgModule({
   declarations: [
@@ -61,6 +66,11 @@ import { TechnicalSupportComponent } from './interface_communication/technical-s
         FreelancerWalletComponent,
         MessengerComponent,
         TechnicalSupportComponent,
+        DashboardAdminComponent,
+        UserAdminComponent,
+        JobsAdminComponent,
+        DetailJobsAdminComponent,
+        DisputesAdminComponent,
         
   ],
   imports: [

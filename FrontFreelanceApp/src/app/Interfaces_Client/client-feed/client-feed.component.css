@@ -47,7 +47,7 @@
 }
 
 .nav-brand { display: flex; align-items: center; cursor: pointer; height: 100%; }
-.logo-img { height: 40px; width: auto; object-fit: contain; }
+.logo-img { height: 50px; width: auto; object-fit: contain; }
 
 /* Search */
 .nav-search { flex: 0 1 420px; position: relative; display: flex; align-items: center; }
