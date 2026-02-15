@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RequestMapping("/Project")
 public class ProjectController {
 
@@ -26,13 +27,22 @@ public class ProjectController {
         return service.getAllProjects();
     }
 
+    @GetMapping("/{id}")
+    public Project getProjectById(@PathVariable Long id) {
+        return service.getProjectById(id);
+    }
+
+    @PutMapping("/{projectId}/react")
+    public Project reactToProject(@PathVariable Long projectId, @RequestParam String type) {
+        return service.reactToProject(projectId, type);
+    }
 
     @PostMapping("/{projectId}/proposals")
     public Proposal submitProposal(@PathVariable Long projectId, @RequestBody Proposal proposal) {
         return service.createProposal(projectId, proposal);
     }
 
-    // 4. View all proposals for a specific project (Client action)
+
     @GetMapping("/{projectId}/proposals")
     public List<Proposal> getProposals(@PathVariable Long projectId) {
         return service.getProposalsForProject(projectId);

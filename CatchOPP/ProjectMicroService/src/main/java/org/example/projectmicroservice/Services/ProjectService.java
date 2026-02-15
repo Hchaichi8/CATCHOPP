@@ -38,17 +38,26 @@ public class ProjectService {
         proposal.setProject(project);
         return proposalRepo.save(proposal);
     }
-
     public List<Proposal> getProposalsForProject(Long projectId) {
         return proposalRepo.findByProjectId(projectId);
     }
-
-    // Change le type de String -> StatusProposal
     public Proposal updateProposalStatus(Long proposalId, StatusProposal newStatus) {
         Proposal proposal = proposalRepo.findById(proposalId)
                 .orElseThrow(() -> new RuntimeException("Proposal not found"));
 
         proposal.setStatus(newStatus);
         return proposalRepo.save(proposal);
+    }
+    public Project reactToProject(Long id, String reactionType) {
+        Project project = getProjectById(id);
+
+        switch (reactionType.toUpperCase()) {
+            case "LIKE": project.setLikes(project.getLikes() + 1); break;
+            case "LOVE": project.setLoves(project.getLoves() + 1); break;
+            case "HAHA": project.setHahas(project.getHahas() + 1); break;
+            case "SUPPORT": project.setSupports(project.getSupports() + 1); break;
+        }
+
+        return projectRepo.save(project);
     }
 }
