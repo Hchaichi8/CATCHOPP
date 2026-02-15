@@ -30,6 +30,7 @@ import { UserAdminComponent } from './Interfaces_Admin/user-admin/user-admin.com
 import { JobsAdminComponent } from './Interfaces_Admin/jobs-admin/jobs-admin.component';
 import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/detail-jobs-admin.component';
 import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
+import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
 
 const routes: Routes = [
 
@@ -52,7 +53,7 @@ const routes: Routes = [
  {path:'AllProjects',component:AllProjectsComponent, },
  {path:'ClientProfil',component:ClientProfileComponent, },
  {path:'VirtualContract',component:VirtualContractComponent, },
- {path:'ClientDetailProject',component:DetailclientprojectComponent, },
+ {path:'ClientDetailProject/:id',component:DetailclientprojectComponent, },
  {path:'ClientProfileManager',component:ClientProfilManagerComponent, },
  {path:'ClientWallet',component:ClientWalletComponent, },
 
@@ -77,6 +78,8 @@ const routes: Routes = [
 {path:'AdminJobs',component:JobsAdminComponent, },
 {path:'DetailJobs',component:DetailJobsAdminComponent, },
 {path:'AdminDisputes',component:DisputesAdminComponent, },
+{path:'AdminFinance',component:FinanceAdminComponent, },
+
 
 
 

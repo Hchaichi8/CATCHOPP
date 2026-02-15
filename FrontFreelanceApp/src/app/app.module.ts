@@ -35,6 +35,9 @@ import { UserAdminComponent } from './Interfaces_Admin/user-admin/user-admin.com
 import { JobsAdminComponent } from './Interfaces_Admin/jobs-admin/jobs-admin.component';
 import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/detail-jobs-admin.component';
 import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
+import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -71,12 +74,15 @@ import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disput
         JobsAdminComponent,
         DetailJobsAdminComponent,
         DisputesAdminComponent,
+        FinanceAdminComponent,
         
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    CommonModule
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
     
   ],
   providers: [],

@@ -7,11 +7,10 @@
 
     <div class="nav-search">
       <i class="fa fa-search"></i>
-      <input type="text" placeholder="Search freelancers or services...">
+      <input type="text" [(ngModel)]="searchText" (keyup)="applyFilters()" placeholder="Search projects or keywords...">
     </div>
 
     <div class="nav-actions">
-      
       <div class="icon-btn-wrapper">
         <button class="nav-icon-btn" (click)="toggleMessages(); $event.stopPropagation()" [class.active]="isMessagesOpen">
           <i class="fa fa-comment-dots"></i>
@@ -81,41 +80,122 @@
       </div>
     </div>
 
-    <div class="feed-stream">
-      <article class="card project-post">
-        <div class="post-header">
-          <img src="https://placehold.co/48x48/198754/white?text=A" class="sm-avatar">
-          <div class="meta">
-            <h4>Acme Corp <i class="fa fa-check-circle verified-icon"></i></h4>
-            <span>Posted 2 hours ago • Global</span>
-          </div>
-          <button class="options-btn"><i class="fa fa-ellipsis-h"></i></button>
-        </div>
-        <div class="post-body">
-          <h2 class="title">Senior Angular Developer for SaaS Dashboard</h2>
-          <p class="desc">
-            We are looking for an expert to refactor our existing dashboard. 
-            Must be proficient in <strong>RxJS</strong>, <strong>NgRx</strong>, and <strong>TailwindCSS</strong>.
-          </p>
-          <div class="tags">
-            <span class="tag-pill">Development</span>
-            <span class="tag-pill">Remote</span>
-            <span class="tag-pill green">$45 - $60 / hr</span>
-          </div>
-        </div>
-        <div class="post-footer">
-          <div class="applicants">
-            <div class="avatars">
-              <img src="https://i.pravatar.cc/150?u=1">
-              <img src="https://i.pravatar.cc/150?u=2">
-              <img src="https://i.pravatar.cc/150?u=3">
-            </div>
-            <span>8 Proposals received</span>
-          </div>
-          <button class="btn-primary-outline" routerLink="/ClientDetailProject">View Details</button>
-        </div>
-      </article>
+     <div class="card filter-bar">
+      <div class="filter-group">
+        <label>Category:</label>
+        <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
+          <option value="All">All Categories</option>
+          <option value="WEB_DEVELOPMENT">Web Development</option>
+          <option value="MOBILE_DEVELOPMENT">Mobile Dev</option>
+          <option value="UI_UX_DESIGN">UI/UX Design</option>
+          <option value="DIGITAL_MARKETING">Marketing</option>
+          <option value="DATA_SCIENCE_AI">Data & AI</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Level:</label>
+        <select [(ngModel)]="selectedExperience" (change)="applyFilters()">
+          <option value="All">All Levels</option>
+          <option value="Entry Level">Entry Level</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Expert">Expert</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Sort:</label>
+        <select [(ngModel)]="selectedSort" (change)="applyFilters()">
+          <option value="Newest">Newest</option>
+          <option value="Highest Budget">Highest Budget</option>
+        </select>
+      </div>
     </div>
+
+  <div class="feed-stream">
+  
+  <div class="empty-state card" *ngIf="filteredProjects.length === 0">
+    <i class="fa fa-search"></i>
+    <h3>No projects found</h3>
+    <p>Try adjusting your search or filters.</p>
+    <button class="btn-primary-outline" style="margin-top: 15px;" (click)="clearFilters()" *ngIf="searchText || selectedExperience !== 'All' || selectedSort !== 'Newest'">Clear Filters</button>
+  </div>
+
+  <article class="card project-post premium-card" *ngFor="let p of filteredProjects">
+    
+    <div class="post-header">
+      <div class="client-info">
+        <img src="https://placehold.co/48x48/198754/white?text=A" class="client-avatar" alt="Client Avatar">
+        <div class="client-meta">
+          <h4>Acme Corp <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
+          <span class="post-time"><i class="far fa-clock"></i> Posted {{ p.postedAt }}</span> 
+        </div>
+      </div>
+    <div class="post-actions">
+        
+      <div class="reaction-wrapper" [class.force-hide]="p.justReacted">
+          
+          <div class="reaction-popup">
+            <button class="react-emoji" (click)="react(p, 'LIKE')" title="J'aime">👍</button>
+            <button class="react-emoji" (click)="react(p, 'LOVE')" title="J'adore">❤️</button>
+            <button class="react-emoji" (click)="react(p, 'HAHA')" title="Haha">😂</button>
+            <button class="react-emoji" (click)="react(p, 'SUPPORT')" title="Soutien">🤝</button>
+          </div>
+          
+          <button class="icon-btn like-btn" 
+                  [ngClass]="p.myReaction ? 'active-' + p.myReaction.toLowerCase() : ''" 
+                  (click)="react(p, 'LIKE')">
+            
+            <span *ngIf="p.myReaction === 'LOVE'">❤️</span>
+            <span *ngIf="p.myReaction === 'HAHA'">😂</span>
+            <span *ngIf="p.myReaction === 'SUPPORT'">🤝</span>
+            <span *ngIf="p.myReaction === 'LIKE' || !p.myReaction"><i class="fa fa-thumbs-up"></i></span>
+            
+            <span class="like-count" *ngIf="getTotalReactions(p) > 0">{{ getTotalReactions(p) }}</span>
+          </button>
+        </div>
+
+        <button class="icon-btn" title="Save Project"><i class="far fa-heart"></i></button>
+        <button class="icon-btn"><i class="fa fa-ellipsis-h"></i></button>
+      </div>
+    </div>
+    
+    <div class="post-body">
+      <div class="title-row">
+        <h2 class="post-title">{{ p.title }}</h2>
+        <div class="budget-badge">
+          <span class="amount">${{ p.budget }}</span>
+          <span class="type">{{ p.jobType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Price' }}</span>
+        </div>
+      </div>
+      
+      <p class="post-desc">{{ p.description }}</p>
+
+      <div *ngIf="p.image" class="project-image-container">
+        <img [src]="p.image" alt="Project Attachment">
+      </div>
+
+      <div class="post-badges">
+        <span class="badge-item"><i class="fa fa-layer-group"></i> {{ p.ExperienceLevel }}</span>
+        <span class="badge-item status-badge" *ngIf="p.status"><i class="fa fa-bolt"></i> {{ p.status }}</span>
+        <span class="badge-item skill-badge">Angular</span>
+        <span class="badge-item skill-badge">Spring Boot</span>
+      </div>
+    </div>
+    
+    <div class="post-footer">
+      <div class="proposal-stats">
+        <div class="avatars">
+          <img src="https://i.pravatar.cc/150?u=1" alt="Freelancer">
+          <img src="https://i.pravatar.cc/150?u=2" alt="Freelancer">
+          <div class="avatar-more">+3</div>
+        </div>
+        <span class="stat-text"><strong>0</strong> Proposals received</span>
+      </div>
+      
+      <button class="btn-primary" [routerLink]="['/ClientDetailProject', p.id]">View Details</button>
+    </div>
+  </article>
+
+</div>
   </main>
 
   <aside class="sidebar-right">
@@ -154,69 +234,60 @@
 <div class="modal-overlay" *ngIf="isProjectModalOpen">
   <div class="modal-card">
     <div class="modal-header">
-      <div class="header-content">
-        <h2>Post a Project</h2>
-        <p>Fill in the details to attract top talent.</p>
-      </div>
+      <h2>Post a New Project</h2>
       <button class="close-btn" (click)="closeProjectModal()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label>Project Title</label>
-        <input type="text" class="form-control" placeholder="e.g. Build an E-commerce App for IOS">
+        <label>Title</label>
+        <input type="text" class="form-control" [(ngModel)]="project.title" placeholder="Project name">
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Category</label>
-          <select class="form-control">
-            <option>Web Development</option>
-            <option>Mobile Apps</option>
-            <option>UI/UX Design</option>
+          <select class="form-control" [(ngModel)]="project.category">
+            <option value="WEB_DEVELOPMENT">Web Development</option>
+            <option value="MOBILE_DEVELOPMENT">Mobile App</option>
+            <option value="UI_UX_DESIGN">UI/UX Design</option>
+            <option value="DIGITAL_MARKETING">Digital Marketing</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Experience Level</label>
-          <select class="form-control">
-            <option>Entry Level</option>
-            <option>Intermediate</option>
-            <option>Expert</option>
+          <label>Experience</label>
+          <select class="form-control" [(ngModel)]="project.ExperienceLevel">
+            <option value="Entry Level">Entry Level</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Expert">Expert</option>
           </select>
         </div>
       </div>
       <div class="form-group">
         <label>Description</label>
-        <textarea class="form-control text-area" placeholder="Describe deliverables..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Required Skills</label>
-        <input type="text" class="form-control" placeholder="Angular, Node.js...">
+        <textarea class="form-control text-area" [(ngModel)]="project.description"></textarea>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Project Type</label>
-          <div class="radio-group">
-            <label class="radio-btn"><input type="radio" name="type" checked> Hourly</label>
-            <label class="radio-btn"><input type="radio" name="type"> Fixed</label>
+          <label>Contract Type</label>
+          <div class="radio-group" style="display: flex; gap: 15px; margin-top: 10px;">
+            <label><input type="radio" value="FIXED_PRICE" [(ngModel)]="project.jobType"> Fixed Price</label>
+            <label><input type="radio" value="HOURLY" [(ngModel)]="project.jobType"> Hourly</label>
           </div>
         </div>
-        <div class="form-group budget-group">
-          <label>Budget Range ($)</label>
-          <div class="dual-input">
-            <input type="number" placeholder="Min" class="form-control">
-            <span class="dash">-</span>
-            <input type="number" placeholder="Max" class="form-control">
-          </div>
+        <div class="form-group">
+          <label>Budget ($)</label>
+          <input type="number" class="form-control" [(ngModel)]="project.budget">
         </div>
       </div>
-      <div class="upload-area">
-        <i class="fa fa-cloud-upload-alt"></i>
-        <p><strong>Click to upload</strong> or drag and drop</p>
+      <div class="upload-area" (click)="fileInput.click()">
+        <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none">
+        <p *ngIf="!project.image">Click to upload image</p>
+        <img *ngIf="project.image" [src]="project.image" style="max-height: 100px;">
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeProjectModal()">Save Draft</button>
-      <button class="btn-publish">Publish Project</button>
+      <button class="btn-cancel" (click)="closeProjectModal()">Cancel</button>
+      <button class="btn-publish" (click)="publishProject()">Publish Now</button>
     </div>
   </div>
-  
-</div><app-technical-support></app-technical-support>
+</div>
+<app-technical-support></app-technical-support>
