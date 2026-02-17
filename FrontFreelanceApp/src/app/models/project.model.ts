@@ -17,4 +17,5 @@ export interface Project {
   justReacted?: boolean;
   category?: string; 
   jobType?: string;
+  proposals?: any[];
 }

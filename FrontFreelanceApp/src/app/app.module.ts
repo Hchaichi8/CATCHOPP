@@ -38,6 +38,7 @@ import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disput
 import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/competence-admin.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { FormsModule } from '@angular/forms';
         DetailJobsAdminComponent,
         DisputesAdminComponent,
         FinanceAdminComponent,
+        CompetenceAdminComponent,
         
   ],
   imports: [

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Project } from '../models/project.model';
@@ -24,11 +24,18 @@ export class ProjectServiceService {
   getProjectById(id: number): Observable<Project> {
     return this.http.get<Project>(`${this.url}/${id}`);
   }
-  getArticlesByCategory(categoryId: string): Observable<any> {
-    return this.http.get(`${this.url}article/getArticlesby/${categoryId}`);
+  
+  getProposalsForProject(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/${projectId}/proposals`);
   }
-    getarticlebyid(id:any)
-  {
-    return this.http.get(`${this.url}article/getbyid/${id}`);
+
+ 
+  submitProposal(projectId: number, proposal: any): Observable<any> {
+    return this.http.post<any>(`${this.url}/${projectId}/proposals`, proposal);
   }
+  updateProposalStatus(proposalId: number, status: string): Observable<any> {
+  // Spring Boot attend le status en @RequestParam, donc on utilise HttpParams
+  const params = new HttpParams().set('status', status);
+  return this.http.put<any>(`${this.url}/proposals/${proposalId}/status`, {}, { params });
+}
 }

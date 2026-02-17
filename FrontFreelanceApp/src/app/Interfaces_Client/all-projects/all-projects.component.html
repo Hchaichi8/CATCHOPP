@@ -14,7 +14,7 @@
     </div>
 
     <div class="nav-actions">
-        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
+        <button class="btn-create-nav" routerLink="/ClientFeed"><i class="fa fa-plus"></i> Post Job</button>
         <div class="user-profile">
             <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
         </div>
@@ -23,7 +23,6 @@
 </nav>
 
 <div class="layout-container">
-
   <main class="main-content">
     
     <header class="page-header">
@@ -36,20 +35,20 @@
     <div class="controls-bar">
       
       <div class="tabs">
-        <button class="tab-btn" [class.active]="selectedTab === 'active'" (click)="setTab('active')">
-          Active Jobs <span class="badge">2</span>
+        <button class="tab-btn" [class.active]="selectedTab === 'OPEN'" (click)="setTab('OPEN')">
+          Active Jobs <span class="badge">{{ getCount('OPEN') }}</span>
         </button>
-        <button class="tab-btn" [class.active]="selectedTab === 'draft'" (click)="setTab('draft')">
-          Drafts <span class="badge gray">1</span>
+        <button class="tab-btn" [class.active]="selectedTab === 'DRAFT'" (click)="setTab('DRAFT')">
+          Drafts <span class="badge gray">{{ getCount('DRAFT') }}</span>
         </button>
-        <button class="tab-btn" [class.active]="selectedTab === 'closed'" (click)="setTab('closed')">
-          Closed <span class="badge gray">14</span>
+        <button class="tab-btn" [class.active]="selectedTab === 'CLOSED'" (click)="setTab('CLOSED')">
+          Closed <span class="badge gray">{{ getCount('CLOSED') }}</span>
         </button>
       </div>
 
       <div class="search-box">
         <i class="fa fa-search"></i>
-        <input type="text" placeholder="Search by title...">
+        <input type="text" [(ngModel)]="searchText" placeholder="Search by title...">
       </div>
     </div>
 
@@ -58,62 +57,79 @@
       <div class="empty-state" *ngIf="filteredProjects.length === 0">
         <div class="empty-icon"><i class="fa fa-folder-open"></i></div>
         <h3>No projects found</h3>
-        <p>You don't have any projects in this category yet.</p>
-        <button class="btn-outline">Post a Job</button>
+        <p>You don't have any projects matching this criteria.</p>
+        <button class="btn-outline" routerLink="/ClientFeed">Post a Job</button>
       </div>
 
       <div class="project-row" *ngFor="let p of filteredProjects">
         
-        <div class="status-strip" [ngClass]="p.status"></div>
+        <div class="status-strip" [ngClass]="p.status || 'OPEN'"></div>
 
         <div class="row-content">
           
           <div class="col-info">
-            <h3 class="job-title"><a href="#">{{p.title}}</a></h3>
+            <h3 class="job-title"><a [routerLink]="['/ClientDetailProject', p.id]">{{ p.title }}</a></h3>
             <div class="job-meta">
-              <span class="id">ID: #{{p.id}}</span>
+              <span class="id">ID: #{{ p.id }}</span>
               <span class="dot">•</span>
-              <span class="date">Posted {{p.postedDate}}</span>
-              <span class="category-tag">{{p.category}}</span>
+              <span class="date">Posted {{ p.postedAt }}</span>
+              <span class="dot">•</span>
+              <span class="category-tag">{{ formatEnumText(p.category) }}</span>
             </div>
           </div>
 
           <div class="col-metrics">
             <div class="metric">
-              <strong>{{p.proposals}}</strong>
+              <strong>{{ p.proposals?.length || 0 }}</strong>
               <small>Proposals</small>
             </div>
             <div class="metric">
-              <strong>{{p.hires}}</strong>
+              <strong>0</strong>
               <small>Hired</small>
             </div>
             <div class="metric budget">
-              <strong>{{p.budget}}</strong>
-              <small>Budget</small>
+              <strong>${{ p.budget }}</strong>
+              <small>{{ p.jobType === 'HOURLY' ? '/ hr' : 'Fixed' }}</small>
             </div>
           </div>
 
           <div class="col-actions">
             
-            <button class="btn-action edit" *ngIf="p.status === 'draft'">
+            <button class="btn-action edit" *ngIf="selectedTab === 'DRAFT'">
               <i class="fa fa-pen"></i> Edit Draft
             </button>
             
-            <button class="btn-action view" *ngIf="p.status === 'active'" routerLink="/ProjectProposals/{{p.id}}">
+            <button class="btn-action view" *ngIf="selectedTab === 'OPEN'" [routerLink]="['/ProjectProposals', p.id]">
               View Proposals
             </button>
             
-            <button class="btn-action repost" *ngIf="p.status === 'closed'">
+            <button class="btn-action repost" *ngIf="selectedTab === 'CLOSED'">
                <i class="fa fa-redo"></i> Repost
             </button>
 
-            <button class="btn-icon-more"><i class="fa fa-ellipsis-v"></i></button>
-          </div>
+            <div class="more-menu-container">
+              <button class="btn-icon-more" (click)="toggleMenu(p.id, $event)">
+                <i class="fa fa-ellipsis-v"></i>
+              </button>
 
+              <div class="actions-dropdown" *ngIf="activeMenuId === p.id" (click)="$event.stopPropagation()">
+                <button class="dropdown-item" (click)="editProject(p.id)">
+                  <i class="fa fa-pen"></i> Edit Project
+                </button>
+                <button class="dropdown-item" *ngIf="selectedTab === 'OPEN'" (click)="closeJob(p.id)">
+                  <i class="fa fa-ban"></i> Close Job
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item delete" (click)="deleteProject(p.id)">
+                  <i class="fa fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
     </div>
-
   </main>
 </div>

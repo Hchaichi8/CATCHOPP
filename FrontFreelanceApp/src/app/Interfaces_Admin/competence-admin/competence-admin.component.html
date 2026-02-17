@@ -1,0 +1,130 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/AdminDashboard">
+      <img src="assets/logo.png" alt="CatchIQ Admin" class="logo-img">
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+     <div class="nav-menu">
+      <a routerLink="/AdminDashboard" routerLinkActive="active" ><i class="fa fa-chart-line"></i> Overview</a>
+      <a routerLink="/AdminUsers" routerLinkActive="active"><i class="fa fa-users-cog"></i> Users</a>
+     <a routerLink="/AdminSkills" routerLinkActive="active" class="active-link"><i class="fa fa-tags"></i> Skills</a>
+      <a routerLink="/AdminJobs" routerLinkActive="active"><i class="fa fa-briefcase"></i> Jobs</a>
+      <a routerLink="/AdminFinance" routerLinkActive="active"><i class="fa fa-wallet"></i> Finance</a>
+      <a routerLink="/AdminDisputes" routerLinkActive="active"><i class="fa fa-gavel"></i> Disputes <span class="badge-dot"></span></a>
+    </div>
+
+    <div class="nav-actions">
+        <div class="user-profile">
+            <img src="https://placehold.co/40x40/1f2937/ffffff?text=AD" alt="Admin">
+            <div class="user-text">
+                <span class="name">Super Admin</span>
+            </div>
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
+  <main class="main-content">
+    
+    <header class="page-header">
+      <div class="header-text">
+        <h1>Skills Database Management</h1>
+        <p>Manage the list of skills available for freelancers and clients.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="openAddModal()"><i class="fa fa-plus"></i> Add New Skill</button>
+      </div>
+    </header>
+
+    <div class="controls-card">
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Search a skill (e.g., Angular)...">
+      </div>
+      <div class="filter-box">
+        <span class="filter-label">Category:</span>
+        <select [(ngModel)]="selectedCategory">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Skill Name</th>
+            <th>Category</th>
+            <th>Usage Stats</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredSkills.length === 0">
+            <td colspan="6" class="empty-state">
+              <i class="fa fa-search"></i>
+              <p>No skills found matching your criteria.</p>
+            </td>
+          </tr>
+
+          <tr *ngFor="let skill of filteredSkills" [class.archived-row]="skill.status === 'archived'">
+            <td class="text-muted">#{{ skill.id }}</td>
+            <td><strong>{{ skill.name }}</strong></td>
+            <td><span class="category-tag">{{ skill.category }}</span></td>
+            <td>
+              <div class="usage-bar-container">
+                <span class="usage-number">{{ skill.usageCount }} users</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="skill.status === 'active' ? 'success' : 'danger'">
+                {{ skill.status | uppercase }}
+              </span>
+            </td>
+            <td class="action-cell">
+              <button class="btn-icon" [title]="skill.status === 'active' ? 'Archive' : 'Activate'" (click)="toggleStatus(skill)">
+                <i class="fa" [ngClass]="skill.status === 'active' ? 'fa-ban text-orange' : 'fa-check text-green'"></i>
+              </button>
+              <button class="btn-icon cross" title="Delete Permanently" (click)="deleteSkill(skill.id)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Add New Skill</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Skill Name</label>
+        <input type="text" class="form-control" [(ngModel)]="newSkillName" placeholder="e.g., React Native">
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select class="form-control" [(ngModel)]="newSkillCategory">
+          <option *ngFor="let cat of categories.slice(1)" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-outline" (click)="closeModal()">Cancel</button>
+      <button class="btn-primary" (click)="addSkill()"><i class="fa fa-save"></i> Save Skill</button>
+    </div>
+  </div>
+</div>

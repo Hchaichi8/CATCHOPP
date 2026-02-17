@@ -31,6 +31,7 @@ import { JobsAdminComponent } from './Interfaces_Admin/jobs-admin/jobs-admin.com
 import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/detail-jobs-admin.component';
 import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
 import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
+import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/competence-admin.component';
 
 const routes: Routes = [
 
@@ -47,7 +48,6 @@ const routes: Routes = [
 
 //client routes
  {path:'ClientFeed',component: ClientFeedComponent, },
- {path:'ProjectDetails',component:ProjectDetailsComponent, },
  {path:'ClientDashboard',component:ClientDashboardComponent, },
  {path:'ProjectProposals/:id',component:ProjectProposalsComponent, },
  {path:'AllProjects',component:AllProjectsComponent, },
@@ -60,6 +60,7 @@ const routes: Routes = [
 
 
  //Freelancer routes
+ {path:'ProjectDetails/:id',component:ProjectDetailsComponent, },
 {path:'FreelancerDashboard',component:DashboardFreelancerComponent, },
 {path:'FreelancerProfileManager',component:ProfileManagerComponent, },
 {path:'FreelancerFeed',component:FreelancerFeedComponent, },
@@ -79,6 +80,7 @@ const routes: Routes = [
 {path:'DetailJobs',component:DetailJobsAdminComponent, },
 {path:'AdminDisputes',component:DisputesAdminComponent, },
 {path:'AdminFinance',component:FinanceAdminComponent, },
+{path:'AdminSkills',component:CompetenceAdminComponent, },
 
 
 

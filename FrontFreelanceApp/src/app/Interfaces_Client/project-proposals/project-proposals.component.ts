@@ -1,74 +1,94 @@
-import { Component } from '@angular/core';
-interface Proposal {
-  id: number;
-  name: string;
-  title: string;
-  rate: number;
-  coverLetter: string;
-  rating: number;
-  skills: string[];
-  image: string;
-  status: 'pending' | 'accepted' | 'rejected';
-}
+import { Component, OnInit } from '@angular/core';
+import { Project } from '../../models/project.model';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectServiceService } from '../../Services/project-service.service';
+import { Proposal } from '../../models/proposal';
+
 
 @Component({
   selector: 'app-project-proposals',
   templateUrl: './project-proposals.component.html',
   styleUrl: './project-proposals.component.css'
 })
-export class ProjectProposalsComponent {
-proposals: Proposal[] = [
-    {
-      id: 1,
-      name: 'Kenneth Silva',
-      title: 'Senior Fullstack Dev',
-      rate: 55,
-      coverLetter: 'I have 5+ years of experience in Angular and Node.js...',
-      rating: 5.0,
-      skills: ['Angular', 'Node.js', 'MongoDB'],
-      image: 'https://i.pravatar.cc/150?u=10',
-      status: 'pending'
-    },
-    {
-      id: 2,
-      name: 'Sarah Jenkins',
-      title: 'UI/UX Specialist',
-      rate: 45,
-      coverLetter: 'I specialize in creating clean, user-friendly dashboards...',
-      rating: 4.8,
-      skills: ['Figma', 'CSS/SCSS', 'Adobe XD'],
-      image: 'https://i.pravatar.cc/150?u=20',
-      status: 'pending'
-    },
-    {
-      id: 3,
-      name: 'David Miller',
-      title: 'Angular Architect',
-      rate: 65,
-      coverLetter: 'I maintain open source libraries for the Angular community...',
-      rating: 4.9,
-      skills: ['RxJS', 'NgRx', 'TypeScript'],
-      image: 'https://i.pravatar.cc/150?u=33',
-      status: 'pending'
-    },
-    {
-      id: 4,
-      name: 'Lina Al-Fayeed',
-      title: 'Frontend Developer',
-      rate: 40,
-      coverLetter: 'Experienced in building responsive web applications...',
-      rating: 4.7,
-      skills: ['HTML5', 'Bootstrap', 'JavaScript'],
-      image: 'https://i.pravatar.cc/150?u=45',
-      status: 'pending'
-    }
-  ];
+export class ProjectProposalsComponent implements OnInit {
+  
+  projectId: number | null = null;
+  project: Project | null = null;
+  proposals: Proposal[] = [];
+  
+  isLoading: boolean = true;
+  
+  // Statistiques calculées dynamiquement
+  averageBid: number = 0;
+  shortlistedCount: number = 0;
 
-  updateStatus(id: number, newStatus: 'accepted' | 'rejected') {
-    const proposal = this.proposals.find(p => p.id === id);
-    if (proposal) {
-      proposal.status = newStatus;
+  constructor(
+    private route: ActivatedRoute,
+    private projectService: ProjectServiceService
+  ) {}
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.projectId = Number(idParam);
+      this.loadProjectDetails(this.projectId);
+      this.loadProposals(this.projectId);
+    } else {
+      this.isLoading = false;
     }
+  }
+
+  loadProjectDetails(id: number) {
+    this.projectService.getProjectById(id).subscribe({
+      next: (data) => this.project = data,
+      error: (err) => console.error("Error loading project details", err)
+    });
+  }
+
+  loadProposals(projectId: number) {
+    this.projectService.getProposalsForProject(projectId).subscribe({
+      next: (data) => {
+        this.proposals = data;
+        this.calculateStats();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error("Error loading proposals", err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  calculateStats() {
+    if (this.proposals.length === 0) {
+      this.averageBid = 0;
+      this.shortlistedCount = 0;
+      return;
+    }
+
+    const totalBids = this.proposals.reduce((sum, p) => sum + p.bidAmount, 0);
+    this.averageBid = Math.round(totalBids / this.proposals.length);
+    
+    // On compte combien ont été acceptés (shortlisted)
+    this.shortlistedCount = this.proposals.filter(p => p.status === 'ACCEPTED').length;
+  }
+
+  // --- NOUVEAU : Mettre à jour le statut via le backend ---
+  updateStatus(proposalId: number | undefined, newStatus: string) {
+    if (!proposalId) return;
+
+    // Appel HTTP PUT vers ton backend Spring Boot
+    this.projectService.updateProposalStatus(proposalId, newStatus).subscribe({
+      next: (updatedProposal) => {
+        // Mettre à jour la proposition dans la liste locale
+        const index = this.proposals.findIndex(p => p.id === proposalId);
+        if (index !== -1) {
+          this.proposals[index].status = newStatus;
+          this.calculateStats(); // Recalculer les stats (Shortlisted count)
+        }
+      },
+      error: (err) => alert("Failed to update status. Please try again.")
+    });
   }
 
 }

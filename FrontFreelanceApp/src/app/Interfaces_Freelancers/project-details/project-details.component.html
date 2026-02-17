@@ -1,8 +1,8 @@
 <nav class="navbar">
   <div class="nav-container">
-       <div class="nav-brand" routerLink="/FreelancerFeed">
-<img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
-</div>
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
+    </div>
     <div class="nav-search">
       <i class="fa fa-search"></i>
       <input type="text" placeholder="Search freelancers or services...">
@@ -11,13 +11,18 @@
       <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
       <div class="nav-divider"></div>
       <div class="user-profile-menu">
-        <img src="https://placehold.co/40x40/198754/white?text=A" alt="Profile">
+        <img src="https://i.pravatar.cc/150?u=10" alt="Profile">
       </div>
     </div>
   </div>
 </nav>
 
-<div class="details-layout">
+<div *ngIf="isLoading" style="text-align: center; padding: 100px; color: var(--primary);">
+  <i class="fa fa-circle-notch fa-spin fa-3x"></i>
+  <p style="margin-top: 15px; font-weight: 500;">Loading project details...</p>
+</div>
+
+<div class="details-layout" *ngIf="!isLoading && project">
   
   <div class="back-row">
     <a routerLink="/FreelancerFeed" class="back-link"><i class="fa fa-arrow-left"></i> Back to Feed</a>
@@ -30,82 +35,102 @@
         
         <div class="project-header">
           <div class="header-top">
-            <span class="category-badge">Web Development</span>
-            <span class="time-badge">Posted 2 hours ago</span>
+            <span class="category-badge">{{ formatEnumText(project.category) }}</span>
+            <span class="time-badge">Posted {{ project.postedAt }}</span>
           </div>
-          <h1>Senior Angular Developer for SaaS Dashboard Refactoring</h1>
+          <h1>{{ project.title }}</h1>
           <div class="project-meta">
             <span><i class="fa fa-globe-americas"></i> Worldwide</span>
             <span class="separator">•</span>
-            <span><i class="fa fa-clock"></i> Hourly Project</span>
+            <span><i class="fa fa-clock"></i> {{ project.jobType === 'HOURLY' ? 'Hourly Project' : 'Fixed Price Project' }}</span>
             <span class="separator">•</span>
-            <span><i class="fa fa-layer-group"></i> Intermediate Level</span>
+            <span><i class="fa fa-layer-group"></i> {{ project.ExperienceLevel }} Level</span>
           </div>
         </div>
 
         <div class="tabs-row">
-          <button class="tab-btn active">View Job</button>
-          <button class="tab-btn">Proposals <span class="badge">8</span></button>
-          <button class="tab-btn">Invite Talent</button>
+          <button class="tab-btn" [class.active]="activeTab === 'job'" (click)="setTab('job')">View Job</button>
+          <button class="tab-btn" [class.active]="activeTab === 'proposals'" (click)="setTab('proposals')">
+            Proposals <span class="badge">{{ proposals.length }}</span>
+          </button>
         </div>
-
+        
         <div class="divider"></div>
 
-        <div class="section description-section">
-          <h3>Project Description</h3>
-          <p>
-            We are a fintech startup looking for an experienced Angular Developer to help us refactor our main client dashboard. 
-            The current codebase is built on Angular 14, and we are upgrading to Angular 18 with standalone components.
-          </p>
-          <p><strong>Key Responsibilities:</strong></p>
-          <ul>
-            <li>Migrate legacy modules to standalone components.</li>
-            <li>Implement NgRx for better state management.</li>
-            <li>Optimize load times and fix existing UI bugs using TailwindCSS.</li>
-            <li>Collaborate with our backend team (Node.js) for API integrations.</li>
-          </ul>
-          <p><strong>Requirements:</strong></p>
-          <ul>
-            <li>3+ years of commercial Angular experience.</li>
-            <li>Strong understanding of RxJS operators.</li>
-            <li>Experience with Figma to HTML implementation.</li>
-          </ul>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="section skills-section">
-          <h3>Skills & Expertise</h3>
-          <div class="tags-container">
-            <span class="skill-tag">Angular</span>
-            <span class="skill-tag">TypeScript</span>
-            <span class="skill-tag">RxJS</span>
-            <span class="skill-tag">Tailwind CSS</span>
-            <span class="skill-tag">NgRx</span>
-            <span class="skill-tag">Node.js</span>
+        <div *ngIf="activeTab === 'job'">
+          <div class="section description-section">
+            <h3>Project Description</h3>
+            <p style="white-space: pre-wrap;">{{ project.description }}</p>
+            
+            <div *ngIf="project.image" style="margin-top: 20px;">
+              <img [src]="project.image" alt="Project Attachment" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border);">
+            </div>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <div class="section skills-section">
+            <h3>Skills & Expertise</h3>
+            <div class="tags-container">
+              <span class="skill-tag">Angular</span>
+              <span class="skill-tag">Spring Boot</span>
+              <span class="skill-tag">Web Development</span>
+            </div>
           </div>
         </div>
 
-        <div class="divider"></div>
+        <div *ngIf="activeTab === 'proposals'" class="section proposals-section">
+          <h3>Freelancer Bids ({{ proposals.length }})</h3>
+          
+          <div *ngIf="proposals.length === 0" class="empty-proposals">
+            <i class="fa fa-file-signature"></i>
+            <p>No proposals yet. Be the first to apply!</p>
+          </div>
 
-        <div class="section activity-section">
-          <h3>Activity on this Job</h3>
-          <div class="activity-grid">
-            <div class="activity-item">
-              <span class="label">Proposals:</span>
-              <span class="value">8</span>
+          <div class="analytics-dashboard" *ngIf="proposals.length > 0">
+            <div class="stat-card lowest">
+              <i class="fa fa-arrow-down"></i>
+              <div>
+                <small>Lowest Bid</small>
+                <strong>${{ lowestBid }}</strong>
+              </div>
             </div>
-            <div class="activity-item">
-              <span class="label">Last Viewed:</span>
-              <span class="value">5 minutes ago</span>
+            
+            <div class="stat-card average">
+              <i class="fa fa-equals"></i>
+              <div>
+                <small>Average Bid</small>
+                <strong>${{ averageBid }}</strong>
+              </div>
             </div>
-            <div class="activity-item">
-              <span class="label">Interviewing:</span>
-              <span class="value">1</span>
+            
+            <div class="stat-card highest">
+              <i class="fa fa-arrow-up"></i>
+              <div>
+                <small>Highest Bid</small>
+                <strong>${{ highestBid }}</strong>
+              </div>
             </div>
-            <div class="activity-item">
-              <span class="label">Invites Sent:</span>
-              <span class="value">4</span>
+          </div>
+          <div class="proposal-card" *ngFor="let prop of proposals">
+            <div class="prop-freelancer">
+              <img src="https://placehold.co/40x40/1f2937/white?text=F" alt="Freelancer">
+              <div>
+                <strong>Freelancer #{{ prop.freelancerId }}</strong>
+                <small>Submitted an offer</small>
+              </div>
+            </div>
+            
+            <div class="prop-details">
+              <div class="prop-stat">
+                <small>Bid Amount</small>
+                <strong>${{ prop.bidAmount }}</strong>
+              </div>
+              <div class="prop-stat">
+                <small>Est. Delivery</small>
+                <strong>{{ prop.estimationEndDate }}</strong>
+              </div>
+              <span class="status-badge" [ngClass]="prop.status?.toLowerCase()">{{ prop.status || 'PENDING' }}</span>
             </div>
           </div>
         </div>
@@ -117,12 +142,23 @@
       
       <div class="card action-widget">
         <div class="budget-display">
-          <small>Hourly Range</small>
-          <h2>$45.00 - $60.00</h2>
+          <small>{{ project.jobType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Budget' }}</small>
+          <h2>${{ project.budget }}</h2>
         </div>
         <div class="action-buttons">
-          <button class="btn-primary-full">Submit a Proposal</button>
-          <button class="btn-outline-full"><i class="fa fa-heart"></i> Save Job</button>
+          
+          <button class="btn-primary-full" *ngIf="!hasAlreadyApplied" (click)="openModal()">
+            Submit a Proposal
+          </button>
+          
+          <button class="btn-primary-full btn-applied" *ngIf="hasAlreadyApplied" disabled>
+            <i class="fa fa-check-circle"></i> Already Applied
+          </button>
+          
+          <button class="btn-outline-full" [class.saved]="isSaved" (click)="toggleSave()">
+            <i class="fa-heart" [ngClass]="isSaved ? 'fas' : 'far'"></i> 
+            {{ isSaved ? 'Saved' : 'Save Job' }}
+          </button>
         </div>
         <div class="flag-row">
           <i class="fa fa-flag"></i> Flag as inappropriate
@@ -139,7 +175,7 @@
             <i class="fa fa-star filled"></i>
             <i class="fa fa-star filled"></i>
           </div>
-          <span>4.96 of 12 reviews</span>
+          <span>5.0 of 12 reviews</span>
         </div>
         
         <ul class="client-stats-list">
@@ -158,13 +194,6 @@
             </div>
           </li>
           <li>
-            <i class="fa fa-coins"></i>
-            <div>
-              <strong>$45k+ Total Spent</strong>
-              <small>Tech & SaaS Category</small>
-            </div>
-          </li>
-          <li>
             <i class="fa fa-check-circle verified-color"></i>
             <div>
               <strong>Payment Verified</strong>
@@ -177,12 +206,47 @@
       <div class="card share-widget">
         <h4>Job Link</h4>
         <div class="copy-box">
-          <input type="text" value="https://catchiq.com/job/8291" readonly>
-          <button>Copy</button>
+          <input type="text" [value]="currentUrl" readonly>
+          <button (click)="copyLink()">Copy</button>
         </div>
       </div>
 
     </aside>
 
+  </div>
+</div>
+
+<div *ngIf="!isLoading && !project" style="text-align: center; padding: 100px;">
+  <h2>Project not found</h2>
+  <a routerLink="/FreelancerFeed" style="color: var(--primary);">Return to feed</a>
+</div>
+
+<div class="modal-overlay" *ngIf="isProposalModalOpen">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Submit Your Proposal</h2>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+        You are bidding on: <strong>{{ project?.title }}</strong>
+      </p>
+
+      <div class="form-group">
+        <label>Bid Amount ($)</label>
+        <input type="number" class="form-control" [(ngModel)]="newProposal.bidAmount" placeholder="Enter your price">
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Delivery Date</label>
+        <input type="date" class="form-control" [(ngModel)]="newProposal.estimationEndDate">
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-publish" (click)="submitProposal()">Send Proposal <i class="fa fa-paper-plane"></i></button>
+    </div>
   </div>
 </div>

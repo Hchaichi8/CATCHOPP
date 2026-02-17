@@ -97,17 +97,27 @@
 /* Project List */
 .project-list { display: flex; flex-direction: column; gap: 16px; }
 
+/* 🔴 MODIFICATION ICI : Suppression de overflow: hidden */
 .project-row {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  overflow: hidden; display: flex; transition: 0.2s; position: relative;
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 12px;
+  display: flex; 
+  transition: 0.2s; 
+  position: relative;
 }
 .project-row:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: #d1d5db; }
 
-/* Status Strip */
-.status-strip { width: 6px; flex-shrink: 0; }
-.status-strip.active { background: var(--primary); }
-.status-strip.draft { background: #9ca3af; }
-.status-strip.closed { background: #1f2937; }
+/* 🔴 MODIFICATION ICI : Arrondi ajouté pour la bande de couleur */
+.status-strip { 
+  width: 6px; 
+  flex-shrink: 0; 
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+}
+.status-strip.OPEN { background: var(--primary); }
+.status-strip.DRAFT { background: #9ca3af; }
+.status-strip.CLOSED { background: #1f2937; }
 
 /* Row Content */
 .row-content { flex: 1; display: flex; align-items: center; padding: 20px 24px; }
@@ -139,7 +149,7 @@
 .btn-action.edit:hover { border-color: var(--text-muted); color: var(--text-main); background: #f9fafb; }
 .btn-action.repost { background: white; border: 1px solid var(--border); color: var(--primary); }
 
-.btn-icon-more { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 8px; border-radius: 50%; }
+.btn-icon-more { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 8px; border-radius: 50%; transition: 0.2s;}
 .btn-icon-more:hover { background: #f3f4f6; color: var(--text-main); }
 
 /* Empty State */
@@ -149,10 +159,92 @@
 .empty-state p { color: var(--text-muted); margin-bottom: 20px; }
 .btn-outline { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
+
+
+.more-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.actions-dropdown {
+  position: absolute;
+  
+  top: -45px;
+  /* Pousse le menu sur la gauche du bouton (il reste sur la carte) */
+  right: -80px; 
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* Ombre ajustée pour bien le détacher de la carte */
+  box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  min-width: 150px;
+  padding: 4px 0;
+  /* Nouvelle animation pour arriver depuis la droite */
+  animation: fadeInSide 0.15s ease-out;
+}
+
+@keyframes fadeInSide {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.dropdown-item i {
+  color: var(--text-muted);
+  width: 16px;
+  text-align: center;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-body);
+}
+
+/* Bouton Supprimer en rouge */
+.dropdown-item.delete {
+  color: #dc3545;
+}
+
+.dropdown-item.delete i {
+  color: #dc3545;
+}
+
+.dropdown-item.delete:hover {
+  background: #fef2f2;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+/* Garder le hover sur l'icône quand le menu est ouvert */
+.more-menu-container:hover .btn-icon-more {
+  background: var(--bg-body);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
-  .nav-menu { display: none; } /* Hide menu on small screens */
+  .nav-menu { display: none; }
   .row-content { flex-direction: column; align-items: flex-start; gap: 20px; }
   .col-metrics { width: 100%; border: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 15px 0; justify-content: flex-start; gap: 40px; }
   .col-actions { width: 100%; justify-content: flex-start; padding: 0; }
+  /* En mobile, le menu se décale un peu pour ne pas sortir de l'écran */
+  .actions-dropdown { right: 0; top: 35px; } 
 }
