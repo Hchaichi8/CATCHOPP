@@ -1,0 +1,141 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
+    </div>
+
+     <div class="nav-menu">
+      <a routerLink="/FreelancerFeed" routerLinkActive="active"><i class="fa fa-stream"></i> Feed</a>
+      <a routerLink="/FreelancerDashboard" routerLinkActive="active" ><i class="fa fa-th-large"></i> Dashboard</a>
+      <a routerLink="/FreelancerProfileManager" routerLinkActive="active" class="active-link"><i class="fa fa-user-circle"></i> Profile</a>
+      <a routerLink="/FreelancerJobs" routerLinkActive="active"><i class="fa fa-briefcase"></i> My Jobs</a>
+      <a routerLink="/Messages" routerLinkActive="active"><i class="fa fa-comment-dots"></i> Messages</a>
+      <a routerLink="/FreelancerWallet" routerLinkActive="active"><i class="fa fa-wallet"></i> Wallet</a>
+    </div>
+
+    <div class="nav-actions">
+        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
+        <div class="user-profile" routerLink="/FreelancerProfil">
+            <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
+
+  <main class="main-content">
+    
+    <header class="top-header">
+      <div class="welcome-text">
+        <h1>Manage Profile</h1>
+        <p>Update your professional details and preferences.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline" routerLink="/FreelancerProfil">View Public Profile</button>
+        <button class="btn-create">Save Changes</button>
+      </div>
+    </header>
+
+    <div class="edit-grid">
+      
+      <div class="column-main">
+        
+        <div class="card edit-card">
+            <div class="card-header">
+                <h3><i class="fa fa-layer-group"></i> Skills & Expertise</h3>
+                <p>Add skills that match your needs to get better recommendations.</p>
+            </div>
+            
+            <div class="skills-input-area">
+                <input type="text" placeholder="Type a skill and press Enter (e.g. Angular)...">
+                <button class="btn-add"><i class="fa fa-plus"></i></button>
+            </div>
+
+            <div class="active-skills-list">
+                <div class="skill-tag-edit">Angular <i class="fa fa-times"></i></div>
+                <div class="skill-tag-edit">TypeScript <i class="fa fa-times"></i></div>
+                <div class="skill-tag-edit">Node.js <i class="fa fa-times"></i></div>
+                <div class="skill-tag-edit">Figma <i class="fa fa-times"></i></div>
+                <div class="skill-tag-edit">SaaS <i class="fa fa-times"></i></div>
+            </div>
+
+            <div class="suggested-skills">
+                <small>Suggested:</small>
+                <span>React</span><span>Vue.js</span><span>AWS</span>
+            </div>
+        </div>
+
+        <div class="card edit-card">
+            <div class="card-header">
+                <h3><i class="fa fa-file-alt"></i> Company Documents / Brochure</h3>
+                <p>Upload documents to share with freelancers (optional).</p>
+            </div>
+
+            <div class="upload-zone">
+                <div class="upload-content">
+                    <i class="fa fa-cloud-upload-alt"></i>
+                    <h4>Drag & Drop files here</h4>
+                    <p>or <span class="browse-link">Browse Files</span></p>
+                    <small>Supported formats: PDF, DOCX (Max 5MB)</small>
+                </div>
+            </div>
+
+            <div class="uploaded-file-item">
+                <div class="file-icon"><i class="fa fa-file-pdf"></i></div>
+                <div class="file-info">
+                    <strong>Company_Overview_2026.pdf</strong>
+                    <small>Uploaded on Feb 10, 2026 • 2.4 MB</small>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon"><i class="fa fa-eye"></i></button>
+                    <button class="btn-icon delete"><i class="fa fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+
+      </div>
+
+      <aside class="column-side">
+        
+        <div class="card edit-card">
+            <div class="card-header">
+                <h3>Company Name</h3>
+            </div>
+            <div class="form-group">
+                <input type="text" value="Acme Corp">
+            </div>
+        </div>
+
+        <div class="card edit-card">
+            <div class="card-header">
+                <h3>Industry</h3>
+            </div>
+            <div class="form-group">
+                <input type="text" value="Fintech & SaaS">
+            </div>
+        </div>
+
+        <div class="card edit-card">
+            <div class="card-header">
+                <h3>Preferred Languages</h3>
+            </div>
+            <ul class="language-list">
+                <li>
+                    <span>English</span>
+                    <select class="mini-select"><option>Fluent</option></select>
+                </li>
+                <li>
+                    <span>French</span>
+                    <select class="mini-select"><option>Native</option></select>
+                </li>
+            </ul>
+            <button class="btn-text-add">+ Add Language</button>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </main>
+</div>

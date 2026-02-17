@@ -1,0 +1,92 @@
+<div class="msg-dropdown">
+
+  <ng-container *ngIf="!activeChat">
+    
+    <div class="msg-header">
+      <h3>Chats</h3>
+      <div class="header-actions">
+        <a href="#">See all</a>
+        <button class="icon-sm"><i class="fa fa-edit"></i></button>
+      </div>
+    </div>
+
+    <div class="msg-search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Search Messenger">
+    </div>
+
+    <div class="msg-list">
+      <div class="msg-item" 
+           *ngFor="let user of users" 
+           [class.unread]="user.unread"
+           (click)="openChat(user)">
+        
+        <div class="avatar-wrap">
+          <img [src]="user.avatar" [alt]="user.name">
+          <div class="status-dot" [class.online]="user.status === 'online'"></div>
+        </div>
+        
+        <div class="msg-content">
+          <div class="msg-top">
+            <span class="name">{{ user.name }}</span>
+            <span class="time">{{ user.time }}</span>
+          </div>
+          <p class="preview">{{ user.lastMsg }}</p>
+        </div>
+        
+        <div class="unread-dot" *ngIf="user.unread"></div>
+      </div>
+    </div>
+
+    <div class="msg-footer">
+      <a href="#">See all in Messenger</a>
+    </div>
+
+  </ng-container>
+
+
+  <div class="chat-view" *ngIf="activeChat">
+    
+    <div class="chat-header">
+      <div class="chat-user-info">
+        <button class="back-btn" (click)="goBack()">
+          <i class="fa fa-arrow-left"></i>
+        </button>
+        <div class="avatar-wrap sm">
+          <img [src]="activeChat.avatar">
+          <div class="status-dot" [class.online]="activeChat.status === 'online'"></div>
+        </div>
+        <div class="user-details">
+          <span class="name">{{ activeChat.name }}</span>
+          <span class="status-text">{{ activeChat.status === 'online' ? 'Active now' : 'Active ' + activeChat.time + ' ago' }}</span>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <i class="fa fa-phone"></i>
+        <i class="fa fa-video"></i>
+        <i class="fa fa-info-circle"></i>
+      </div>
+    </div>
+
+    <div class="chat-body">
+      <div class="message-bubble" 
+           *ngFor="let msg of activeChat.history"
+           [class.me]="msg.isMe" 
+           [class.other]="!msg.isMe">
+        {{ msg.text }}
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <i class="fa fa-plus-circle icon-add"></i>
+      <i class="fa fa-image icon-img"></i>
+      <div class="input-wrapper">
+        <input type="text" placeholder="Aa">
+        <i class="fa fa-smile"></i>
+      </div>
+      <i class="fa fa-thumbs-up icon-like"></i>
+    </div>
+
+  </div>
+
+</div>
