@@ -1,27 +1,36 @@
 <nav class="navbar">
   <div class="nav-container">
     <div class="nav-brand" routerLink="/ClientFeed">
-      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
+      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img" />
     </div>
     <div class="nav-search">
       <i class="fa fa-search"></i>
-      <input type="text" placeholder="Search freelancers...">
+      <input type="text" placeholder="Search freelancers..." />
     </div>
   </div>
 </nav>
 
 <div class="profile-container">
-  
   <header class="profile-header">
     <div class="cover-photo">
-      <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80" alt="Office Cover">
-      <button class="btn-edit-cover"><i class="fa fa-camera"></i> Edit Brand Cover</button>
+      <img
+        src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80"
+        alt="Office Cover"
+      />
+      <button class="btn-edit-cover">
+        <i class="fa fa-camera"></i> Edit Brand Cover
+      </button>
     </div>
 
     <div class="user-info-bar">
       <div class="profile-pic-container">
-        <img src="https://placehold.co/160x160/198754/ffffff?text=ACME" alt="Acme Corp">
-        <div class="verified-badge" title="Payment Verified"><i class="fa fa-shield-alt"></i></div>
+        <img
+          src="https://placehold.co/160x160/198754/ffffff?text=ACME"
+          alt="Acme Corp"
+        />
+        <div class="verified-badge" title="Payment Verified">
+          <i class="fa fa-shield-alt"></i>
+        </div>
       </div>
 
       <div class="user-details">
@@ -36,42 +45,78 @@
         </div>
         <div class="details-right">
           <div class="action-buttons">
-            <button class="btn-message"><i class="fa fa-envelope"></i> Contact</button>
-            <button class="btn-follow"><i class="fa fa-plus"></i> Follow</button>
+            <button class="btn-message">
+              <i class="fa fa-envelope"></i> Contact
+            </button>
+            <button class="btn-follow">
+              <i class="fa fa-plus"></i> Follow
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="profile-tabs">
-      <button class="tab-link" [class.active]="currentTab === 'about'" (click)="setTab('about')">About</button>
-      <button class="tab-link" [class.active]="currentTab === 'jobs'" (click)="setTab('jobs')">Jobs <span class="count">3</span></button>
-      <button class="tab-link" [class.active]="currentTab === 'reviews'" (click)="setTab('reviews')">Reviews <span class="count">12</span></button>
+      <button
+        class="tab-link"
+        [class.active]="currentTab === 'about'"
+        (click)="setTab('about')"
+      >
+        About
+      </button>
+      <button
+        class="tab-link"
+        [class.active]="currentTab === 'jobs'"
+        (click)="setTab('jobs')"
+      >
+        Jobs <span class="count">3</span>
+      </button>
+      <button
+        class="tab-link"
+        [class.active]="currentTab === 'reviews'"
+        (click)="setTab('reviews')"
+      >
+        Reviews <span class="count">12</span>
+      </button>
     </div>
   </header>
 
   <div class="profile-body">
-    
     <aside class="left-col">
-      
       <div *ngIf="currentTab === 'about'">
         <div class="card verification-card">
           <h3>Verifications</h3>
           <ul class="verify-list">
-            <li class="verified"><i class="fa fa-check-circle"></i> Payment Method Verified</li>
-            <li class="verified"><i class="fa fa-check-circle"></i> Email Verified</li>
-            <li class="verified"><i class="fa fa-check-circle"></i> Phone Verified</li>
-            <li class="pending"><i class="fa fa-circle"></i> Facebook Connected</li>
+            <li class="verified">
+              <i class="fa fa-check-circle"></i> Payment Method Verified
+            </li>
+            <li class="verified">
+              <i class="fa fa-check-circle"></i> Email Verified
+            </li>
+            <li class="verified">
+              <i class="fa fa-check-circle"></i> Phone Verified
+            </li>
+            <li class="pending">
+              <i class="fa fa-circle"></i> Facebook Connected
+            </li>
           </ul>
         </div>
 
         <div class="card stats-card">
           <h3>Hiring Statistics</h3>
           <div class="stat-grid">
-            <div class="stat-item"><strong>12</strong><small>Jobs Posted</small></div>
-            <div class="stat-item"><strong>80%</strong><small>Hire Rate</small></div>
-            <div class="stat-item"><strong>$45k+</strong><small>Total Spent</small></div>
-            <div class="stat-item"><strong>$55/hr</strong><small>Avg Rate</small></div>
+            <div class="stat-item">
+              <strong>12</strong><small>Jobs Posted</small>
+            </div>
+            <div class="stat-item">
+              <strong>80%</strong><small>Hire Rate</small>
+            </div>
+            <div class="stat-item">
+              <strong>$45k+</strong><small>Total Spent</small>
+            </div>
+            <div class="stat-item">
+              <strong>$55/hr</strong><small>Avg Rate</small>
+            </div>
           </div>
         </div>
       </div>
@@ -82,42 +127,84 @@
           <div class="rating-big">
             <span class="score">4.8</span>
             <div class="stars-static">
-              <i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star-half-alt filled"></i>
+              <i class="fa fa-star filled"></i><i class="fa fa-star filled"></i
+              ><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i
+              ><i class="fa fa-star-half-alt filled"></i>
             </div>
             <small>12 Reviews</small>
           </div>
           <div class="rating-bars">
-            <div class="bar-row"><span>5 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 80%"></div></div><span>80%</span></div>
-            <div class="bar-row"><span>4 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 15%"></div></div><span>15%</span></div>
-            <div class="bar-row"><span>3 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 5%"></div></div><span>5%</span></div>
-            <div class="bar-row"><span>2 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 0%"></div></div><span>0%</span></div>
-            <div class="bar-row"><span>1 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 0%"></div></div><span>0%</span></div>
+            <div class="bar-row">
+              <span>5 <i class="fa fa-star"></i></span>
+              <div class="progress-bg">
+                <div class="progress-fill" style="width: 80%"></div>
+              </div>
+              <span>80%</span>
+            </div>
+            <div class="bar-row">
+              <span>4 <i class="fa fa-star"></i></span>
+              <div class="progress-bg">
+                <div class="progress-fill" style="width: 15%"></div>
+              </div>
+              <span>15%</span>
+            </div>
+            <div class="bar-row">
+              <span>3 <i class="fa fa-star"></i></span>
+              <div class="progress-bg">
+                <div class="progress-fill" style="width: 5%"></div>
+              </div>
+              <span>5%</span>
+            </div>
+            <div class="bar-row">
+              <span>2 <i class="fa fa-star"></i></span>
+              <div class="progress-bg">
+                <div class="progress-fill" style="width: 0%"></div>
+              </div>
+              <span>0%</span>
+            </div>
+            <div class="bar-row">
+              <span>1 <i class="fa fa-star"></i></span>
+              <div class="progress-bg">
+                <div class="progress-fill" style="width: 0%"></div>
+              </div>
+              <span>0%</span>
+            </div>
           </div>
         </div>
 
         <div class="card verification-card">
-            <h3>Verifications</h3>
-            <ul class="verify-list">
-              <li class="verified"><i class="fa fa-check-circle"></i> Payment Verified</li>
-              <li class="verified"><i class="fa fa-check-circle"></i> Email Verified</li>
-            </ul>
+          <h3>Verifications</h3>
+          <ul class="verify-list">
+            <li class="verified">
+              <i class="fa fa-check-circle"></i> Payment Verified
+            </li>
+            <li class="verified">
+              <i class="fa fa-check-circle"></i> Email Verified
+            </li>
+          </ul>
         </div>
       </div>
-
     </aside>
 
     <main class="right-col">
-      
       <div *ngIf="currentTab === 'about'" class="fade-in">
-        
         <div class="card about-section">
           <div class="section-header"><h3>About Us</h3></div>
-          <p>Acme Corp is a leading fintech startup focused on democratizing access to financial tools for small businesses. Founded in 2021, we have grown to a team of 50+ remote-first employees.</p>
-          <p>We frequently hire freelancers for <strong>Angular Development</strong>, <strong>UI/UX Design</strong>, and <strong>Content Marketing</strong>.</p>
+          <p>
+            Acme Corp is a leading fintech startup focused on democratizing
+            access to financial tools for small businesses. Founded in 2021, we
+            have grown to a team of 50+ remote-first employees.
+          </p>
+          <p>
+            We frequently hire freelancers for
+            <strong>Angular Development</strong>, <strong>UI/UX Design</strong>,
+            and <strong>Content Marketing</strong>.
+          </p>
           <div class="tech-stack">
             <h5>Tech Stack We Use:</h5>
             <div class="stack-tags">
-              <span>Angular 18</span><span>Node.js</span><span>AWS</span><span>Figma</span>
+              <span>Angular 18</span><span>Node.js</span><span>AWS</span
+              ><span>Figma</span>
             </div>
           </div>
         </div>
@@ -131,7 +218,8 @@
             <div class="job-main">
               <h4>Senior Angular Developer for Dashboard</h4>
               <div class="job-meta">
-                <span class="badge hourly">Hourly</span><span>Intermediate - Expert</span><span>Est. 3 months</span>
+                <span class="badge hourly">Hourly</span
+                ><span>Intermediate - Expert</span><span>Est. 3 months</span>
               </div>
               <p>We need an expert to help refactor our legacy dashboard...</p>
             </div>
@@ -143,76 +231,144 @@
         </div>
 
         <div class="card feedback-section">
-            <h3>Latest Feedback</h3>
-            <div class="feedback-item">
-                <div class="f-header"><h4>Mobile App UI Design</h4><div class="stars"><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><span>5.0</span></div></div>
-                <p class="f-text">"Acme Corp was amazing to work with! Clear requirements and fast payment."</p>
+          <h3>Latest Feedback</h3>
+          <div class="feedback-item">
+            <div class="f-header">
+              <h4>Mobile App UI Design</h4>
+              <div class="stars">
+                <i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i><span>5.0</span>
+              </div>
             </div>
+            <p class="f-text">
+              "Acme Corp was amazing to work with! Clear requirements and fast
+              payment."
+            </p>
+          </div>
         </div>
-
       </div>
 
       <div *ngIf="currentTab === 'reviews'" class="fade-in">
-        
         <div class="card write-review-card">
-            <div class="section-header"><h3>Leave a Review</h3></div>
-            <div class="review-form">
-                <div class="form-group">
-                    <label>Rate your experience</label>
-                    <div class="star-rating-input">
-                        <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="fa fa-star"></i></label>
-                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fa fa-star"></i></label>
-                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fa fa-star"></i></label>
-                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fa fa-star"></i></label>
-                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fa fa-star"></i></label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Your Review</label>
-                    <textarea placeholder="Share your experience working with this client..." rows="4"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button class="btn-primary">Post Review</button>
-                </div>
+          <div class="section-header"><h3>Leave a Review</h3></div>
+          <div class="review-form">
+            <div class="form-group">
+              <label>Rate your experience</label>
+              <div class="star-rating-input">
+                <input type="radio" id="star5" name="rating" value="5" /><label
+                  for="star5"
+                  title="5 stars"
+                  ><i class="fa fa-star"></i
+                ></label>
+                <input type="radio" id="star4" name="rating" value="4" /><label
+                  for="star4"
+                  title="4 stars"
+                  ><i class="fa fa-star"></i
+                ></label>
+                <input type="radio" id="star3" name="rating" value="3" /><label
+                  for="star3"
+                  title="3 stars"
+                  ><i class="fa fa-star"></i
+                ></label>
+                <input type="radio" id="star2" name="rating" value="2" /><label
+                  for="star2"
+                  title="2 stars"
+                  ><i class="fa fa-star"></i
+                ></label>
+                <input type="radio" id="star1" name="rating" value="1" /><label
+                  for="star1"
+                  title="1 star"
+                  ><i class="fa fa-star"></i
+                ></label>
+              </div>
             </div>
+            <div class="form-group">
+              <label>Your Review</label>
+              <textarea
+                placeholder="Share your experience working with this client..."
+                rows="4"
+              ></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary">Post Review</button>
+            </div>
+          </div>
         </div>
 
         <div class="card reviews-feed">
-            <div class="section-header">
-                <h3>Client Reviews (12)</h3>
-                <div class="sort-dropdown"><span>Sort by: <strong>Newest</strong> <i class="fa fa-chevron-down"></i></span></div>
+          <div class="section-header">
+            <h3>Client Reviews (12)</h3>
+            <div class="sort-dropdown">
+              <span
+                >Sort by: <strong>Newest</strong>
+                <i class="fa fa-chevron-down"></i
+              ></span>
             </div>
+          </div>
 
-            <div class="review-item">
-                <div class="review-avatar"><img src="https://placehold.co/50x50/3b82f6/ffffff?text=SJ" alt="SJ"></div>
-                <div class="review-content">
-                    <div class="review-top">
-                        <div><h4 class="reviewer-name">Sarah Jenkins</h4><span class="review-role">Mobile Developer</span></div>
-                        <span class="review-date">2 weeks ago</span>
-                    </div>
-                    <div class="stars-static"><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i></div>
-                    <p class="review-body">Acme Corp was amazing to work with! Clear requirements and fast payment.</p>
+          <div class="review-item">
+            <div class="review-avatar">
+              <img
+                src="https://placehold.co/50x50/3b82f6/ffffff?text=SJ"
+                alt="SJ"
+              />
+            </div>
+            <div class="review-content">
+              <div class="review-top">
+                <div>
+                  <h4 class="reviewer-name">Sarah Jenkins</h4>
+                  <span class="review-role">Mobile Developer</span>
                 </div>
+                <span class="review-date">2 weeks ago</span>
+              </div>
+              <div class="stars-static">
+                <i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i>
+              </div>
+              <p class="review-body">
+                Acme Corp was amazing to work with! Clear requirements and fast
+                payment.
+              </p>
             </div>
+          </div>
 
-            <div class="divider"></div>
+          <div class="divider"></div>
 
-            <div class="review-item">
-                <div class="review-avatar"><img src="https://placehold.co/50x50/f59e0b/ffffff?text=DK" alt="DK"></div>
-                <div class="review-content">
-                    <div class="review-top">
-                        <div><h4 class="reviewer-name">David Kim</h4><span class="review-role">Backend Engineer</span></div>
-                        <span class="review-date">1 month ago</span>
-                    </div>
-                    <div class="stars-static"><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star"></i></div>
-                    <p class="review-body">Good client, but the project scope crept up a little bit towards the end.</p>
+          <div class="review-item">
+            <div class="review-avatar">
+              <img
+                src="https://placehold.co/50x50/f59e0b/ffffff?text=DK"
+                alt="DK"
+              />
+            </div>
+            <div class="review-content">
+              <div class="review-top">
+                <div>
+                  <h4 class="reviewer-name">David Kim</h4>
+                  <span class="review-role">Backend Engineer</span>
                 </div>
+                <span class="review-date">1 month ago</span>
+              </div>
+              <div class="stars-static">
+                <i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i
+                ><i class="fa fa-star filled"></i><i class="fa fa-star"></i>
+              </div>
+              <p class="review-body">
+                Good client, but the project scope crept up a little bit towards
+                the end.
+              </p>
             </div>
+          </div>
         </div>
-
       </div>
-
     </main>
-
   </div>
 </div>

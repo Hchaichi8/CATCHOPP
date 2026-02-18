@@ -30,10 +30,18 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
+<<<<<<< HEAD
              "assets": [
               "src/favicon.ico",
               "src/assets"
 
+=======
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+>>>>>>> 73af901af61b9bf55befcf9106d82c427051ef27
             ],
             "styles": [
               "src/styles.css"
@@ -88,8 +96,15 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
+<<<<<<< HEAD
               "src/favicon.ico",
               "src/assets"
+=======
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+>>>>>>> 73af901af61b9bf55befcf9106d82c427051ef27
             ],
             "styles": [
               "src/styles.css"

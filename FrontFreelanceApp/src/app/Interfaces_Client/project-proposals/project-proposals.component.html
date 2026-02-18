@@ -1,42 +1,61 @@
 <nav class="navbar">
   <div class="nav-container">
     <div class="nav-brand" routerLink="/ClientFeed">
-      <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
+      <img src="assets/logo.png" alt="CatchIQ" class="logo-img" />
     </div>
 
     <div class="nav-menu">
-      <a routerLink="/ClientFeed" routerLinkActive="active"><i class="fa fa-stream"></i> Feed</a>
-      <a routerLink="/ClientDashboard" routerLinkActive="active"><i class="fa fa-th-large"></i> Dashboard</a>
-      <a routerLink="/ClientProfileManager" routerLinkActive="active"><i class="fa fa-user-circle"></i> Profile</a>
-      <a routerLink="/AllProjects" routerLinkActive="active" class="active-link"><i class="fa fa-folder-open"></i> Projects</a>
-      <a routerLink="/Messages" routerLinkActive="active"><i class="fa fa-comment-dots"></i> Messages</a>
-      <a routerLink="/ClientWallet" routerLinkActive="active"><i class="fa fa-wallet"></i> Payments</a>
+      <a routerLink="/ClientFeed" routerLinkActive="active"
+        ><i class="fa fa-stream"></i> Feed</a
+      >
+      <a routerLink="/ClientDashboard" routerLinkActive="active"
+        ><i class="fa fa-th-large"></i> Dashboard</a
+      >
+      <a routerLink="/ClientProfileManager" routerLinkActive="active"
+        ><i class="fa fa-user-circle"></i> Profile</a
+      >
+      <a routerLink="/AllProjects" routerLinkActive="active" class="active-link"
+        ><i class="fa fa-folder-open"></i> Projects</a
+      >
+      <a routerLink="/Messages" routerLinkActive="active"
+        ><i class="fa fa-comment-dots"></i> Messages</a
+      >
+      <a routerLink="/ClientWallet" routerLinkActive="active"
+        ><i class="fa fa-wallet"></i> Payments</a
+      >
     </div>
 
     <div class="nav-actions">
-        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
-        <div class="user-profile">
-            <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
-        </div>
+      <button class="btn-create-nav">
+        <i class="fa fa-plus"></i> Post Job
+      </button>
+      <div class="user-profile">
+        <img
+          src="https://placehold.co/40x40/198754/ffffff?text=AC"
+          alt="Acme Corp"
+        />
+      </div>
     </div>
   </div>
 </nav>
 
 <div class="layout-container">
-
   <main class="main-content">
-    
     <header class="top-header">
       <div class="header-left">
-        <a routerLink="/AllProjects" class="back-link"><i class="fa fa-arrow-left"></i> Back to Projects</a>
+        <a routerLink="/AllProjects" class="back-link"
+          ><i class="fa fa-arrow-left"></i> Back to Projects</a
+        >
         <h1>Manage Proposals</h1>
-        <p>Project: <strong>Senior Angular Developer for SaaS Dashboard</strong></p>
+        <p>
+          Project: <strong>Senior Angular Developer for SaaS Dashboard</strong>
+        </p>
       </div>
-      
+
       <div class="header-stats">
         <div class="stat-pill">
           <span class="label">Total Proposals</span>
-          <span class="value">{{proposals.length}}</span>
+          <span class="value">{{ proposals.length }}</span>
         </div>
         <div class="stat-pill">
           <span class="label">Avg Bid</span>
@@ -50,9 +69,11 @@
     </header>
 
     <div class="proposals-grid">
-      
-      <div class="freelancer-card" *ngFor="let p of proposals" [class.dimmed]="p.status === 'rejected'">
-        
+      <div
+        class="freelancer-card"
+        *ngFor="let p of proposals"
+        [class.dimmed]="p.status === 'rejected'"
+      >
         <div class="card-badge" *ngIf="p.status === 'accepted'">
           <i class="fa fa-check"></i> Hired
         </div>
@@ -61,25 +82,27 @@
         </div>
 
         <div class="card-top">
-          <img [src]="p.image" alt="User" class="avatar">
+          <img [src]="p.image" alt="User" class="avatar" />
           <div class="user-meta">
-            <h3>{{p.name}}</h3>
-            <p class="role">{{p.title}}</p>
+            <h3>{{ p.name }}</h3>
+            <p class="role">{{ p.title }}</p>
             <div class="rating">
-              <i class="fa fa-star filled"></i> {{p.rating}}
+              <i class="fa fa-star filled"></i> {{ p.rating }}
             </div>
           </div>
           <div class="rate-box">
-            <span class="amount">${{p.rate}}</span>
+            <span class="amount">${{ p.rate }}</span>
             <small>/hr</small>
           </div>
         </div>
 
         <div class="card-body">
-          <p class="cover-letter">"{{p.coverLetter}}"</p>
-          
+          <p class="cover-letter">"{{ p.coverLetter }}"</p>
+
           <div class="skills-row">
-            <span class="skill-tag" *ngFor="let skill of p.skills">{{skill}}</span>
+            <span class="skill-tag" *ngFor="let skill of p.skills">{{
+              skill
+            }}</span>
           </div>
         </div>
 
@@ -93,12 +116,11 @@
         </div>
 
         <div class="card-footer">
-          <button class="btn-view" routerLink="/FreelancerProfil">View Full Profile</button>
+          <button class="btn-view" routerLink="/FreelancerProfil">
+            View Full Profile
+          </button>
         </div>
-
       </div>
-      
     </div>
-
   </main>
 </div>

@@ -1,36 +1,42 @@
 <nav class="navbar">
   <div class="nav-container">
-    
     <div class="nav-brand" routerLink="/ClientFeed">
-      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
+      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img" />
     </div>
 
     <div class="nav-search">
       <i class="fa fa-search"></i>
-      <input type="text" placeholder="Search freelancers or services...">
+      <input type="text" placeholder="Search freelancers or services..." />
     </div>
 
     <div class="nav-actions">
-      
       <div class="icon-btn-wrapper">
-        <button class="nav-icon-btn" (click)="toggleMessages(); $event.stopPropagation()" [class.active]="isMessagesOpen">
+        <button
+          class="nav-icon-btn"
+          (click)="toggleMessages(); $event.stopPropagation()"
+          [class.active]="isMessagesOpen"
+        >
           <i class="fa fa-comment-dots"></i>
         </button>
 
-        <app-messenger 
-            *ngIf="isMessagesOpen" 
-            (click)="$event.stopPropagation()">
+        <app-messenger
+          *ngIf="isMessagesOpen"
+          (click)="$event.stopPropagation()"
+        >
         </app-messenger>
       </div>
       <div class="icon-btn-wrapper">
         <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
         <span class="badge">3</span>
       </div>
-      
+
       <div class="nav-divider"></div>
-      
+
       <div class="user-profile-menu" routerLink="/ClientProfil">
-        <img src="https://placehold.co/40x40/198754/white?text=A" alt="Profile">
+        <img
+          src="https://placehold.co/40x40/198754/white?text=A"
+          alt="Profile"
+        />
         <div class="user-text">
           <span class="name">Acme Corp</span>
           <span class="role">Client</span>
@@ -42,14 +48,18 @@
 </nav>
 
 <div class="main-layout">
-  
   <aside class="sidebar-left">
     <div class="card profile-card">
       <div class="profile-bg"></div>
       <div class="profile-content">
-        <img src="https://placehold.co/70x70/198754/white?text=A" class="main-avatar">
+        <img
+          src="https://placehold.co/70x70/198754/white?text=A"
+          class="main-avatar"
+        />
         <h3>Acme Corp</h3>
-        <p class="verified"><i class="fa fa-check-circle"></i> Verified Client</p>
+        <p class="verified">
+          <i class="fa fa-check-circle"></i> Verified Client
+        </p>
       </div>
       <div class="profile-metrics">
         <div><strong>12</strong><small>Jobs</small></div>
@@ -58,10 +68,16 @@
       </div>
     </div>
     <nav class="side-menu">
-      <a routerLink="/ClientDashboard" class="menu-item active"><i class="fa fa-th-large"></i> Dashboard</a>
-      <a routerLink="/AllProjects" class="menu-item"><i class="fa fa-file-alt"></i> My Postings</a>
+      <a routerLink="/ClientDashboard" class="menu-item active"
+        ><i class="fa fa-th-large"></i> Dashboard</a
+      >
+      <a routerLink="/AllProjects" class="menu-item"
+        ><i class="fa fa-file-alt"></i> My Postings</a
+      >
       <a href="#" class="menu-item"><i class="fa fa-users"></i> Hired Talent</a>
-      <a href="#" class="menu-item"><i class="fa fa-file-invoice"></i> Invoices</a>
+      <a href="#" class="menu-item"
+        ><i class="fa fa-file-invoice"></i> Invoices</a
+      >
       <a href="#" class="menu-item"><i class="fa fa-cog"></i> Settings</a>
     </nav>
   </aside>
@@ -69,22 +85,34 @@
   <main class="feed-center">
     <div class="card create-trigger">
       <div class="trigger-row">
-        <img src="https://placehold.co/40x40/198754/white?text=A" class="sm-avatar">
+        <img
+          src="https://placehold.co/40x40/198754/white?text=A"
+          class="sm-avatar"
+        />
         <button class="trigger-btn" (click)="openProjectModal()">
           <span>Post a new project opportunity...</span>
         </button>
       </div>
       <div class="trigger-actions">
-        <button (click)="openProjectModal()"><i class="fa fa-laptop-code"></i> IT & Dev</button>
-        <button (click)="openProjectModal()"><i class="fa fa-pen-nib"></i> Design</button>
-        <button (click)="openProjectModal()"><i class="fa fa-bullhorn"></i> Marketing</button>
+        <button (click)="openProjectModal()">
+          <i class="fa fa-laptop-code"></i> IT & Dev
+        </button>
+        <button (click)="openProjectModal()">
+          <i class="fa fa-pen-nib"></i> Design
+        </button>
+        <button (click)="openProjectModal()">
+          <i class="fa fa-bullhorn"></i> Marketing
+        </button>
       </div>
     </div>
 
     <div class="feed-stream">
       <article class="card project-post">
         <div class="post-header">
-          <img src="https://placehold.co/48x48/198754/white?text=A" class="sm-avatar">
+          <img
+            src="https://placehold.co/48x48/198754/white?text=A"
+            class="sm-avatar"
+          />
           <div class="meta">
             <h4>Acme Corp <i class="fa fa-check-circle verified-icon"></i></h4>
             <span>Posted 2 hours ago • Global</span>
@@ -94,8 +122,9 @@
         <div class="post-body">
           <h2 class="title">Senior Angular Developer for SaaS Dashboard</h2>
           <p class="desc">
-            We are looking for an expert to refactor our existing dashboard. 
-            Must be proficient in <strong>RxJS</strong>, <strong>NgRx</strong>, and <strong>TailwindCSS</strong>.
+            We are looking for an expert to refactor our existing dashboard.
+            Must be proficient in <strong>RxJS</strong>, <strong>NgRx</strong>,
+            and <strong>TailwindCSS</strong>.
           </p>
           <div class="tags">
             <span class="tag-pill">Development</span>
@@ -106,13 +135,15 @@
         <div class="post-footer">
           <div class="applicants">
             <div class="avatars">
-              <img src="https://i.pravatar.cc/150?u=1">
-              <img src="https://i.pravatar.cc/150?u=2">
-              <img src="https://i.pravatar.cc/150?u=3">
+              <img src="https://i.pravatar.cc/150?u=1" />
+              <img src="https://i.pravatar.cc/150?u=2" />
+              <img src="https://i.pravatar.cc/150?u=3" />
             </div>
             <span>8 Proposals received</span>
           </div>
-          <button class="btn-primary-outline" routerLink="/ClientDetailProject">View Details</button>
+          <button class="btn-primary-outline" routerLink="/ClientDetailProject">
+            View Details
+          </button>
         </div>
       </article>
     </div>
@@ -126,26 +157,34 @@
       </div>
       <div class="talent-row">
         <div class="talent-img-wrapper">
-          <img src="https://i.pravatar.cc/150?u=10" alt="User">
+          <img src="https://i.pravatar.cc/150?u=10" alt="User" />
           <div class="status-dot online"></div>
         </div>
         <div class="talent-info">
           <h5>Kenneth Silva</h5>
           <p>Senior Fullstack Dev</p>
-          <div class="rating"><i class="fa fa-star filled"></i> <strong>5.0</strong> (24 jobs)</div>
+          <div class="rating">
+            <i class="fa fa-star filled"></i> <strong>5.0</strong> (24 jobs)
+          </div>
         </div>
-        <button class="btn-icon-add" title="Invite to Job"><i class="fa fa-user-plus"></i></button>
+        <button class="btn-icon-add" title="Invite to Job">
+          <i class="fa fa-user-plus"></i>
+        </button>
       </div>
       <div class="talent-row">
         <div class="talent-img-wrapper">
-          <img src="https://i.pravatar.cc/150?u=20" alt="User">
+          <img src="https://i.pravatar.cc/150?u=20" alt="User" />
         </div>
         <div class="talent-info">
           <h5>Sarah Jenkins</h5>
           <p>UI/UX Specialist</p>
-          <div class="rating"><i class="fa fa-star filled"></i> <strong>4.9</strong> (12 jobs)</div>
+          <div class="rating">
+            <i class="fa fa-star filled"></i> <strong>4.9</strong> (12 jobs)
+          </div>
         </div>
-        <button class="btn-icon-add" title="Invite to Job"><i class="fa fa-user-plus"></i></button>
+        <button class="btn-icon-add" title="Invite to Job">
+          <i class="fa fa-user-plus"></i>
+        </button>
       </div>
     </div>
   </aside>
@@ -163,7 +202,11 @@
     <div class="modal-body">
       <div class="form-group">
         <label>Project Title</label>
-        <input type="text" class="form-control" placeholder="e.g. Build an E-commerce App for IOS">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="e.g. Build an E-commerce App for IOS"
+        />
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -185,26 +228,37 @@
       </div>
       <div class="form-group">
         <label>Description</label>
-        <textarea class="form-control text-area" placeholder="Describe deliverables..."></textarea>
+        <textarea
+          class="form-control text-area"
+          placeholder="Describe deliverables..."
+        ></textarea>
       </div>
       <div class="form-group">
         <label>Required Skills</label>
-        <input type="text" class="form-control" placeholder="Angular, Node.js...">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Angular, Node.js..."
+        />
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Project Type</label>
           <div class="radio-group">
-            <label class="radio-btn"><input type="radio" name="type" checked> Hourly</label>
-            <label class="radio-btn"><input type="radio" name="type"> Fixed</label>
+            <label class="radio-btn"
+              ><input type="radio" name="type" checked /> Hourly</label
+            >
+            <label class="radio-btn"
+              ><input type="radio" name="type" /> Fixed</label
+            >
           </div>
         </div>
         <div class="form-group budget-group">
           <label>Budget Range ($)</label>
           <div class="dual-input">
-            <input type="number" placeholder="Min" class="form-control">
+            <input type="number" placeholder="Min" class="form-control" />
             <span class="dash">-</span>
-            <input type="number" placeholder="Max" class="form-control">
+            <input type="number" placeholder="Max" class="form-control" />
           </div>
         </div>
       </div>
@@ -214,9 +268,11 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeProjectModal()">Save Draft</button>
+      <button class="btn-cancel" (click)="closeProjectModal()">
+        Save Draft
+      </button>
       <button class="btn-publish">Publish Project</button>
     </div>
   </div>
-  
-</div><app-technical-support></app-technical-support>
+</div>
+<app-technical-support></app-technical-support>
