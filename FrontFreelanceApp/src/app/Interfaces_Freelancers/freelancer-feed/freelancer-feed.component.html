@@ -1,0 +1,223 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+<img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
+</div>
+    <div class="nav-search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Search for jobs (e.g. Angular, Design)...">
+    </div>
+    <div class="nav-actions">
+       
+       
+       
+       <a routerLink="/LeaderboardFreelancer" class="nav-link">
+         <i class="fa fa-trophy"></i> Leaderboard
+       </a>
+
+       <a href="#" class="nav-link"><i class="fa fa-comments"></i> Messages</a>
+       
+       <div class="nav-divider"></div>
+       
+       <div class="user-profile-menu" routerLink="/FreelancerProfil">
+        <img src="https://i.pravatar.cc/150?u=10" alt="Kenneth">
+        <i class="fa fa-chevron-down"></i>
+       </div>
+    </div>
+  </div>
+</nav>
+
+<div class="main-layout">
+
+  <aside class="sidebar-left">
+    <div class="filter-card">
+      <h3>Filter Jobs</h3>
+      
+      <div class="filter-group">
+        <label>Category</label>
+        <div class="checkbox-row"><input type="checkbox" checked> <span>Web Development</span></div>
+        <div class="checkbox-row"><input type="checkbox"> <span>Mobile Apps</span></div>
+        <div class="checkbox-row"><input type="checkbox"> <span>UI/UX Design</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group">
+        <label>Job Type</label>
+        <div class="checkbox-row"><input type="checkbox" checked> <span>Hourly</span></div>
+        <div class="checkbox-row"><input type="checkbox"> <span>Fixed Price</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group">
+        <label>Budget Range</label>
+        <div class="radio-row"><input type="radio" name="budget"> <span>Any Budget</span></div>
+        <div class="radio-row"><input type="radio" name="budget"> <span>$100 - $500</span></div>
+        <div class="radio-row"><input type="radio" name="budget"> <span>$500 - $1k</span></div>
+        <div class="radio-row"><input type="radio" name="budget" checked> <span>$1k+</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="filter-group">
+        <label>My Workspace</label>
+        <a routerLink="/FreelancerDashboard" class="dashboard-link">
+            <i class="fa fa-th-large"></i> Go to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="feed-center">
+    
+    <div class="feed-header">
+      <h2>Jobs you might like</h2>
+      <div class="sort-box">
+        <span>Sort by:</span>
+        <select>
+          <option>Newest</option>
+          <option>Relevance</option>
+          <option>Budget (High-Low)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="job-card">
+      <div class="card-header">
+        <div class="header-main">
+          <h3 class="job-title">Senior Angular Developer for SaaS Dashboard</h3>
+          <span class="posted-time">Posted 25 minutes ago</span>
+        </div>
+        <button class="btn-save"><i class="fa fa-heart"></i></button>
+      </div>
+      
+      <div class="job-meta">
+        <span class="badge hourly">Hourly: $45 - $60</span>
+        <span class="meta-item">Intermediate</span>
+        <span class="meta-item">Est. 3 Months</span>
+      </div>
+
+      <p class="job-desc">
+        We are looking for an expert to refactor our existing dashboard. Must be proficient in RxJS, NgRx, and TailwindCSS. The goal is to modernize our legacy codebase...
+      </p>
+
+      <div class="skills-row">
+        <span class="skill">Angular</span>
+        <span class="skill">TypeScript</span>
+        <span class="skill">RxJS</span>
+      </div>
+
+      <div class="client-info">
+        <div class="verified-badge"><i class="fa fa-check-circle"></i> Payment Verified</div>
+        <div class="rating">
+          <i class="fa fa-star filled"></i>
+          <i class="fa fa-star filled"></i>
+          <i class="fa fa-star filled"></i>
+          <i class="fa fa-star filled"></i>
+          <i class="fa fa-star filled"></i>
+          <strong>5.0</strong>
+        </div>
+        <span class="location"><i class="fa fa-map-marker-alt"></i> United States</span>
+        <span class="spend">$45k+ spent</span>
+      </div>
+
+      <div class="card-footer-action">
+        <button class="btn-view-details" routerLink="/ProjectDetails">View Details</button>
+      </div>
+    </div>
+
+    <div class="job-card">
+      <div class="card-header">
+        <div class="header-main">
+          <h3 class="job-title">UI/UX Designer for Fintech Mobile App</h3>
+          <span class="posted-time">Posted 2 hours ago</span>
+        </div>
+        <button class="btn-save"><i class="fa fa-heart"></i></button>
+      </div>
+      
+      <div class="job-meta">
+        <span class="badge fixed">Fixed: $2,500</span>
+        <span class="meta-item">Expert</span>
+      </div>
+
+      <p class="job-desc">
+        Need a creative designer to build high-fidelity prototypes for a new banking app. Experience with Figma and Auto-layout is a must.
+      </p>
+
+      <div class="skills-row">
+        <span class="skill">Figma</span>
+        <span class="skill">UI Design</span>
+        <span class="skill">Mobile App</span>
+      </div>
+
+      <div class="client-info">
+        <div class="verified-badge"><i class="fa fa-check-circle"></i> Payment Verified</div>
+        <div class="rating"><i class="fa fa-star filled"></i> <strong>4.8</strong></div>
+        <span class="location"><i class="fa fa-map-marker-alt"></i> France</span>
+        <span class="spend">$12k+ spent</span>
+      </div>
+
+      <div class="card-footer-action">
+        <button class="btn-view-details" routerLink="/submit-proposal">View Details</button>
+      </div>
+    </div>
+
+  </main>
+
+  <aside class="sidebar-right">
+    
+  <div class="card profile-widget">
+    <div class="widget-head">
+      <img src="https://i.pravatar.cc/150?u=10" alt="Me">
+      <div>
+        <h4>Kenneth Silva</h4>
+        <p>Fullstack Developer</p>
+      </div>
+    </div>
+    <div class="profile-link">
+      <a href="#">Complete your profile</a>
+      <div class="progress-bar"><div class="fill" style="width: 85%"></div></div>
+      <small>85% Complete</small>
+    </div>
+  </div>
+
+  <div class="card saved-widget">
+    <div class="widget-header">
+      <h4>Saved Jobs (3)</h4>
+      <a href="#">View All</a>
+    </div>
+
+    <ul class="saved-list">
+      <li class="saved-item">
+        <a href="#" class="saved-title">React Frontend Developer</a>
+        <span class="saved-meta">Hourly • Posted 1h ago</span>
+      </li>
+      <li class="saved-item">
+        <a href="#" class="saved-title">Logo Design for Startup</a>
+        <span class="saved-meta">Fixed • Posted 5h ago</span>
+      </li>
+      <li class="saved-item">
+        <a href="#" class="saved-title">SEO Specialist Needed</a>
+        <span class="saved-meta">Hourly • Posted Yesterday</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card stats-widget">
+    <h4>Your Analytics</h4>
+    <div class="stat-row">
+      <span>Profile Views</span>
+      <strong>124</strong>
+    </div>
+    <div class="stat-row">
+      <span>Invites</span>
+      <strong>3</strong>
+    </div>
+  </div>
+
+</aside>
+<app-technical-support></app-technical-support>
+
+</div>

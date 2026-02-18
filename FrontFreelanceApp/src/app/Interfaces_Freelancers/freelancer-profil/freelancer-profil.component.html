@@ -1,0 +1,281 @@
+<nav class="navbar">
+  <div class="nav-container">
+      <div class="nav-brand" routerLink="/FreelancerFeed">
+<img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
+</div>
+    <div class="nav-search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Search for jobs...">
+    </div>
+  </div>
+</nav>
+
+<div class="profile-container">
+  
+  <header class="profile-header">
+    <div class="cover-photo">
+      <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80" alt="Code Cover">
+    </div>
+
+    <div class="user-info-bar">
+      <div class="profile-pic-container">
+        <img src="https://placehold.co/160x160/2563eb/ffffff?text=AD" alt="Alex Dev">
+        <div class="online-badge" title="Online Now"></div>
+      </div>
+
+      <div class="user-details">
+        <div class="details-left">
+          <h1>Alex Dev <span class="badge-top-rated"><i class="fa fa-medal"></i> Top Rated</span></h1>
+          <p class="headline">Senior Full Stack Developer (Angular, Node.js, AWS)</p>
+          <div class="location-row">
+            <span><i class="fa fa-map-marker-alt"></i> Tunis, Tunisia</span>
+            <span class="dot">•</span>
+            <span><i class="fa fa-clock"></i> 2:00 PM Local Time</span>
+          </div>
+        </div>
+        <div class="details-right">
+          <div class="rate-box">
+             <span class="rate">$45.00</span>
+             <small>/ hr</small>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-message">Message</button>
+            <button class="btn-primary">Hire Talent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-tabs">
+      <button class="tab-link" [class.active]="currentTab === 'overview'" (click)="setTab('overview')">Overview</button>
+      <button class="tab-link" [class.active]="currentTab === 'portfolio'" (click)="setTab('portfolio')">Portfolio <span class="count">6</span></button>
+      <button class="tab-link" [class.active]="currentTab === 'reviews'" (click)="setTab('reviews')">Reviews <span class="count">24</span></button>
+    </div>
+  </header>
+
+  <div class="profile-body">
+    
+    <aside class="left-col">
+      
+      <div class="card stats-card">
+        <h3>Job Success</h3>
+        <div class="success-bar">
+            <div class="fill" style="width: 98%"></div>
+        </div>
+        <div class="stat-grid mt-3">
+            <div class="stat-item"><strong>98%</strong><small>Success Score</small></div>
+            <div class="stat-item"><strong>$120k+</strong><small>Total Earnings</small></div>
+            <div class="stat-item"><strong>42</strong><small>Total Jobs</small></div>
+            <div class="stat-item"><strong>1,400</strong><small>Hours Worked</small></div>
+        </div>
+      </div>
+
+      <div class="card skills-card">
+        <h3>Skills</h3>
+        <div class="stack-tags">
+            <span>Angular</span>
+            <span>TypeScript</span>
+            <span>Node.js</span>
+            <span>MongoDB</span>
+            <span>Docker</span>
+            <span>AWS</span>
+            <span>Figma</span>
+            <span>Git</span>
+        </div>
+      </div>
+
+      <div class="card info-card">
+         <h3>Languages</h3>
+         <ul class="info-list">
+             <li><strong>English:</strong> Fluent</li>
+             <li><strong>French:</strong> Native</li>
+             <li><strong>Arabic:</strong> Native</li>
+         </ul>
+      </div>
+
+      <div class="card info-card">
+        <h3>Education</h3>
+        <div class="edu-item">
+            <strong>B.S. Computer Science</strong>
+            <small>Esprit, 2018-2023</small>
+        </div>
+     </div>
+
+    </aside>
+
+    <main class="right-col">
+      
+      <div *ngIf="currentTab === 'overview'" class="fade-in">
+        
+        <div class="card about-section">
+          <div class="section-header"><h3>About Me</h3></div>
+          <p>
+            Hi, I'm Alex! I am a passionate Full Stack Developer with over 5 years of experience building scalable web applications. 
+            I specialize in the MEAN/MERN stack and have a strong background in cloud architecture.
+          </p>
+          <p>
+            <strong>What I can do for you:</strong><br>
+            • Build responsive Single Page Applications (SPA) with Angular.<br>
+            • Design RESTful APIs using Node.js and Express.<br>
+            • Optimize database performance (MongoDB, PostgreSQL).<br>
+            • Deploy and manage applications on AWS.
+          </p>
+        </div>
+
+        <div class="card history-section">
+            <h3>Work History</h3>
+            
+            <div class="history-item">
+                <div class="h-main">
+                    <h4>E-Commerce Platform Migration</h4>
+                    <div class="h-rating">
+                        <i class="fa fa-star filled"></i> 5.0 
+                        <span class="h-dates">Aug 2025 - Oct 2025</span>
+                    </div>
+                    <p class="h-feedback">"Alex is a fantastic developer. He solved our complex database issues in record time."</p>
+                </div>
+                <div class="h-meta">
+                    <strong>$4,500</strong>
+                    <small>Fixed Price</small>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="history-item">
+                <div class="h-main">
+                    <h4>Angular Dashboard for Fintech</h4>
+                    <div class="h-rating">
+                        <i class="fa fa-star filled"></i> 5.0 
+                        <span class="h-dates">Jan 2025 - July 2025</span>
+                    </div>
+                    <p class="h-feedback">"Great communication and high quality code. Will hire again."</p>
+                </div>
+                <div class="h-meta">
+                    <strong>$12,000</strong>
+                    <small>180 hrs $65/hr</small>
+                </div>
+            </div>
+
+        </div>
+
+      </div>
+
+      <div *ngIf="currentTab === 'portfolio'" class="fade-in">
+         <div class="portfolio-grid">
+             <div class="card project-card">
+                 <div class="project-img">
+                     <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Dashboard">
+                 </div>
+                 <div class="project-info">
+                     <h4>Crypto Dashboard</h4>
+                     <p>Angular, D3.js, WebSocket</p>
+                 </div>
+             </div>
+             <div class="card project-card">
+                <div class="project-img">
+                    <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&q=80" alt="App">
+                </div>
+                <div class="project-info">
+                    <h4>Delivery App UI</h4>
+                    <p>Figma, Mobile Design</p>
+                </div>
+            </div>
+             <div class="card project-card">
+                <div class="project-img">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="SaaS">
+                </div>
+                <div class="project-info">
+                    <h4>SaaS Landing Page</h4>
+                    <p>HTML5, SCSS, Animation</p>
+                </div>
+            </div>
+         </div>
+      </div>
+
+      <div *ngIf="currentTab === 'reviews'" class="fade-in">
+        
+        <div class="card summary-card">
+            <div class="row-flex">
+                <div class="rating-big-side">
+                    <span class="score">4.9</span>
+                    <div class="stars-static">
+                        <i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i>
+                    </div>
+                    <small>Based on 24 reviews</small>
+                </div>
+                <div class="rating-bars-side">
+                     <div class="bar-row"><span>5 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 90%"></div></div></div>
+                    <div class="bar-row"><span>4 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 8%"></div></div></div>
+                    <div class="bar-row"><span>3 <i class="fa fa-star"></i></span><div class="progress-bg"><div class="progress-fill" style="width: 2%"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card write-review-card">
+            <div class="section-header"><h3>Rate this Freelancer</h3></div>
+            <div class="review-form">
+                <div class="form-group">
+                    <label>How was your experience working with Alex?</label>
+                    <div class="star-rating-input">
+                        <input type="radio" id="f-star5" name="rating" value="5" /><label for="f-star5"><i class="fa fa-star"></i></label>
+                        <input type="radio" id="f-star4" name="rating" value="4" /><label for="f-star4"><i class="fa fa-star"></i></label>
+                        <input type="radio" id="f-star3" name="rating" value="3" /><label for="f-star3"><i class="fa fa-star"></i></label>
+                        <input type="radio" id="f-star2" name="rating" value="2" /><label for="f-star2"><i class="fa fa-star"></i></label>
+                        <input type="radio" id="f-star1" name="rating" value="1" /><label for="f-star1"><i class="fa fa-star"></i></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Feedback</label>
+                    <textarea placeholder="Describe the project and Alex's performance..." rows="4"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary">Submit Review</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card reviews-feed">
+            <div class="section-header">
+                <h3>Work History & Feedback</h3>
+            </div>
+            
+            <div class="review-item">
+                <div class="review-avatar">
+                   <img src="https://placehold.co/50x50/10b981/ffffff?text=AC">
+                </div>
+                <div class="review-content">
+                    <div class="review-top">
+                        <div><h4 class="reviewer-name">Acme Corp</h4><span class="review-role">Client</span></div>
+                        <span class="review-date">Oct 2025</span>
+                    </div>
+                    <div class="stars-static"><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i></div>
+                    <p class="review-body">Alex is a top-tier developer. He understood the assignment perfectly.</p>
+                    <div class="review-project-tag">Project: E-Commerce Migration</div>
+                </div>
+            </div>
+            
+             <div class="divider"></div>
+
+             <div class="review-item">
+                <div class="review-avatar">
+                   <img src="https://placehold.co/50x50/6366f1/ffffff?text=ST">
+                </div>
+                <div class="review-content">
+                    <div class="review-top">
+                        <div><h4 class="reviewer-name">Startup Inc</h4><span class="review-role">Client</span></div>
+                        <span class="review-date">July 2025</span>
+                    </div>
+                    <div class="stars-static"><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i><i class="fa fa-star filled"></i></div>
+                    <p class="review-body">Very professional and delivered on time. Highly recommended.</p>
+                </div>
+            </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+</div>
