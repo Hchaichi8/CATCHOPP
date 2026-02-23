@@ -170,17 +170,14 @@
   position: absolute;
   
   top: -45px;
-  /* Pousse le menu sur la gauche du bouton (il reste sur la carte) */
   right: -80px; 
   background: white;
   border: 1px solid var(--border);
   border-radius: 8px;
-  /* Ombre ajustée pour bien le détacher de la carte */
   box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.08);
   z-index: 100;
   min-width: 150px;
   padding: 4px 0;
-  /* Nouvelle animation pour arriver depuis la droite */
   animation: fadeInSide 0.15s ease-out;
 }
 
@@ -204,7 +201,109 @@
   gap: 12px;
   transition: background 0.2s;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+}
+.modal-card {
+  background: white; width: 600px; border-radius: 12px; padding: 25px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;
+}
+.close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888; }
+.form-group { margin-bottom: 15px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 15px;
+  margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;
+}
+.btn-cancel { background: #f1f5f9; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+.btn-publish { background: #198754; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
 
+/* 🟢 STYLES SPECIFIQUES POPUPS CONFIRMATION */
+.small-modal { max-width: 400px; }
+.text-center { text-align: center; }
+.flex-center { display: flex; justify-content: center; gap: 15px; }
+.warning-text { color: #dc3545; font-size: 0.85rem; margin-top: 10px; }
+.info-text { color: #6c757d; font-size: 0.85rem; margin-top: 10px; }
+.delete-header h2 { color: #dc3545; margin: 0; }
+.close-header h2 { color: #f59e0b; margin: 0; }
+
+.btn-danger {
+  background-color: #dc3545; color: white; border: none;
+  padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+}
+.btn-danger:hover { background-color: #c82333; }
+
+.btn-warning {
+  background-color: #f59e0b; color: white; border: none;
+  padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+}
+.btn-warning:hover { background-color: #d97706; }
+
+/* =========================================
+   🟢 NVIDIA STYLE TOAST NOTIFICATION 
+   ========================================= */
+.nvidia-toast {
+  position: fixed;
+  bottom: 40px;
+  right: -500px; 
+  background-color: #080808; 
+  border: 1px solid #1a1a1a;
+  border-left: 5px solid #198754; 
+  color: white;
+  padding: 18px 25px;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(118, 185, 0, 0.15), inset 0 0 10px rgba(118, 185, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 9999;
+  overflow: hidden;
+  min-width: 320px;
+}
+
+.nvidia-toast.show {
+  right: 40px; 
+}
+
+.nvidia-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+
+
+.nvidia-text {
+  font-weight: bold;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: #e0e0e0;
+}
+
+.nvidia-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: #198754;
+  width: 100%;
+  box-shadow: 0 0 8px #198754;
+  animation: nvidiaLoad 3.5s linear forwards;
+}
+
+@keyframes nvidiaLoad {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
 .dropdown-item i {
   color: var(--text-muted);
   width: 16px;
@@ -215,7 +314,6 @@
   background: var(--bg-body);
 }
 
-/* Bouton Supprimer en rouge */
 .dropdown-item.delete {
   color: #dc3545;
 }

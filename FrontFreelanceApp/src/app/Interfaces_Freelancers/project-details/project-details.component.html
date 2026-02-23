@@ -10,8 +10,8 @@
     <div class="nav-actions">
       <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
       <div class="nav-divider"></div>
-      <div class="user-profile-menu">
-        <img src="https://i.pravatar.cc/150?u=10" alt="Profile">
+      <div class="user-profile-menu" routerLink="/FreelancerProfilManager" style="cursor: pointer;">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/150x150/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="Profile">
       </div>
     </div>
   </div>
@@ -112,11 +112,12 @@
               </div>
             </div>
           </div>
+          
           <div class="proposal-card" *ngFor="let prop of proposals">
             <div class="prop-freelancer">
               <img src="https://placehold.co/40x40/1f2937/white?text=F" alt="Freelancer">
               <div>
-                <strong>Freelancer #{{ prop.freelancerId }}</strong>
+                <strong>Freelancer #{{ prop.freelancerId }} <span *ngIf="prop.freelancerId === currentFreelancerId" style="color:var(--primary); font-size: 0.8em;">(You)</span></strong>
                 <small>Submitted an offer</small>
               </div>
             </div>
@@ -180,17 +181,10 @@
         
         <ul class="client-stats-list">
           <li>
-            <i class="fa fa-globe"></i>
+            <i class="fa fa-building"></i>
             <div>
-              <strong>United States</strong>
-              <small>San Francisco, 10:42 AM</small>
-            </div>
-          </li>
-          <li>
-            <i class="fa fa-briefcase"></i>
-            <div>
-              <strong>12 Jobs Posted</strong>
-              <small>80% Hire Rate</small>
+              <strong>Client ID: {{ project.clientId }}</strong>
+              <small>From Eureka/Feign later</small>
             </div>
           </li>
           <li>

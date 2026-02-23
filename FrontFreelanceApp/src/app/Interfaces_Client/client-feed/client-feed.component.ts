@@ -1,13 +1,14 @@
 import { Component , ElementRef,HostListener, OnInit} from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
+import { UserService } from '../../Services/user.service';
 
 @Component({
   selector: 'app-client-feed',
   templateUrl: './client-feed.component.html',
   styleUrl: './client-feed.component.css'
 })
-export class ClientFeedComponent implements OnInit{
+export class ClientFeedComponent implements OnInit {
 
   isProjectModalOpen: boolean = false;
   isMessagesOpen: boolean = false;
@@ -21,22 +22,69 @@ export class ClientFeedComponent implements OnInit{
   selectedSort: string = 'Newest';
 
   project: Project = this.getDefaultProject(); 
+  currentUser: any = null;
 
   constructor(
     private eRef: ElementRef,
-    private projectService: ProjectServiceService
+    private projectService: ProjectServiceService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.loadProjects();
+    // On charge le profil EN PREMIER, et à l'intérieur ça chargera les projets
+    this.loadUserData(); 
+  }
+
+  loadUserData() {
+    const storedData = localStorage.getItem('currentUser');
+    if (storedData) {
+      try {
+        let token = storedData.includes('token') ? JSON.parse(storedData).token : storedData;
+        if (token) {
+          const payload = token.split('.')[1];
+          const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
+          const currentUserId = decodedPayload.id;
+
+          if (currentUserId) {
+            this.userService.getUserById(currentUserId).subscribe({
+              next: (user) => {
+                this.currentUser = user;
+                this.project.clientId = user.id; 
+                
+                // Maintenant qu'on sait qui est connecté, on charge les projets
+                this.loadProjects(); 
+              },
+              error: (err) => {
+                console.error("Erreur Backend Profil :", err);
+                this.loadProjects(); // On charge quand même les projets en cas d'erreur
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erreur de décodage du token :", e);
+        this.loadProjects();
+      }
+    } else {
+      this.loadProjects();
+    }
   }
 
   loadProjects() {
     this.projectService.getAllProjects().subscribe({
       next: (data) => {
-        // .reverse() puts the newest projects at the top of the feed!
         this.projectsList = data.reverse(); 
-        // Initialiser la liste filtrée avec tous les projets au démarrage
+
+        // 🟢 RESTAURATION DES RÉACTIONS APRÈS LE F5
+        this.projectsList.forEach(p => {
+          if (this.currentUser && p.id) {
+            const savedReaction = localStorage.getItem(`reaction_${this.currentUser.id}_${p.id}`);
+            if (savedReaction) {
+              p.myReaction = savedReaction;
+            }
+          }
+        });
+
         this.filteredProjects = [...this.projectsList]; 
       },
       error: (err) => {
@@ -91,7 +139,7 @@ export class ClientFeedComponent implements OnInit{
       budget: 0,
       postedAt: '',
       status: 'OPEN',
-      clientId: 1
+      clientId: this.currentUser ? this.currentUser.id : 1
     };
   }
 
@@ -99,6 +147,7 @@ export class ClientFeedComponent implements OnInit{
     if (!value) return '';
     return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
   }
+  
   openProjectModal() {
     this.isProjectModalOpen = true;
     document.body.style.overflow = 'hidden';
@@ -123,7 +172,7 @@ export class ClientFeedComponent implements OnInit{
         console.log("Created:", response);
         alert("Project created successfully 🚀");
         this.closeProjectModal();
-        this.loadProjects();
+        this.loadProjects(); // Recharge la liste pour afficher le nouveau
       },
       error: (err) => {
         console.error(err);
@@ -134,6 +183,9 @@ export class ClientFeedComponent implements OnInit{
   
   resetForm() {
     this.project = this.getDefaultProject();
+    if (this.currentUser) {
+       this.project.clientId = this.currentUser.id;
+    }
   }
 
   toggleMessages() {
@@ -149,21 +201,20 @@ export class ClientFeedComponent implements OnInit{
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
-    
     if (file) {
       const reader = new FileReader();
-      
       reader.onload = (e: any) => {
         this.project.image = e.target.result; 
       };
-      
       reader.readAsDataURL(file);
     }
   }
+  
   getTotalReactions(p: Project): number {
     return (p.likes || 0) + (p.loves || 0) + (p.hahas || 0) + (p.supports || 0);
   }
 
+  // 🟢 LOGIQUE DE RÉACTION AVEC SAUVEGARDE LOCALE
   react(project: Project, type: string) {
     if (!project.id) return;
 
@@ -172,8 +223,10 @@ export class ClientFeedComponent implements OnInit{
       project.justReacted = false;
     }, 500); 
 
+    // Annule si on clique sur la même chose
     if (project.myReaction === type) return;
 
+    // Retire l'ancienne réaction des compteurs
     if (project.myReaction) {
       if (project.myReaction === 'LIKE') project.likes = (project.likes || 1) - 1;
       if (project.myReaction === 'LOVE') project.loves = (project.loves || 1) - 1;
@@ -181,11 +234,17 @@ export class ClientFeedComponent implements OnInit{
       if (project.myReaction === 'SUPPORT') project.supports = (project.supports || 1) - 1;
     }
 
+    // Applique la nouvelle
     project.myReaction = type;
     if (type === 'LIKE') project.likes = (project.likes || 0) + 1;
     if (type === 'LOVE') project.loves = (project.loves || 0) + 1;
     if (type === 'HAHA') project.hahas = (project.hahas || 0) + 1;
     if (type === 'SUPPORT') project.supports = (project.supports || 0) + 1;
+
+    // Sauvegarde dans le localStorage (Pour résister au F5)
+    if (this.currentUser) {
+      localStorage.setItem(`reaction_${this.currentUser.id}_${project.id}`, type);
+    }
 
     this.projectService.reactToProject(project.id, type).subscribe({
       next: () => console.log(`Réaction ${type} enregistrée !`),

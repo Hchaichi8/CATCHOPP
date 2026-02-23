@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectServiceService } from '../../Services/project-service.service';
 import { Proposal } from '../../models/proposal';
+import { UserService } from '../../Services/user.service';
 
 
 @Component({
@@ -18,16 +19,22 @@ export class ProjectProposalsComponent implements OnInit {
   
   isLoading: boolean = true;
   
-  // Statistiques calculées dynamiquement
   averageBid: number = 0;
   shortlistedCount: number = 0;
 
+  currentUser: any = null; 
+  freelancersMap: { [key: number]: any } = {}; 
+
   constructor(
     private route: ActivatedRoute,
-    private projectService: ProjectServiceService
+    private router: Router, 
+    private projectService: ProjectServiceService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
+    this.loadUserData(); 
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.projectId = Number(idParam);
@@ -35,6 +42,27 @@ export class ProjectProposalsComponent implements OnInit {
       this.loadProposals(this.projectId);
     } else {
       this.isLoading = false;
+    }
+  }
+
+  loadUserData() {
+    const storedData = localStorage.getItem('currentUser');
+    if (storedData) {
+      try {
+        let token = storedData.includes('token') ? JSON.parse(storedData).token : storedData;
+        if (token) {
+          const payload = token.split('.')[1];
+          const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
+          if (decodedPayload.id) {
+            this.userService.getUserById(decodedPayload.id).subscribe({
+              next: (user) => this.currentUser = user,
+              error: (err) => console.error("Erreur Backend Profil :", err)
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erreur token :", e);
+      }
     }
   }
 
@@ -50,11 +78,26 @@ export class ProjectProposalsComponent implements OnInit {
       next: (data) => {
         this.proposals = data;
         this.calculateStats();
+        this.fetchFreelancersInfo(); 
         this.isLoading = false;
       },
       error: (err) => {
         console.error("Error loading proposals", err);
         this.isLoading = false;
+      }
+    });
+  }
+
+  fetchFreelancersInfo() {
+    this.proposals.forEach(prop => {
+    
+      if (prop.freelancerId && !this.freelancersMap[prop.freelancerId]) {
+        this.userService.getUserById(prop.freelancerId).subscribe({
+          next: (user) => {
+            this.freelancersMap[prop.freelancerId] = user;
+          },
+          error: (err) => console.error("Erreur chargement freelance", err)
+        });
       }
     });
   }
@@ -69,25 +112,40 @@ export class ProjectProposalsComponent implements OnInit {
     const totalBids = this.proposals.reduce((sum, p) => sum + p.bidAmount, 0);
     this.averageBid = Math.round(totalBids / this.proposals.length);
     
-    // On compte combien ont été acceptés (shortlisted)
     this.shortlistedCount = this.proposals.filter(p => p.status === 'ACCEPTED').length;
   }
 
-  // --- NOUVEAU : Mettre à jour le statut via le backend ---
-  updateStatus(proposalId: number | undefined, newStatus: string) {
-    if (!proposalId) return;
+  updateStatus(proposal: Proposal, newStatus: string) {
+    if (!proposal.id) return;
 
-    // Appel HTTP PUT vers ton backend Spring Boot
-    this.projectService.updateProposalStatus(proposalId, newStatus).subscribe({
+    this.projectService.updateProposalStatus(proposal.id, newStatus).subscribe({
       next: (updatedProposal) => {
-        // Mettre à jour la proposition dans la liste locale
-        const index = this.proposals.findIndex(p => p.id === proposalId);
+        console.log(`Statut mis à jour : ${newStatus}`);
+        
+        const index = this.proposals.findIndex(p => p.id === proposal.id);
         if (index !== -1) {
           this.proposals[index].status = newStatus;
-          this.calculateStats(); // Recalculer les stats (Shortlisted count)
+          this.calculateStats();
+        }
+
+        if (newStatus === 'ACCEPTED') {
+          const fUser = this.freelancersMap[proposal.freelancerId];
+          const fName = fUser ? `${fUser.firstName} ${fUser.lastName || ''}`.trim() : `Freelancer #${proposal.freelancerId}`;
+
+          this.router.navigate(['/ClientCreateContract', proposal.id], {
+            state: {
+              freelancerName: fName, 
+              freelancerId: proposal.freelancerId,
+              projectTitle: this.project?.title || 'Project',
+              bidAmount: proposal.bidAmount
+            }
+          });
         }
       },
-      error: (err) => alert("Failed to update status. Please try again.")
+      error: (err) => {
+        console.error("Erreur mise à jour statut", err);
+        alert("Failed to update status. Please try again.");
+      }
     });
   }
 

@@ -32,6 +32,13 @@ import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/d
 import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
 import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
 import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/competence-admin.component';
+import { ContractCreationComponent } from './Interfaces_Client/contract-creation/contract-creation.component';
+import { ClientContractComponent } from './Interfaces_Client/client-contract/client-contract.component';
+import { ClientContractDetailsComponent } from './Interfaces_Client/client-contract-details/client-contract-details.component';
+import { FreelancerContractsComponent } from './Interfaces_Freelancers/freelancer-contracts/freelancer-contracts.component';
+import { FreelancerContractReviewComponent } from './Interfaces_Freelancers/freelancer-contract-review/freelancer-contract-review.component';
+import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/freelancer-contract-details/freelancer-contract-details.component';
+import { authGuard } from './Interfaces_Authentification/Guards/auth.guard';
 
 const routes: Routes = [
 
@@ -47,27 +54,33 @@ const routes: Routes = [
   {path:'RegisterFreelancer',component: RegisterFreelancerComponent, },
 
 //client routes
- {path:'ClientFeed',component: ClientFeedComponent, },
- {path:'ClientDashboard',component:ClientDashboardComponent, },
- {path:'ProjectProposals/:id',component:ProjectProposalsComponent, },
- {path:'AllProjects',component:AllProjectsComponent, },
- {path:'ClientProfil',component:ClientProfileComponent, },
- {path:'VirtualContract',component:VirtualContractComponent, },
- {path:'ClientDetailProject/:id',component:DetailclientprojectComponent, },
- {path:'ClientProfileManager',component:ClientProfilManagerComponent, },
- {path:'ClientWallet',component:ClientWalletComponent, },
+ {path:'ClientFeed',component: ClientFeedComponent, canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientDashboard',component:ClientDashboardComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ProjectProposals/:id',component:ProjectProposalsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'AllProjects',component:AllProjectsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientProfil',component:ClientProfileComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'VirtualContract',component:VirtualContractComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientDetailProject/:id',component:DetailclientprojectComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientProfileManager',component:ClientProfilManagerComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientWallet',component:ClientWalletComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientCreateContract/:proposalId',component:ContractCreationComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientContracts', component: ClientContractComponent , canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientContracts/:id', component: ClientContractDetailsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
 
 
 
  //Freelancer routes
- {path:'ProjectDetails/:id',component:ProjectDetailsComponent, },
-{path:'FreelancerDashboard',component:DashboardFreelancerComponent, },
-{path:'FreelancerProfileManager',component:ProfileManagerComponent, },
-{path:'FreelancerFeed',component:FreelancerFeedComponent, },
-{path:'FreelancerJobs',component:FreelancerJobsComponent, },
-{path:'FreelancerProfil',component:FreelancerProfilComponent, },
-{path:'LeaderboardFreelancer',component:LeaderboardFreelancerComponent, },
-{path:'FreelancerWallet',component:FreelancerWalletComponent, },
+{path:'FreelancerContractDetails/:id',component:FreelancerContractDetailsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerContractReview/:id',component:FreelancerContractReviewComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerContracts',component:FreelancerContractsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'ProjectDetails/:id',component:ProjectDetailsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerDashboard',component:DashboardFreelancerComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerProfileManager',component:ProfileManagerComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerFeed',component:FreelancerFeedComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerJobs',component:FreelancerJobsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerProfil',component:FreelancerProfilComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'LeaderboardFreelancer',component:LeaderboardFreelancerComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerWallet',component:FreelancerWalletComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 
  //Communication routes
 {path:'TechnicalSupport',component:TechnicalSupportComponent, },

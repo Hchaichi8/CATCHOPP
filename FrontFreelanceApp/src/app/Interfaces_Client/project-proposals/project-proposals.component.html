@@ -14,9 +14,9 @@
     </div>
 
     <div class="nav-actions">
-        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
-        <div class="user-profile">
-            <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
+        <button class="btn-create-nav" routerLink="/ClientFeed"><i class="fa fa-plus"></i> Post Job</button>
+        <div class="user-profile" routerLink="/ClientProfil" style="cursor: pointer;">
+            <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" alt="Client Profile">
         </div>
     </div>
   </div>
@@ -72,10 +72,11 @@
         </div>
 
         <div class="card-top">
-          <img src="https://placehold.co/40x40/1f2937/white?text=F" alt="User" class="avatar">
+          <img [src]="freelancersMap[p.freelancerId]?.profilePictureUrl || 'https://placehold.co/40x40/1f2937/white?text=' + (freelancersMap[p.freelancerId]?.firstName ? freelancersMap[p.freelancerId]?.firstName.charAt(0) : 'F')" alt="User" class="avatar">
+          
           <div class="user-meta">
-            <h3>Freelancer #{{ p.freelancerId }}</h3>
-            <p class="role">Professional Developer</p>
+            <h3>{{ freelancersMap[p.freelancerId]?.firstName || 'Freelancer' }} {{ freelancersMap[p.freelancerId]?.lastName || '' }}</h3>
+            <p class="role">{{ freelancersMap[p.freelancerId]?.bio || 'Professional Developer' }}</p>
             <div class="rating">
               <i class="fa fa-star filled"></i> 4.9
             </div>
@@ -98,17 +99,20 @@
           </div>
         </div>
 
-        <div class="card-actions" *ngIf="!p.status || p.status === 'PENDING'">
-          <button class="btn-refuse" (click)="updateStatus(p.id, 'REJECTED')">
-            <i class="fa fa-times"></i> Refuse
-          </button>
-          <button class="btn-accept" (click)="updateStatus(p.id, 'ACCEPTED')">
-            <i class="fa fa-check"></i> Accept / Interview
-          </button>
-        </div>
+       <div class="card-actions" *ngIf="!p.status || p.status === 'PENDING'">
+         
+         <button class="btn-refuse" (click)="updateStatus(p, 'REJECTED')">
+           <i class="fa fa-times"></i> Refuse
+         </button>
+         
+         <button class="btn-accept" (click)="updateStatus(p, 'ACCEPTED')">
+           <i class="fa fa-check"></i> Accept / Hire
+         </button>
+         
+       </div>
 
         <div class="card-footer">
-          <button class="btn-view" routerLink="/FreelancerProfil">View Full Profile</button>
+          <button class="btn-view" [routerLink]="['/FreelancerProfil', p.freelancerId]">View Full Profile</button>
         </div>
 
       </div>

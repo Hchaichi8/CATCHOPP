@@ -29,9 +29,9 @@
       <div class="nav-divider"></div>
       
       <div class="user-profile-menu" routerLink="/ClientProfil">
-        <img src="https://placehold.co/40x40/198754/white?text=A" alt="Profile">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" alt="Profile">
         <div class="user-text">
-          <span class="name">Acme Corp</span>
+          <span class="name">{{ currentUser?.firstName || 'Company' }}</span>
           <span class="role">Client</span>
         </div>
         <i class="fa fa-chevron-down"></i>
@@ -46,8 +46,8 @@
     <div class="card profile-card">
       <div class="profile-bg"></div>
       <div class="profile-content">
-        <img src="https://placehold.co/70x70/198754/white?text=A" class="main-avatar">
-        <h3>Acme Corp</h3>
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/70x70/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" class="main-avatar">
+        <h3>{{ currentUser?.firstName || 'Company' }}</h3>
         <p class="verified"><i class="fa fa-check-circle"></i> Verified Client</p>
       </div>
       <div class="profile-metrics">
@@ -68,7 +68,7 @@
   <main class="feed-center">
     <div class="card create-trigger">
       <div class="trigger-row">
-        <img src="https://placehold.co/40x40/198754/white?text=A" class="sm-avatar">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" class="sm-avatar">
         <button class="trigger-btn" (click)="openProjectModal()">
           <span>Post a new project opportunity...</span>
         </button>
@@ -123,9 +123,9 @@
     
     <div class="post-header">
       <div class="client-info">
-        <img src="https://placehold.co/48x48/198754/white?text=A" class="client-avatar" alt="Client Avatar">
+        <img [src]="p.clientId === currentUser?.id ? (currentUser?.profilePictureUrl || 'https://placehold.co/48x48/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')) : ('https://placehold.co/48x48/198754/white?text=C')" class="client-avatar" alt="Client Avatar">
         <div class="client-meta">
-          <h4>Acme Corp <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
+          <h4>{{ p.clientId === currentUser?.id ? (currentUser?.firstName || 'Company') : 'Company' }} <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
           <span class="post-time"><i class="far fa-clock"></i> Posted {{ p.postedAt }}</span> 
         </div>
       </div>

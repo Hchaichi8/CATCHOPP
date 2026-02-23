@@ -18,6 +18,18 @@ export class ProjectServiceService {
   getAllProjects(): Observable<Project[]> {
     return this.http.get<Project[]>(`${this.url}/allprojects`);
   }
+  deleteProject(id: number): Observable<any> {
+    return this.http.delete(`${this.url}/delete/${id}`);
+  }
+
+  updateProjectStatus(id: number, status: string): Observable<Project> {
+    
+    return this.http.put<Project>(`${this.url}/${id}/status?status=${status}`, {});
+  }
+
+  updateProject(id: number, project: Project): Observable<Project> {
+    return this.http.put<Project>(`${this.url}/update/${id}`, project);
+  }
   reactToProject(projectId: number, reactionType: string): Observable<Project> {
     return this.http.put<Project>(`${this.url}/${projectId}/react?type=${reactionType}`, {});
   }

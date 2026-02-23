@@ -1,0 +1,142 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+        <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
+    </div>
+    <div class="nav-menu">
+        <a routerLink="/FreelancerContracts" class="back-link"><i class="fa fa-arrow-left"></i> Back to My Jobs</a>
+    </div>
+    <div class="nav-actions" style="display: flex; align-items: center; gap: 20px;">
+        <button id="downloadBtn" class="btn-download" (click)="downloadPDF()" [disabled]="!contract">
+            <i class="fa fa-file-download"></i> Download Signed PDF
+        </button>
+        <div class="user-profile" routerLink="/FreelancerProfileManager" style="cursor: pointer;">
+            <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="Freelancer Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb;">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container" *ngIf="isLoading">
+    <div class="loading-state">
+        <i class="fa fa-circle-notch fa-spin fa-2x"></i>
+        <p>Retrieving contract document...</p>
+    </div>
+</div>
+
+<div class="layout-container" *ngIf="!isLoading && contract">
+  
+  <div class="contract-paper" #contentToConvert>
+    
+    <header class="doc-header">
+        <div class="brand">
+            <img src="assets/logo.png" alt="Logo" style="height: 25px; opacity: 0.6;">
+            <span>CatchOPP Official Contract</span>
+        </div>
+        <div class="doc-title">
+            <h1>INDEPENDENT CONTRACTOR AGREEMENT</h1>
+            <span class="contract-id">Agreement #{{ contract.id }}</span>
+        </div>
+        <div class="doc-meta">
+            <div class="meta-row">
+                <strong>Date:</strong> <span>{{ contract.startDate | date:'longDate' }}</span>
+            </div>
+            <div class="meta-row">
+                <strong>Status:</strong> <span class="status-badge">SIGNED & ACTIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <hr class="divider">
+
+    <section class="section-block">
+        <h3>1. PARTIES</h3>
+        <p>This Agreement is made and entered into by and between:</p>
+        
+        <div class="parties-grid">
+            <div class="party-box client">
+                <span class="role">Client (Hiring Party)</span>
+                <strong class="name">{{ contract.clientName }}</strong>
+                <p class="details">Project Owner</p>
+            </div>
+            <div class="party-box freelancer">
+                <span class="role">Contractor (Freelancer)</span>
+                <strong class="name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</strong>
+                <p class="details">Service Provider</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-block">
+        <h3>2. PROJECT DETAILS</h3>
+        <table class="details-table">
+            <tr>
+                <td class="label">Project Title:</td>
+                <td class="value">{{ contract.projectTitle }}</td>
+            </tr>
+            <tr>
+                <td class="label">Payment Amount:</td>
+                <td class="value"><strong>${{ contract.rate | number:'1.2-2' }}</strong> (Fixed Price)</td>
+            </tr>
+            <tr>
+                <td class="label">Start Date:</td>
+                <td class="value">{{ contract.startDate | date:'mediumDate' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Deadline:</td>
+                <td class="value">{{ contract.deadline ? (contract.deadline | date:'mediumDate') : 'As agreed upon completion' }}</td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="section-block">
+        <h3>3. SCOPE OF WORK & TERMS</h3>
+        <div class="terms-content">
+            {{ contract.terms }}
+        </div>
+    </section>
+
+    <section class="section-block signature-section">
+        <h3>4. SIGNATURES</h3>
+        <p class="legal-text">
+            By signing below, both parties acknowledge that they have read, understood, and agreed to the terms of this Agreement.
+        </p>
+
+        <div class="sig-grid">
+            
+            <div class="sig-box">
+                <p class="sig-label">Signed by Client:</p>
+                <div class="sig-image-wrapper">
+                    <img [src]="contract.clientSignature" alt="Client Signature" *ngIf="contract.clientSignature">
+                    <span *ngIf="!contract.clientSignature" class="missing">(Pending Signature)</span>
+                </div>
+                <div class="sig-line"></div>
+                <p class="signer-name">{{ contract.clientName }}</p>
+                <p class="sig-date">{{ contract.startDate | date:'shortDate' }}</p>
+            </div>
+
+            <div class="sig-box">
+                <p class="sig-label">Signed by Contractor:</p>
+                <div class="sig-image-wrapper">
+                    <img [src]="contract.freelancerSignature" alt="Freelancer Signature" *ngIf="contract.freelancerSignature">
+                    <span *ngIf="!contract.freelancerSignature" class="missing">(Not Signed)</span>
+                </div>
+                <div class="sig-line"></div>
+                <p class="signer-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</p>
+                <p class="sig-date">{{ contract.startDate | date:'shortDate' }}</p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="doc-footer">
+        <p>Generated by CatchIQ Platform • Digital Contract ID: {{ contract.id }} • Page 1 of 1</p>
+    </footer>
+
+  </div>
+</div>
+
+<div *ngIf="!isLoading && !contract" style="text-align: center; padding: 100px;">
+    <h2>Contract not found</h2>
+    <a routerLink="/FreelancerContracts" style="color: var(--primary);">Return to My Jobs</a>
+</div>

@@ -1,53 +1,92 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
+import { UserService } from '../../Services/user.service';
 
 @Component({
   selector: 'app-all-projects',
   templateUrl: './all-projects.component.html',
-  styleUrl: './all-projects.component.css'
+  styleUrls: ['./all-projects.component.css']
 })
-export class AllProjectsComponent implements OnInit{
+export class AllProjectsComponent implements OnInit {
 
-  // On utilise les statuts de ton backend (OPEN, DRAFT, CLOSED)
   selectedTab: string = 'OPEN'; 
-  
-  projects: Project[] = []; // Tous les projets du client
-  activeMenuId: number | null = null; // Pour le menu 3 points
-  searchText: string = ''; // Pour la barre de recherche
+  projects: Project[] = []; 
+  activeMenuId: number | null = null;
+  searchText: string = '';
 
-  constructor(private projectService: ProjectServiceService) {}
+  currentUser: any = null;
+
+  isEditModalOpen: boolean = false;
+  projectToEdit: Project = {} as Project;
+  
+
+  isConfirmDeleteOpen: boolean = false;
+  isConfirmCloseOpen: boolean = false;
+  projectActionId: number | null = null;
+
+ 
+  showNvidiaToast: boolean = false;
+  toastMessage: string = '';
+
+  constructor(
+    private projectService: ProjectServiceService,
+    private userService: UserService 
+  ) {}
 
   ngOnInit(): void {
-    this.loadMyProjects();
+    this.loadUserData();
+  }
+
+  loadUserData() {
+    const storedData = localStorage.getItem('currentUser');
+    if (storedData) {
+      try {
+        let token = storedData.includes('token') ? JSON.parse(storedData).token : storedData;
+        if (token) {
+          const payload = token.split('.')[1];
+          const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
+          const currentUserId = decodedPayload.id;
+
+          if (currentUserId) {
+            this.userService.getUserById(currentUserId).subscribe({
+              next: (user) => {
+                this.currentUser = user;
+                this.loadMyProjects();
+              },
+              error: (err) => console.error("Erreur Backend Profil :", err)
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erreur de décodage du token :", e);
+      }
+    }
   }
 
   loadMyProjects() {
     this.projectService.getAllProjects().subscribe({
       next: (data) => {
-        // Optionnel : Ici tu pourras filtrer par clientId quand tu géreras la connexion
-        // ex: this.projects = data.filter(p => p.clientId === MON_ID).reverse();
-        this.projects = data.reverse(); 
+        if (this.currentUser && this.currentUser.id) {
+            const myId = this.currentUser.id;
+            this.projects = data.filter(p => p.clientId === myId).reverse();
+        } else {
+            this.projects = [];
+        }
       },
       error: (err) => console.error("Erreur de chargement", err)
     });
   }
 
-  // Helper pour filtrer les projets dans le HTML en temps réel
   get filteredProjects() {
     return this.projects.filter(p => {
-      // 1. Vérifie le statut (Si p.status est null, on le considère comme OPEN par défaut)
       const currentStatus = p.status ? p.status : 'OPEN';
       const matchesStatus = currentStatus === this.selectedTab;
-      
-      // 2. Vérifie la recherche par titre
       const matchesSearch = p.title.toLowerCase().includes(this.searchText.toLowerCase());
-      
       return matchesStatus && matchesSearch;
     });
   }
 
-  // Calcule le nombre de projets pour les badges des onglets
   getCount(status: string): number {
     return this.projects.filter(p => (p.status ? p.status : 'OPEN') === status).length;
   }
@@ -56,13 +95,11 @@ export class AllProjectsComponent implements OnInit{
     this.selectedTab = tab;
   }
 
-  // Formatage pour l'Enum Catégorie (ex: WEB_DEVELOPMENT -> Web Development)
   formatEnumText(value: string | undefined): string {
     if (!value) return 'Uncategorized';
     return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
   }
 
-  // --- LOGIQUE DU MENU 3 POINTS ---
   toggleMenu(id: number | undefined, event: MouseEvent) {
     if (!id) return;
     event.stopPropagation();
@@ -74,29 +111,114 @@ export class AllProjectsComponent implements OnInit{
     this.activeMenuId = null;
   }
 
-  // --- ACTIONS DU MENU ---
+
   editProject(id: number | undefined) {
     if (!id) return;
-    console.log("Edit project", id);
-    // TODO: Ouvrir la modal d'édition
     this.activeMenuId = null; 
+    
+    const proj = this.projects.find(p => p.id === id);
+    if (proj) {
+      this.projectToEdit = JSON.parse(JSON.stringify(proj)); 
+      this.isEditModalOpen = true;
+      document.body.style.overflow = 'hidden'; 
+    }
   }
 
-  closeJob(id: number | undefined) {
-    if (!id) return;
-    if (confirm("Are you sure you want to close this job? Freelancers will no longer be able to apply.")) {
-      console.log("Close project", id);
-      // TODO: this.projectService.updateStatus(id, 'CLOSED').subscribe(...)
-    }
-    this.activeMenuId = null; 
+  closeEditModal() {
+    this.isEditModalOpen = false;
+    document.body.style.overflow = 'auto';
   }
 
-  deleteProject(id: number | undefined) {
-    if (!id) return;
-    if (confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
-      console.log("Delete project", id);
-      // TODO: this.projectService.deleteProject(id).subscribe(...)
-    }
-    this.activeMenuId = null; 
+  saveUpdatedProject() {
+    if (!this.projectToEdit.id) return;
+
+    this.projectService.updateProject(this.projectToEdit.id, this.projectToEdit).subscribe({
+      next: (updatedProject) => {
+        const index = this.projects.findIndex(p => p.id === updatedProject.id);
+        if (index !== -1) {
+          this.projects[index] = updatedProject;
+        }
+        this.closeEditModal();
+        this.triggerNvidiaToast("SYSTEM_UPDATE: Project modified successfully.");
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Error updating the project.");
+      }
+    });
+  }
+
+ 
+  openCloseConfirm(id: number | undefined) {
+    if(!id) return;
+    this.projectActionId = id;
+    this.isConfirmCloseOpen = true;
+    this.activeMenuId = null;
+    document.body.style.overflow = 'hidden';
+  }
+
+  cancelClose() {
+    this.isConfirmCloseOpen = false;
+    this.projectActionId = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  confirmCloseJob() {
+    if (!this.projectActionId) return;
+    
+    this.projectService.updateProjectStatus(this.projectActionId, 'CLOSED').subscribe({
+      next: () => {
+        const projectIndex = this.projects.findIndex(p => p.id === this.projectActionId);
+        if (projectIndex !== -1) {
+          this.projects[projectIndex].status = 'CLOSED';
+        }
+        this.cancelClose();
+        this.triggerNvidiaToast("STATUS_OVERRIDE: Project is now closed.");
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Error closing the project.");
+      }
+    });
+  }
+
+
+  openDeleteConfirm(id: number | undefined) {
+    if(!id) return;
+    this.projectActionId = id;
+    this.isConfirmDeleteOpen = true;
+    this.activeMenuId = null;
+    document.body.style.overflow = 'hidden';
+  }
+
+  cancelDelete() {
+    this.isConfirmDeleteOpen = false;
+    this.projectActionId = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  confirmDeleteProject() {
+    if (!this.projectActionId) return;
+    
+    this.projectService.deleteProject(this.projectActionId).subscribe({
+      next: () => {
+        this.projects = this.projects.filter(p => p.id !== this.projectActionId);
+        this.cancelDelete();
+        this.triggerNvidiaToast("DATA_PURGED: Project deleted successfully.");
+      },
+      error: (err) => {
+        console.error(err);
+        alert("Error deleting the project.");
+      }
+    });
+  }
+
+
+  triggerNvidiaToast(message: string) {
+    this.toastMessage = message;
+    this.showNvidiaToast = true;
+    setTimeout(() => {
+      this.showNvidiaToast = false;
+    }, 3500);
   }
 }

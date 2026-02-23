@@ -39,6 +39,12 @@ import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/competence-admin.component';
+import { ContractCreationComponent } from './Interfaces_Client/contract-creation/contract-creation.component';
+import { ClientContractComponent } from './Interfaces_Client/client-contract/client-contract.component';
+import { ClientContractDetailsComponent } from './Interfaces_Client/client-contract-details/client-contract-details.component';
+import { FreelancerContractsComponent } from './Interfaces_Freelancers/freelancer-contracts/freelancer-contracts.component';
+import { FreelancerContractReviewComponent } from './Interfaces_Freelancers/freelancer-contract-review/freelancer-contract-review.component';
+import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/freelancer-contract-details/freelancer-contract-details.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +83,12 @@ import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/co
         DisputesAdminComponent,
         FinanceAdminComponent,
         CompetenceAdminComponent,
+        ContractCreationComponent,
+        ClientContractComponent,
+        ClientContractDetailsComponent,
+        FreelancerContractsComponent,
+        FreelancerContractReviewComponent,
+        FreelancerContractDetailsComponent,
         
   ],
   imports: [

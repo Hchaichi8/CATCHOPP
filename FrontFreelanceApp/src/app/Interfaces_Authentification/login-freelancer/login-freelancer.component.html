@@ -10,15 +10,23 @@
           <p>Login to manage your projects and earnings.</p>
         </div>
 
-        <form>
+        <div *ngIf="errorMessage" style="color: #ef4444; background: #fee2e2; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+          <i class="fa fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" style="color: #166534; background: #dcfce7; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+          <i class="fa fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <form (ngSubmit)="onLogin()">
           <div class="input-field">
             <label>Professional Email</label>
-            <input type="email" placeholder="e.g. freelancer@workiq.com">
+            <input type="email" placeholder="e.g. freelancer@workiq.com" name="email" [(ngModel)]="email" required>
           </div>
           
           <div class="input-field">
             <label>Password</label>
-            <input type="password" placeholder="••••••••">
+            <input type="password" placeholder="••••••••" name="password" [(ngModel)]="password" required>
           </div>
 
           <div class="form-help">
@@ -26,10 +34,10 @@
             <a href="#">Forgot password?</a>
           </div>
 
-          <button class="btn-primary freelancer-btn">Log In to Dashboard</button>
+          <button type="submit" class="btn-primary freelancer-btn">Log In to Dashboard</button>
         </form>
 
-        <p class="switch-page">Don't Have Aaccount? <a routerLink="/RegisterFreelancer">Register</a></p>
+        <p class="switch-page">Don't Have Account? <a routerLink="/RegisterFreelancer">Register</a></p>
       </div>
     </div>
 

@@ -1,5 +1,5 @@
 <nav class="navbar">
-  <div class="logo">CatchOPP</div>
+  <div class="logo">Catch<span style="color: #a7f3d0;">OPP</span></div>
   <ul class="nav-links">
     <li><a href="#">Home</a></li>
     <li><a href="#">About Us</a></li>
@@ -8,112 +8,62 @@
   </ul>
   <div class="nav-buttons">
     <button class="btn-outline" routerLink="/Auth">Join Us</button>
-    
   </div>
 </nav>
 
 <header class="hero-section">
-    <div class="shape circle-shape"></div>
-  <div class="shape triangle-shape"></div>
+  <div class="shape circle-shape floating-slow"></div>
+  <div class="shape triangle-shape floating-fast"></div>
+  <div class="shape dots-shape pulse-slow"></div>
 
-  <div class="shape dots-shape"></div>
-  <div class="hero-content">
-    <h1>CatchOPP <br> <span>FREELANCING MADE EASY!</span></h1>
+  <div class="hero-content animate-fade-in-up">
+    <h1>CatchOPP <br> <span class="typing-text">FREELANCING MADE EASY!</span></h1>
     <p class="hero-sub">Hire an Expert Or Be An Expert.</p>
     <p class="hero-desc">Get the perfect professional for your project or find work that matches your skills.</p>
     
-    <div class="search-bar">
+    <div class="search-bar shadow-hover">
       <input type="text" placeholder="Search for any service...">
       <button class="search-btn"><i class="fa fa-search"></i></button>
     </div>
     
     <div class="hero-tags">
-      <span>Design <i class="fa fa-times-circle"></i></span>
-      <span>Marketing <i class="fa fa-times-circle"></i></span>
+      <span>Design <i class="fa fa-check-circle"></i></span>
+      <span>Marketing <i class="fa fa-check-circle"></i></span>
+      <span>Development <i class="fa fa-check-circle"></i></span>
     </div>
   </div>
 
-<div class="img-grid">
-  <div id="Teamwork" class="img-card top-right">
-    <img src="https://cdn.lifehack.org/wp-content/uploads/2018/09/teamwork-in-the-workplace.jpeg">
+  <div class="img-grid">
+    <div id="Teamwork" class="img-card top-right float-card-1">
+      <img src="https://cdn.lifehack.org/wp-content/uploads/2018/09/teamwork-in-the-workplace.jpeg" alt="Team">
+    </div>
+    <div id="Freelancer" class="img-card bottom-left float-card-2">
+      <img src="https://tse1.mm.bing.net/th/id/OIP.W3mFB2BzmrLDOHxwWLaWPAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Freelance">
+    </div>
+    <div id="Work" class="img-card bottom-right float-card-3">
+      <img src="https://as2.ftcdn.net/v2/jpg/03/43/14/87/1000_F_343148725_LLIgr5Sp1XfvG5xwmV8w6hRkPybKOqva.jpg" alt="Work">
+    </div>
   </div>
-  
-  <div id="Freelancer" class="img-card bottom-left">
-    <img src="https://tse1.mm.bing.net/th/id/OIP.W3mFB2BzmrLDOHxwWLaWPAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3">
-  </div>
-  
-  <div id="Work" class="img-card bottom-right">
-    <img src="https://as2.ftcdn.net/v2/jpg/03/43/14/87/1000_F_343148725_LLIgr5Sp1XfvG5xwmV8w6hRkPybKOqva.jpg">
-  </div>
-</div>
 </header>
 
 <section class="section services">
   <div class="section-header">
     <h2>Most Popular Services <i class="fa fa-chart-line"></i></h2>
-    <a href="#" class="see-all">See All <i class="fa fa-arrow-right"></i></a>
+    <a href="#" class="see-all hover-arrow">See All <i class="fa fa-arrow-right"></i></a>
   </div>
   
   <div class="cards-row">
-    <div class="service-card purple">
-      <div class="overlay">
-        <i class="fa fa-code"></i>
-        <h3>WEB DEVELOPMENT</h3>
-      </div>
+    <div class="service-card purple hover-lift">
+      <div class="overlay"><i class="fa fa-code pop-icon"></i><h3>WEB DEV</h3></div>
     </div>
-    <div class="service-card blue">
-      <div class="overlay">
-        <i class="fa fa-paint-brush"></i>
-        <h3>LOGO DESIGN</h3>
-      </div>
+    <div class="service-card blue hover-lift">
+      <div class="overlay"><i class="fa fa-paint-brush pop-icon"></i><h3>DESIGN</h3></div>
     </div>
-    <div class="service-card green">
-      <div class="overlay">
-        <i class="fa fa-search"></i>
-        <h3>SEO</h3>
-      </div>
+    <div class="service-card green hover-lift">
+      <div class="overlay"><i class="fa fa-search pop-icon"></i><h3>SEO</h3></div>
     </div>
-    <div class="service-card purple-dark">
-      <div class="overlay">
-        <i class="fa fa-video"></i>
-        <h3>VIDEO EDITING</h3>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section features">
-  <div class="features-text">
-    <h2 class="blue-title">Discover Our Outstanding Features</h2>
-    
-    <div class="feature-item">
-      <div class="icon-box"><i class="fa fa-check"></i></div>
-      <div>
-        <h4>Feature 1</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.</p>
-      </div>
-    </div>
-    <div class="feature-item">
-      <div class="icon-box"><i class="fa fa-check"></i></div>
-      <div>
-        <h4>Feature 2</h4>
-        <p>Labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
-      </div>
-    </div>
-    <div class="feature-item">
-      <div class="icon-box"><i class="fa fa-check"></i></div>
-      <div>
-        <h4>Feature 3</h4>
-        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="features-image">
-    <div class="circle-collage">
-      <img src="https://placehold.co/300x300/f0f0f0/333?text=Collab" alt="Collaboration" class="main-circle">
-      <img src="https://placehold.co/150x150/e0e0e0/333?text=User1" alt="User" class="small-circle c1">
-      <img src="https://placehold.co/150x150/e0e0e0/333?text=User2" alt="User" class="small-circle c2">
+    <div class="service-card purple-dark hover-lift">
+      <div class="overlay"><i class="fa fa-video pop-icon"></i><h3>VIDEO</h3></div>
     </div>
   </div>
 </section>
@@ -121,117 +71,19 @@
 <section class="section categories">
   <h2>Here are Something You'd Need</h2>
   <div class="cat-grid">
-    <div class="cat-pill">Graphic Design</div>
-    <div class="cat-pill">Digital Marketing</div>
-    <div class="cat-pill">Translation</div>
-    <div class="cat-pill">Video & Animation</div>
-    <div class="cat-pill">Logo Design</div>
-    <div class="cat-pill">Social Graphics</div>
-    <div class="cat-pill">Article Writing</div>
-    <div class="cat-pill">Video Editing</div>
+    <div class="cat-pill bounce-hover">Graphic Design</div>
+    <div class="cat-pill bounce-hover">Digital Marketing</div>
+    <div class="cat-pill bounce-hover">Translation</div>
+    <div class="cat-pill bounce-hover">Video & Animation</div>
+    <div class="cat-pill bounce-hover">Logo Design</div>
+    <div class="cat-pill bounce-hover">Article Writing</div>
   </div>
-  <div class="center-link"><a href="#">See Categories <i class="fa fa-arrow-right"></i></a></div>
 </section>
 
-<section class="cta-banner">
-  <div class="cta-content">
-    <h2>Ready to Get Started ?</h2>
+<section class="cta-banner animated-bg">
+  <div class="cta-content animate-pulse-soft">
+    <h2>Ready to Get Started?</h2>
     <p>Get access to freelance services at your fingertips.</p>
-    <button class="btn-white">Get Started Now</button>
+    <button class="btn-white pulse-btn">Get Started Now</button>
   </div>
 </section>
-
-<section class="section trending">
-  <h2>Trending <span class="blue-text">Sellers</span></h2>
-  <div class="cards-row">
-    <div class="seller-card">
-      <div class="seller-img"><img src="https://placehold.co/300x200/333/fff?text=Photo" alt="Seller"></div>
-      <div class="seller-info">
-        <h4>Kenneth Silva</h4>
-        <p>UI/UX Designer</p>
-      </div>
-    </div>
-    <div class="seller-card">
-      <div class="seller-img"><img src="https://placehold.co/300x200/444/fff?text=Photo" alt="Seller"></div>
-      <div class="seller-info">
-        <h4>Grant T. Feeney</h4>
-        <p>Data Scientist</p>
-      </div>
-    </div>
-    <div class="seller-card">
-      <div class="seller-img"><img src="https://placehold.co/300x200/555/fff?text=Photo" alt="Seller"></div>
-      <div class="seller-info">
-        <h4>Maria T.</h4>
-        <p>Content Writer</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section doubts-bg">
-  <h2 class="white-text">Have Some Doubts To Get Started ?</h2>
-  <div class="cards-row">
-    <div class="blog-card">
-      <img src="https://placehold.co/300x150/d63384/fff?text=Image" alt="Blog">
-      <div class="blog-content">
-        <h4>How To Get a Perfect Squad to Finish Task?</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        <a href="#">Read More</a>
-      </div>
-    </div>
-    <div class="blog-card">
-      <img src="https://placehold.co/300x150/fd7e14/fff?text=Image" alt="Blog">
-      <div class="blog-content">
-        <h4>How To Write on Overdue Payment?</h4>
-        <p>Sed do eiusmod tempor incididunt ut labore et dolore.</p>
-        <a href="#">Read More</a>
-      </div>
-    </div>
-    <div class="blog-card">
-      <img src="https://placehold.co/300x150/198754/fff?text=Image" alt="Blog">
-      <div class="blog-content">
-        <h4>Choosing the Right Payment Methods</h4>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation.</p>
-        <a href="#">Read More</a>
-      </div>
-    </div>
-  </div>
-  <div class="center-btn">
-    <button class="btn-blue">Read Articles</button>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-cols">
-    <div>
-      <h4>WorkIQ</h4>
-      <p>Company</p>
-      <p>About Us</p>
-      <p>Careers</p>
-    </div>
-    <div>
-      <h4>Categories</h4>
-      <p>Graphics</p>
-      <p>Programming</p>
-      <p>Marketing</p>
-    </div>
-    <div>
-      <h4>Help</h4>
-      <p>Support</p>
-      <p>Trust & Safety</p>
-      <p>Selling</p>
-    </div>
-    <div>
-      <h4>Newsletter</h4>
-      <p>Subscribe to our newsletter for updates.</p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; 2026 WorkIQ. All rights reserved.</p>
-    <div class="socials">
-      <i class="fab fa-twitter"></i>
-      <i class="fab fa-facebook"></i>
-      <i class="fab fa-instagram"></i>
-    </div>
-  </div>
-</footer>

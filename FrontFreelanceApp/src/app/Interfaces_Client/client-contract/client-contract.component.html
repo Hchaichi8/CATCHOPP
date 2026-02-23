@@ -1,0 +1,127 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
+    </div>
+    <div class="nav-menu">
+      <a routerLink="/ClientFeed" routerLinkActive="active"><i class="fa fa-stream"></i> Feed</a>
+      <a routerLink="/ClientDashboard" routerLinkActive="active"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a routerLink="/ClientProfileManager" routerLinkActive="active"><i class="fa fa-user-circle"></i> Profile</a>
+      <a routerLink="/AllProjects" routerLinkActive="active"><i class="fa fa-folder-open"></i> Projects</a>
+      <a routerLink="/ClientContracts" class="active-link"><i class="fa fa-file-contract"></i> Contracts</a>
+      <a routerLink="/ClientWallet" routerLinkActive="active"><i class="fa fa-wallet"></i> Payments</a>
+    </div>
+    <div class="nav-actions">
+        <button class="btn-create-nav" routerLink="/ClientFeed"><i class="fa fa-plus"></i> Post Job</button>
+        
+        <div class="user-profile" routerLink="/ClientProfil" style="cursor: pointer;">
+            <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" alt="Client Profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+        </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout-container">
+  <main class="main-content">
+    
+    <header class="page-header">
+      <div class="header-text">
+        <h1>My Contracts Overview</h1>
+        <p>Manage your active engagements, track deliverables, and review history.</p>
+      </div>
+      <button class="btn-outline" routerLink="/ClientFeed"><i class="fa fa-plus"></i> Hire New Talent</button>
+    </header>
+
+    <div *ngIf="isLoading" style="text-align: center; padding: 50px; color: var(--text-muted);">
+      <i class="fa fa-circle-notch fa-spin fa-2x"></i>
+      <p>Loading your contracts...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+
+        <div class="balance-grid">
+            
+            <div class="balance-card">
+                <div class="card-label">Total Contracts Created</div>
+                <div class="amount-display">{{ contracts.length }}</div>
+                
+                <div class="card-actions">
+                   <div class="status-badge" style="background: #ecfdf5; color: var(--primary);">
+                       <i class="fa fa-check-circle"></i> All Time
+                   </div>
+                </div>
+
+                <div class="wallet-info">
+                    <i class="fa fa-info-circle"></i> Total contracts generated on the platform.
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="card-label">Active Engagements</div>
+                <div class="amount-display text-locked">{{ getActiveCount() }}</div>
+                
+                <div class="card-actions">
+                    <div class="status-badge">
+                        <i class="fa fa-clock"></i> Currently In Progress
+                    </div>
+                </div>
+                
+                <div class="wallet-info">
+                    <i class="fa fa-shield-alt"></i> Contracts that are Sent or Signed.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section-container">
+            <h3>Active & Recent Contracts</h3>
+            
+            <div *ngIf="contracts.length === 0" style="text-align: center; padding: 40px; background: white; border-radius: 12px; border: 1px dashed #e5e7eb;">
+                <i class="fa fa-folder-open" style="font-size: 3rem; color: #d1d5db; margin-bottom: 15px;"></i>
+                <p style="color: #6b7280;">No contracts found. Start by hiring a freelancer!</p>
+                <button class="btn-create-nav" style="margin: 20px auto;" routerLink="/AllProjects">Browse Your Projects</button>
+            </div>
+
+            <div class="contract-item" *ngFor="let contract of contracts">
+                
+                <div class="contract-header">
+                    <div class="job-info">
+                        <h4>{{ contract.projectTitle || 'Untitled Project' }}</h4>
+                        <span class="freelancer-name">with <strong>{{ contract.freelancerName || 'Freelancer' }}</strong></span>
+                    </div>
+                    <div class="contract-total">
+                        <small>Total Budget</small>
+                        <strong>${{ contract.rate | number:'1.2-2' }}</strong>
+                    </div>
+                </div>
+
+                <div class="escrow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" [style.width]="contract.clientSignature && contract.freelancerSignature ? '100%' : (contract.clientSignature ? '50%' : '5%')"></div> 
+                    </div>
+                    <div class="progress-stats">
+                        <span>Status: <strong>{{ contract.status }}</strong></span>
+                        <span class="locked-text" *ngIf="contract.status === 'SENT'">Waiting for Freelancer Signature</span>
+                        <span class="positive" *ngIf="contract.status === 'ACTIVE' || contract.status === 'SIGNED'">Signed & Active</span>
+                    </div>
+                </div>
+
+                <div class="milestone-actions">
+                    <div class="milestone-info">
+                        <i class="fa fa-calendar-alt"></i> 
+                        <span>Start Date: <strong>{{ contract.startDate | date:'mediumDate' }}</strong></span>
+                        <span style="margin-left: 15px;">|</span>
+                        <span style="margin-left: 15px;"><i class="fa fa-flag"></i> Deadline: <strong>{{ contract.deadline ? (contract.deadline | date:'mediumDate') : 'TBD' }}</strong></span>
+                    </div>
+                    
+                    <button class="btn-release" [routerLink]="['/ClientContracts', contract.id]">
+                        View Details
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+  </main>
+</div>

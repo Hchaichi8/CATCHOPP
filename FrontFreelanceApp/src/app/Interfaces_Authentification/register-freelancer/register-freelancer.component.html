@@ -10,35 +10,43 @@
           <p>Showcase your skills and find your next big gig.</p>
         </div>
 
-        <form>
+        <div *ngIf="errorMessage" style="color: #ef4444; background: #fee2e2; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+          <i class="fa fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" style="color: #166534; background: #dcfce7; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+          <i class="fa fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <form (ngSubmit)="onRegister()">
           <div class="input-row">
             <div class="input-field">
               <label>Full Name</label>
-              <input type="text" placeholder="John Doe">
+              <input type="text" placeholder="John Doe" name="fullName" [(ngModel)]="fullName" required>
             </div>
           </div>
 
           <div class="input-field">
             <label>Email Address</label>
-            <input type="email" placeholder="john@example.com">
+            <input type="email" placeholder="john@example.com" name="email" [(ngModel)]="email" required>
           </div>
           
           <div class="input-field">
             <label>Password</label>
-            <input type="password" placeholder="At least 8 characters">
+            <input type="password" placeholder="At least 8 characters" name="password" [(ngModel)]="password" required>
           </div>
 
           <div class="terms">
             <label>
-              <input type="checkbox"> 
+              <input type="checkbox" name="agreeTerms" [(ngModel)]="agreeTerms"> 
               I agree to the <span>Terms of Service</span> and <span>Privacy Policy</span>.
             </label>
           </div>
 
-          <button class="btn-auth freelancer-btn">Create My Account</button>
+          <button type="submit" class="btn-auth freelancer-btn">Create My Account</button>
         </form>
 
-        <p class="switch-text">Already have an account? <a routerLink="/login-freelancer">Log In</a></p>
+        <p class="switch-text">Already have an account? <a routerLink="/LoginFreelancer">Log In</a></p>
       </div>
     </div>
 

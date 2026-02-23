@@ -15,8 +15,8 @@
        </a>
        <a href="#" class="nav-link"><i class="fa fa-comments"></i> Messages</a>
        <div class="nav-divider"></div>
-       <div class="user-profile-menu" routerLink="/FreelancerProfil">
-        <img src="https://i.pravatar.cc/150?u=10" alt="Kenneth">
+       <div class="user-profile-menu" routerLink="/FreelancerProfil" style="cursor: pointer;">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="User Avatar">
         <i class="fa fa-chevron-down"></i>
        </div>
     </div>
@@ -128,7 +128,7 @@
       <div class="client-info">
         <div class="verified-badge"><i class="fa fa-check-circle"></i> Payment Verified</div>
         <div class="rating"><i class="fa fa-star filled"></i> <strong>5.0</strong></div>
-        <span class="location"><i class="fa fa-globe-americas"></i> Global</span>
+        <span class="location"><i class="fa fa-building"></i> Client ID: {{ p.clientId }}</span>
       </div>
 
     </div>
@@ -139,14 +139,14 @@
     
     <div class="card profile-widget">
       <div class="widget-head">
-        <img src="https://i.pravatar.cc/150?u=10" alt="Me">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/150x150/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="Me">
         <div>
-          <h4>Kenneth Silva</h4>
-          <p>Fullstack Developer</p>
+          <h4>{{ currentUser?.firstName || 'Freelancer' }} {{ currentUser?.lastName || '' }}</h4>
+          <p>{{ currentUser?.bio || 'Update your title in profile' }}</p>
         </div>
       </div>
       <div class="profile-link">
-        <a href="#">Complete your profile</a>
+        <a routerLink="/FreelancerProfilManager">Complete your profile</a>
         <div class="progress-bar"><div class="fill" style="width: 85%"></div></div>
         <small>85% Complete</small>
       </div>

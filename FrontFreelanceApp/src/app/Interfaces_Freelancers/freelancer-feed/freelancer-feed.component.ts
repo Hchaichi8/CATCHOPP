@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
+import { UserService } from '../../Services/user.service';
 
 @Component({
   selector: 'app-freelancer-feed',
@@ -8,11 +9,15 @@ import { ProjectServiceService } from '../../Services/project-service.service';
   styleUrl: './freelancer-feed.component.css'
 })
 export class FreelancerFeedComponent implements OnInit {
-allProjects: Project[] = [];
+  
+  allProjects: Project[] = [];
   filteredProjects: Project[] = [];
   
-  // --- NOUVEAU : LISTE DES PROJETS SAUVEGARDÉS ---
+  // 🟢 LISTE DES PROJETS SAUVEGARDÉS (Favoris)
   savedProjects: Project[] = [];
+  
+  // 🟢 VARIABLE POUR STOCKER LE FREELANCER CONNECTÉ
+  currentUser: any = null;
 
   searchText: string = '';
   sortBy: string = 'Newest';
@@ -31,15 +36,54 @@ allProjects: Project[] = [];
     { label: 'Fixed Price', value: 'FIXED_PRICE', selected: false }
   ];
 
-  constructor(private projectService: ProjectServiceService) { }
+  constructor(
+    private projectService: ProjectServiceService,
+    private userService: UserService 
+  ) { }
 
   ngOnInit(): void {
-    this.loadProjects();
+    this.loadUserData(); 
   }
+
+
+  loadUserData() {
+    const storedData = localStorage.getItem('currentUser');
+    if (storedData) {
+      try {
+        let token = storedData.includes('token') ? JSON.parse(storedData).token : storedData;
+        if (token) {
+          const payload = token.split('.')[1];
+          const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
+          const currentUserId = decodedPayload.id;
+
+          if (currentUserId) {
+            this.userService.getUserById(currentUserId).subscribe({
+              next: (user) => {
+                this.currentUser = user;
+                this.loadSavedProjects(); 
+                this.loadProjects(); 
+              },
+              error: (err) => {
+                console.error("Erreur Backend Profil :", err);
+                this.loadProjects();
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Erreur de décodage du token :", e);
+        this.loadProjects();
+      }
+    } else {
+      this.loadProjects();
+    }
+  }
+
 
   loadProjects() {
     this.projectService.getAllProjects().subscribe({
       next: (data) => {
+      
         this.allProjects = data.filter(p => !p.status || p.status === 'OPEN').reverse();
         this.applyFilters();
       },
@@ -56,13 +100,13 @@ allProjects: Project[] = [];
     }
 
     const selectedCats = this.categories.filter(c => c.selected).map(c => c.value);
-    if (selectedCats.length > 0) {
-      temp = temp.filter(p => p.category && selectedCats.includes(p.category));
+    if (selectedCats.length > 0) { 
+      temp = temp.filter(p => p.category && selectedCats.includes(p.category)); 
     }
 
     const selectedTypes = this.jobTypes.filter(t => t.selected).map(t => t.value);
-    if (selectedTypes.length > 0) {
-      temp = temp.filter(p => p.jobType && selectedTypes.includes(p.jobType));
+    if (selectedTypes.length > 0) { 
+      temp = temp.filter(p => p.jobType && selectedTypes.includes(p.jobType)); 
     }
 
     if (this.selectedBudget !== 'Any') {
@@ -97,18 +141,34 @@ allProjects: Project[] = [];
     this.applyFilters();
   }
 
-  // --- NOUVELLES FONCTIONS POUR LA SAUVEGARDE ---
+  loadSavedProjects() {
+    if (this.currentUser && this.currentUser.id) {
+      const saved = localStorage.getItem(`saved_jobs_${this.currentUser.id}`);
+      if (saved) {
+        this.savedProjects = JSON.parse(saved);
+      }
+    }
+  }
+
   isSaved(projectId: number | undefined): boolean {
     if (!projectId) return false;
     return this.savedProjects.some(p => p.id === projectId);
   }
 
   toggleSave(project: Project, event: Event) {
-    event.stopPropagation(); // Empêche d'ouvrir la page détails en cliquant sur le cœur
+    event.stopPropagation(); 
+    
+    if (!this.currentUser) {
+        alert("Please log in to save jobs.");
+        return;
+    }
+
     if (this.isSaved(project.id)) {
       this.savedProjects = this.savedProjects.filter(p => p.id !== project.id);
     } else {
       this.savedProjects.push(project);
     }
+ 
+    localStorage.setItem(`saved_jobs_${this.currentUser.id}`, JSON.stringify(this.savedProjects));
   }
 }
