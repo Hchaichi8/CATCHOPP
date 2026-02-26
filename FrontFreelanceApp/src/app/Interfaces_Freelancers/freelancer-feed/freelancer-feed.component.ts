@@ -6,21 +6,23 @@ import { UserService } from '../../Services/user.service';
 @Component({
   selector: 'app-freelancer-feed',
   templateUrl: './freelancer-feed.component.html',
-  styleUrl: './freelancer-feed.component.css'
+  styleUrls: ['./freelancer-feed.component.css']
 })
 export class FreelancerFeedComponent implements OnInit {
   
+  isMessagesOpen: boolean = false;
   allProjects: Project[] = [];
   filteredProjects: Project[] = [];
   
-  // 🟢 LISTE DES PROJETS SAUVEGARDÉS (Favoris)
   savedProjects: Project[] = [];
   
-  // 🟢 VARIABLE POUR STOCKER LE FREELANCER CONNECTÉ
   currentUser: any = null;
 
+  clientDetailsMap: { [key: number]: any } = {};
+
   searchText: string = '';
-  sortBy: string = 'Newest';
+  // 🟢 1. Le tri par défaut est maintenant le Matching !
+  sortBy: string = 'Best Match'; 
   selectedBudget: string = 'Any';
 
   categories = [
@@ -45,6 +47,9 @@ export class FreelancerFeedComponent implements OnInit {
     this.loadUserData(); 
   }
 
+  toggleMessages() {
+    this.isMessagesOpen = !this.isMessagesOpen;
+  }
 
   loadUserData() {
     const storedData = localStorage.getItem('currentUser');
@@ -79,16 +84,47 @@ export class FreelancerFeedComponent implements OnInit {
     }
   }
 
-
   loadProjects() {
     this.projectService.getAllProjects().subscribe({
       next: (data) => {
-      
         this.allProjects = data.filter(p => !p.status || p.status === 'OPEN').reverse();
+        
+        const uniqueClientIds = [...new Set(this.allProjects.map(p => p.clientId).filter(id => id != null))];
+        uniqueClientIds.forEach(id => {
+          if (id && !this.clientDetailsMap[id]) {
+            this.userService.getUserById(id).subscribe({
+              next: (user) => this.clientDetailsMap[id] = user
+            });
+          }
+        });
+
         this.applyFilters();
       },
       error: (err) => console.error("Error loading projects", err)
     });
+  }
+
+  getMatchPercentage(project: any): number {
+    const reqSkills = project.requiredCompetenceIds || [];
+    if (reqSkills.length === 0) return 0; 
+
+    const mySkillIds = this.currentUser?.competenceIds || [];
+    if (mySkillIds.length === 0) return 0; 
+
+    const projectSkillNumbers = reqSkills.map((id: any) => Number(id));
+    const freelancerSkillNumbers = mySkillIds.map((id: any) => Number(id));
+
+    const matchedCount = projectSkillNumbers.filter((reqId: number) => 
+      freelancerSkillNumbers.includes(reqId)
+    ).length;
+
+    return Math.round((matchedCount / projectSkillNumbers.length) * 100);
+  }
+
+  getMatchColor(percentage: number): string {
+    if (percentage >= 80) return '#10b981'; // Vert
+    if (percentage >= 50) return '#f59e0b'; // Orange
+    return '#ef4444'; // Rouge
   }
 
   applyFilters() {
@@ -119,7 +155,15 @@ export class FreelancerFeedComponent implements OnInit {
       });
     }
 
-    if (this.sortBy === 'Newest') {
+    // 🟢 2. LA MAGIE DU TRI : On trie les projets selon l'option choisie !
+    if (this.sortBy === 'Best Match') {
+      temp.sort((a, b) => {
+        const matchDiff = this.getMatchPercentage(b) - this.getMatchPercentage(a);
+        // Si les deux projets ont le même %, on met le plus récent en premier
+        if (matchDiff === 0) return (b.id || 0) - (a.id || 0);
+        return matchDiff;
+      });
+    } else if (this.sortBy === 'Newest') {
       temp.sort((a, b) => (b.id || 0) - (a.id || 0));
     } else if (this.sortBy === 'Budget (High-Low)') {
       temp.sort((a, b) => (b.budget || 0) - (a.budget || 0));
@@ -136,6 +180,7 @@ export class FreelancerFeedComponent implements OnInit {
   clearFilters() {
     this.searchText = '';
     this.selectedBudget = 'Any';
+    this.sortBy = 'Best Match'; // 🟢 On remet le tri par défaut quand on efface les filtres
     this.categories.forEach(c => c.selected = false);
     this.jobTypes.forEach(t => t.selected = false);
     this.applyFilters();

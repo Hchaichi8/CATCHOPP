@@ -28,23 +28,29 @@ export class LoginClientComponent {
     this.userService.login({ email: this.email, password: this.password }).subscribe({
       next: (response) => {
         try {
-  
           let token = typeof response === 'string' ? response : ((response as any).token || response);
-          
-      
           const payload = token.split('.')[1];
           const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
           
-      
-          if (decodedPayload.role !== 'CLIENT') {
-            this.errorMessage = "Access Denied: This portal is strictly for Clients. Please use the Freelancer login portal.";
+          // 🟢 1. VÉRIFICATION ADMIN (Le Passe-Partout)
+          if (decodedPayload.role === 'ADMIN') {
+            this.successMessage = 'Admin access granted! Redirecting to control panel...';
+            localStorage.setItem('currentUser', JSON.stringify(response));
+            setTimeout(() => {
+              this.router.navigate(['/AdminDashboard']); 
+            }, 1500);
             return; 
           }
 
-          this.successMessage = 'Login successful! Redirecting to dashboard...';
-         
-          localStorage.setItem('currentUser', JSON.stringify(response));
           
+          if (decodedPayload.role !== 'CLIENT') {
+            this.errorMessage = "Access Denied: This portal is strictly for Clients.";
+            return; 
+          }
+
+          
+          this.successMessage = 'Login successful! Redirecting to dashboard...';
+          localStorage.setItem('currentUser', JSON.stringify(response));
           setTimeout(() => {
             this.router.navigate(['/ClientFeed']); 
           }, 1500);

@@ -17,12 +17,19 @@ public class ApigetwayApplication {
 
     @Bean
     public RouteLocator gatewayroute(RouteLocatorBuilder builder){
-
         return builder.routes()
-                .route("idroute1condidat",r->r.path("/candidats/**")
-                        .uri("lb://MSCandidat4SAE7"))
-                .route("idroute1jobs",r->r.path("/jobs/**")
-                        .uri("lb://MS-job-s"))
+                .route("idroute1project", r -> r.path("/Project/**")
+                        .uri("lb://PROJECTMICROSERVICE"))
+                .route("idroute1user", r -> r.path("/users/**")
+                        .uri("lb://USERMICROSERVICE"))
+                .route("idroute1contract", r -> r.path("/Contract/**")
+                        .uri("lb://PROJECTMICROSERVICE"))
+
+                .route("idroute1CompetanceETreview", r -> r.path("/Competance/**")
+                        .uri("lb://MSCOMPETENCEANDREVIEW"))
+
+                .route("idroute2CompetanceETreview", r -> r.path("/Review/**")
+                        .uri("lb://MSCOMPETENCEANDREVIEW"))
                 .build();
     }
 

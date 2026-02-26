@@ -77,14 +77,25 @@
       </div>
     </div>
 
-    <div class="chat-input-area">
+   <div class="chat-input-area">
       <i class="fa fa-plus-circle icon-add"></i>
       <i class="fa fa-image icon-img"></i>
       <div class="input-wrapper">
-        <input type="text" placeholder="Aa">
+        <input type="text" 
+               [(ngModel)]="newMessageText" 
+               (keyup.enter)="sendMessage()" 
+               placeholder="Aa">
         <i class="fa fa-smile"></i>
       </div>
-      <i class="fa fa-thumbs-up icon-like"></i>
+
+      <i class="fa fa-thumbs-up icon-like" 
+         *ngIf="!newMessageText.trim()"
+         style="cursor: pointer;"></i>
+
+      <i class="fa fa-paper-plane" 
+         *ngIf="newMessageText.trim()" 
+         (click)="sendMessage()"
+         style="cursor: pointer; color: #0084ff; font-size: 1.2rem; margin-left: 10px; transition: 0.3s;"></i>
     </div>
 
   </div>

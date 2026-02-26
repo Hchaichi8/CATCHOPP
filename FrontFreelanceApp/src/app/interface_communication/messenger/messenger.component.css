@@ -19,10 +19,7 @@
 /* Adjust list to take available space */
 .msg-list { flex: 1; overflow-y: auto; }
 
-/* ... (Keep your other existing styles for .msg-item, etc.) ... */
 
-
-/* --- NEW CHAT VIEW STYLES --- */
 
 .chat-view {
   display: flex;

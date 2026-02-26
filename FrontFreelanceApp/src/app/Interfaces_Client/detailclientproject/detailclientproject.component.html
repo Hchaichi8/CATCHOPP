@@ -77,9 +77,17 @@
             
             <div class="section skills-section">
               <h3>Required Skills</h3>
+              
               <div class="tags-container">
-                <span class="skill-tag">Angular</span><span class="skill-tag">Spring Boot</span>
+                <span class="skill-tag" *ngFor="let skill of projectSkills">
+                  {{ skill.nom }}
+                </span>
+                
+                <span *ngIf="projectSkills.length === 0" style="color: #9ca3af; font-size: 0.9rem; font-style: italic;">
+                  No specific skills required for this project.
+                </span>
               </div>
+
             </div>
         </div>
 

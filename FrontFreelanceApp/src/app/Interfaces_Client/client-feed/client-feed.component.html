@@ -1,6 +1,5 @@
 <nav class="navbar">
   <div class="nav-container">
-    
     <div class="nav-brand" routerLink="/ClientFeed">
       <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
     </div>
@@ -123,9 +122,9 @@
     
     <div class="post-header">
       <div class="client-info">
-        <img [src]="p.clientId === currentUser?.id ? (currentUser?.profilePictureUrl || 'https://placehold.co/48x48/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')) : ('https://placehold.co/48x48/198754/white?text=C')" class="client-avatar" alt="Client Avatar">
+        <img [src]="clientDetailsMap[p.clientId!]?.profilePictureUrl || 'https://placehold.co/48x48/198754/white?text=' + (clientDetailsMap[p.clientId!]?.firstName ? clientDetailsMap[p.clientId!].firstName.charAt(0).toUpperCase() : 'C')" class="client-avatar" alt="Client Avatar">
         <div class="client-meta">
-          <h4>{{ p.clientId === currentUser?.id ? (currentUser?.firstName || 'Company') : 'Company' }} <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
+          <h4>{{ clientDetailsMap[p.clientId!]?.firstName || 'Utilisateur inconnu' }}  <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
           <span class="post-time"><i class="far fa-clock"></i> Posted {{ p.postedAt }}</span> 
         </div>
       </div>
@@ -176,8 +175,6 @@
       <div class="post-badges">
         <span class="badge-item"><i class="fa fa-layer-group"></i> {{ p.ExperienceLevel }}</span>
         <span class="badge-item status-badge" *ngIf="p.status"><i class="fa fa-bolt"></i> {{ p.status }}</span>
-        <span class="badge-item skill-badge">Angular</span>
-        <span class="badge-item skill-badge">Spring Boot</span>
       </div>
     </div>
     
@@ -261,6 +258,38 @@
           </select>
         </div>
       </div>
+
+      <div class="form-group">
+        <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span>Required Skills <small style="color: #6b7280; font-weight: normal;">(For matching)</small></span>
+          <span class="badge" style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">
+            {{ selectedSkills.size }} selected
+          </span>
+        </label>
+        
+        <input type="text" 
+               class="form-control" 
+               style="margin-bottom: 10px; padding: 8px; font-size: 0.9rem;" 
+               [(ngModel)]="skillSearchText" 
+               placeholder="Search skills (e.g. Angular, Figma)...">
+        
+        <div class="skills-selector-box" style="max-height: 140px; overflow-y: auto; border: 1px solid #e5e7eb; padding: 10px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; background: #f9fafb;">
+          
+          <div class="skill-chip" 
+               *ngFor="let skill of filteredSkillsArray"
+               (click)="toggleSkill(skill.id)"
+               style="padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #d1d5db; transition: 0.2s; user-select: none;"
+               [ngStyle]="{'background': isSkillSelected(skill.id) ? '#3b82f6' : 'white', 'color': isSkillSelected(skill.id) ? 'white' : '#374151', 'border-color': isSkillSelected(skill.id) ? '#3b82f6' : '#d1d5db'}">
+            {{ skill.nom }}
+            <i class="fa fa-check" *ngIf="isSkillSelected(skill.id)" style="margin-left: 5px; font-size: 0.75rem;"></i>
+          </div>
+
+          <div *ngIf="filteredSkillsArray.length === 0" style="width: 100%; text-align: center; color: #9ca3af; font-size: 0.85rem; padding: 10px;">
+            Aucune compétence trouvée.
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Description</label>
         <textarea class="form-control text-area" [(ngModel)]="project.description"></textarea>

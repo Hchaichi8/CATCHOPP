@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Contract")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ContractController {
 
     @Autowired
@@ -30,14 +29,11 @@ public class ContractController {
             String terms = (String) requestData.get("terms");
             String clientName = (String) requestData.get("clientName");
 
-            // Récupération de la signature
             String clientSignature = (String) requestData.get("clientSignature");
 
-            // Conversion ID et Date (Ton code existant)
             Long clientId = Long.valueOf(requestData.get("clientId").toString());
             LocalDate startDate = LocalDate.parse((String) requestData.get("startDate"));
 
-            // Appel Service (Ajoute clientSignature aux arguments)
             Contract newContract = contractService.generateContractFromProposal(
                     proposalId, terms, clientId, clientName, startDate, clientSignature
             );

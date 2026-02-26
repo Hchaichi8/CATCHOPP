@@ -18,4 +18,5 @@ export interface Project {
   category?: string; 
   jobType?: string;
   proposals?: any[];
+  requiredCompetenceIds?: number[]; 
 }

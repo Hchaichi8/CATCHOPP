@@ -81,6 +81,18 @@
 .saved-title:hover { color: var(--primary); }
 .saved-meta { font-size: 0.8rem; color: var(--text-muted); }
 
+.msg-dropdown {
+  position: absolute; top: 55px; right: -80px; width: 360px; background: white;
+  border-radius: 12px; box-shadow: 0 12px 28px 0 rgba(0,0,0,0.2), 0 2px 4px 0 rgba(0,0,0,0.1);
+  z-index: 1000; border: 1px solid var(--border); overflow: hidden;
+  animation: fadeIn 0.15s ease-out;
+}
+.nav-icon-btn {
+  background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted);
+  cursor: pointer; padding: 10px; border-radius: 50%; transition: 0.2s;
+}
+.nav-icon-btn:hover { background: #f3f4f6; color: var(--text-main); }
+.nav-icon-btn.active { background-color: #e9f7ef; color: var(--primary); }
 /* --- CENTER FEED --- */
 .feed-center {
   height: 100%; overflow-y: auto; padding-right: 15px; padding-bottom: 40px; 

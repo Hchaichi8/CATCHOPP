@@ -39,12 +39,17 @@ import { FreelancerContractsComponent } from './Interfaces_Freelancers/freelance
 import { FreelancerContractReviewComponent } from './Interfaces_Freelancers/freelancer-contract-review/freelancer-contract-review.component';
 import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/freelancer-contract-details/freelancer-contract-details.component';
 import { authGuard } from './Interfaces_Authentification/Guards/auth.guard';
+import { WorkspaceComponent } from './workspace/workspace.component';
+import { OnboardingComponent } from './Interfaces_Freelancers/onboarding/onboarding.component';
+import { MessagesComponent } from './interface_communication/messages/messages.component';
 
 const routes: Routes = [
 
 
 
   {path:'',component: HomeAppComponent, },
+  {path:'Workspace',component: WorkspaceComponent, },
+
 
 //Authentification routes
   {path:'Auth',component: AuthComponent, },
@@ -58,7 +63,9 @@ const routes: Routes = [
  {path:'ClientDashboard',component:ClientDashboardComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ProjectProposals/:id',component:ProjectProposalsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'AllProjects',component:AllProjectsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
- {path:'ClientProfil',component:ClientProfileComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
+ {path:'ClientProfil/:id',component:ClientProfileComponent,  },
+  {path:'ClientProfil',component:ClientProfileComponent,  },
+
  {path:'VirtualContract',component:VirtualContractComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientDetailProject/:id',component:DetailclientprojectComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientProfileManager',component:ClientProfilManagerComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
@@ -66,8 +73,6 @@ const routes: Routes = [
  {path:'ClientCreateContract/:proposalId',component:ContractCreationComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientContracts', component: ClientContractComponent , canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientContracts/:id', component: ClientContractDetailsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
-
-
 
  //Freelancer routes
 {path:'FreelancerContractDetails/:id',component:FreelancerContractDetailsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
@@ -78,13 +83,19 @@ const routes: Routes = [
 {path:'FreelancerProfileManager',component:ProfileManagerComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 {path:'FreelancerFeed',component:FreelancerFeedComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 {path:'FreelancerJobs',component:FreelancerJobsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
-{path:'FreelancerProfil',component:FreelancerProfilComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerProfil/:id',component:FreelancerProfilComponent}, 
+{path:'FreelancerProfil',component:FreelancerProfilComponent}, 
+
 {path:'LeaderboardFreelancer',component:LeaderboardFreelancerComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 {path:'FreelancerWallet',component:FreelancerWalletComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'FreelancerOnboarding',component:OnboardingComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+
 
  //Communication routes
 {path:'TechnicalSupport',component:TechnicalSupportComponent, },
 {path:'Messenger',component:MessengerComponent, },
+{path:'Messages',component:MessagesComponent, },
+
 
 //Admin routes
 {path:'AdminDashboard',component:DashboardAdminComponent, },

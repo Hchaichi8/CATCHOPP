@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ProjectServiceService } from '../../Services/project-service.service';
 import { Proposal } from '../../models/proposal';
 import { UserService } from '../../Services/user.service'; 
+import { CompetanceService } from '../../Services/competance.service'; // 🟢 Ajout du service des compétences
 
 @Component({
   selector: 'app-project-details',
@@ -19,7 +20,6 @@ export class ProjectDetailsComponent implements OnInit {
   isSaved: boolean = false; 
   currentUrl: string = '';
 
- 
   lowestBid: number = 0;
   highestBid: number = 0;
   averageBid: number = 0;
@@ -27,6 +27,9 @@ export class ProjectDetailsComponent implements OnInit {
   currentUser: any = null;
   currentFreelancerId: number | null = null;
 
+  // 🟢 NOUVELLES VARIABLES POUR AFFICHER LES COMPÉTENCES
+  allSkills: any[] = []; 
+  projectSkills: any[] = []; 
 
   get hasAlreadyApplied(): boolean {
     if (!this.currentFreelancerId) return false;
@@ -45,7 +48,8 @@ export class ProjectDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectServiceService,
-    private userService: UserService
+    private userService: UserService,
+    private competenceService: CompetanceService // 🟢 Injection du service
   ) { }
 
   ngOnInit(): void {
@@ -54,10 +58,36 @@ export class ProjectDetailsComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.loadProjectDetails(Number(idParam));
-      this.loadProposals(Number(idParam)); 
+      const projectId = Number(idParam);
+      
+      // 🟢 1. On charge le catalogue de compétences
+      this.competenceService.getAllCompetances().subscribe({
+        next: (skills) => {
+          this.allSkills = skills;
+          this.resolveProjectSkills(); // On essaie de faire le lien
+        },
+        error: (err) => console.error("Erreur chargement catalogue", err)
+      });
+
+      // 🟢 2. On charge le projet et les propositions
+      this.loadProjectDetails(projectId);
+      this.loadProposals(projectId); 
     } else {
       this.isLoading = false;
+    }
+  }
+
+  // 🟢 LA LOGIQUE POUR AFFICHER LES NOMS DES COMPÉTENCES AU LIEU DES IDs
+  resolveProjectSkills() {
+    if (this.project && this.allSkills.length > 0) {
+      if (this.project.requiredCompetenceIds && this.project.requiredCompetenceIds.length > 0) {
+        // On filtre le catalogue avec les IDs exigés par le projet
+        this.projectSkills = this.allSkills.filter(skill => 
+          this.project!.requiredCompetenceIds!.includes(skill.id)
+        );
+      } else {
+        this.projectSkills = [];
+      }
     }
   }
 
@@ -93,6 +123,7 @@ export class ProjectDetailsComponent implements OnInit {
         this.project = data; 
         this.isLoading = false; 
         this.checkIfSaved(); 
+        this.resolveProjectSkills(); // 🟢 On relance le calcul quand le projet est là
       },
       error: (err) => { console.error(err); this.isLoading = false; }
     });

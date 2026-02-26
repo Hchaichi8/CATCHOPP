@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ContractService {
 
-  private apiUrl = 'http://localhost:8082/Contract'; 
-  private proposalUrl = 'http://localhost:8082/Project';
+  private apiUrl = 'http://localhost:8085/Contract'; 
+  private proposalUrl = 'http://localhost:8085/Project';
 
   constructor(private http: HttpClient) {}
 

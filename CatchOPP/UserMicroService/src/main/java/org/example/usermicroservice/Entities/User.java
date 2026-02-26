@@ -8,6 +8,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -52,10 +54,27 @@ public class User {
     private String coverPictureUrl;
     private String linkedinUrl;
     private String website;
+    @ElementCollection
+    @CollectionTable(name = "user_competence_ids", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "competence_id")
+    private List<Long> competenceIds = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @Column(name = "cv_file_name")
+    private String cvFileName;
+
+    public String getCvFileName() { return cvFileName; }
+    public void setCvFileName(String cvFileName) { this.cvFileName = cvFileName; }
+
+    public List<Long> getCompetenceIds() {
+        return competenceIds;
+    }
+
+    public void setCompetenceIds(List<Long> competenceIds) {
+        this.competenceIds = competenceIds;
+    }
 
     public String getCoverPictureUrl() {
         return coverPictureUrl;

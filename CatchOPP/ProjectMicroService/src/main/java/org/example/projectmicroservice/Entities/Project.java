@@ -33,7 +33,18 @@ public class Project {
     private ProjectCategory category;
     @Enumerated(EnumType.STRING)
     private JobType jobType;
+    @ElementCollection
+    @CollectionTable(name = "project_competences", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "competence_id")
+    private List<Long> requiredCompetenceIds;
 
+    public List<Long> getRequiredCompetenceIds() {
+        return requiredCompetenceIds;
+    }
+
+    public void setRequiredCompetenceIds(List<Long> requiredCompetenceIds) {
+        this.requiredCompetenceIds = requiredCompetenceIds;
+    }
 
     public JobType getJobType() { return jobType; }
     public void setJobType(JobType jobType) { this.jobType = jobType; }

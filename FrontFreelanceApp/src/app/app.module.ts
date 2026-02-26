@@ -45,6 +45,9 @@ import { ClientContractDetailsComponent } from './Interfaces_Client/client-contr
 import { FreelancerContractsComponent } from './Interfaces_Freelancers/freelancer-contracts/freelancer-contracts.component';
 import { FreelancerContractReviewComponent } from './Interfaces_Freelancers/freelancer-contract-review/freelancer-contract-review.component';
 import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/freelancer-contract-details/freelancer-contract-details.component';
+import { WorkspaceComponent } from './workspace/workspace.component';
+import { OnboardingComponent } from './Interfaces_Freelancers/onboarding/onboarding.component';
+import { MessagesComponent } from './interface_communication/messages/messages.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +92,9 @@ import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/fre
         FreelancerContractsComponent,
         FreelancerContractReviewComponent,
         FreelancerContractDetailsComponent,
+        WorkspaceComponent,
+        OnboardingComponent,
+        MessagesComponent,
         
   ],
   imports: [
@@ -98,7 +104,7 @@ import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/fre
     HttpClientModule,
     FormsModule,
     
-  ],
+],
   providers: [],
   bootstrap: [AppComponent]
 })

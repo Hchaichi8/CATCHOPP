@@ -12,7 +12,7 @@
       <a routerLink="/FreelancerWallet" routerLinkActive="active"><i class="fa fa-wallet"></i> Wallet</a>
     </div>
     <div class="nav-actions">
-        <button class="btn-create-nav" routerLink="/FreelancerProfile"><i class="fa fa-user"></i> My Profile</button>
+
         <div class="user-profile" routerLink="/FreelancerProfileManager" style="cursor: pointer;">
             <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="Freelancer">
         </div>

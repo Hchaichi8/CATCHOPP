@@ -1,12 +1,14 @@
-import { Component , ElementRef,HostListener, OnInit} from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
 import { UserService } from '../../Services/user.service';
+import { CompetanceService } from '../../Services/competance.service';
+import { Router } from '@angular/router'; // 🟢 Ajout du Router
 
 @Component({
   selector: 'app-client-feed',
   templateUrl: './client-feed.component.html',
-  styleUrl: './client-feed.component.css'
+  styleUrls: ['./client-feed.component.css']
 })
 export class ClientFeedComponent implements OnInit {
 
@@ -24,15 +26,104 @@ export class ClientFeedComponent implements OnInit {
   project: Project = this.getDefaultProject(); 
   currentUser: any = null;
 
+  clientDetailsMap: { [key: number]: any } = {};
+
+  allSkills: any[] = [];
+  selectedSkills: Set<number> = new Set();
+  skillSearchText: string = '';
+
+  // 🟢 NOUVELLES VARIABLES POUR LA RECHERCHE DE FREELANCERS
+  allFreelancers: any[] = [];
+  filteredFreelancers: any[] = [];
+  showFreelancerDropdown: boolean = false;
+
   constructor(
     private eRef: ElementRef,
     private projectService: ProjectServiceService,
-    private userService: UserService
+    private userService: UserService,
+    private competenceService: CompetanceService,
+    private router: Router // 🟢 Injection du Router
   ) {}
 
   ngOnInit(): void {
-    // On charge le profil EN PREMIER, et à l'intérieur ça chargera les projets
     this.loadUserData(); 
+    this.loadSkills(); 
+    this.loadAllFreelancers(); // 🟢 On charge les freelancers pour la barre de recherche
+  }
+
+  // ==========================================
+  // 🟢 LOGIQUE DE RECHERCHE FREELANCER
+  // ==========================================
+  loadAllFreelancers() {
+    // On suppose que ton UserService a une méthode getAllUsers() (sinon il faudra l'ajouter backend/frontend)
+    this.userService.getAllUsers().subscribe({
+      next: (users: any[]) => {
+        // On ne garde que les utilisateurs qui ont le rôle FREELANCER
+        this.allFreelancers = users.filter(u => u.role === 'FREELANCER');
+      },
+      error: (err) => console.error("Erreur chargement des freelancers", err)
+    });
+  }
+
+  onGlobalSearch() {
+    // 1. On filtre les projets du Feed (ancienne logique)
+    this.applyFilters();
+
+    // 2. On filtre les Freelancers pour le menu déroulant
+    const query = this.searchText.trim().toLowerCase();
+    
+    if (query.length > 0) {
+      this.filteredFreelancers = this.allFreelancers.filter(f => 
+        (f.firstName && f.firstName.toLowerCase().includes(query)) ||
+        (f.lastName && f.lastName.toLowerCase().includes(query)) ||
+        (f.bio && f.bio.toLowerCase().includes(query)) // Cherche aussi dans leur Bio !
+      );
+      this.showFreelancerDropdown = true;
+    } else {
+      this.showFreelancerDropdown = false;
+    }
+  }
+
+  hideFreelancerDropdown() {
+    // Petit délai pour laisser le temps au clic de s'exécuter avant de cacher la liste
+    setTimeout(() => {
+      this.showFreelancerDropdown = false;
+    }, 200);
+  }
+
+  goToFreelancerProfile(freelancerId: number) {
+    // Redirige vers le profil public du freelancer
+    this.router.navigate(['/FreelancerProfil', freelancerId]);
+  }
+
+  // ==========================================
+  // RESTE DU CODE (Ne change pas)
+  // ==========================================
+  loadSkills() {
+    this.competenceService.getAllCompetances().subscribe({
+      next: (data) => {
+        this.allSkills = data.filter(skill => String(skill.userId) === '5');
+      },
+      error: (err) => console.error("Erreur chargement skills", err)
+    });
+  }
+
+  get filteredSkillsArray() {
+    if (!this.skillSearchText) return this.allSkills;
+    const lower = this.skillSearchText.toLowerCase();
+    return this.allSkills.filter(s => s.nom.toLowerCase().includes(lower));
+  }
+
+  toggleSkill(skillId: number) {
+    if (this.selectedSkills.has(skillId)) {
+      this.selectedSkills.delete(skillId);
+    } else {
+      this.selectedSkills.add(skillId);
+    }
+  }
+
+  isSkillSelected(skillId: number): boolean {
+    return this.selectedSkills.has(skillId);
   }
 
   loadUserData() {
@@ -50,13 +141,11 @@ export class ClientFeedComponent implements OnInit {
               next: (user) => {
                 this.currentUser = user;
                 this.project.clientId = user.id; 
-                
-                // Maintenant qu'on sait qui est connecté, on charge les projets
                 this.loadProjects(); 
               },
               error: (err) => {
                 console.error("Erreur Backend Profil :", err);
-                this.loadProjects(); // On charge quand même les projets en cas d'erreur
+                this.loadProjects(); 
               }
             });
           }
@@ -75,7 +164,19 @@ export class ClientFeedComponent implements OnInit {
       next: (data) => {
         this.projectsList = data.reverse(); 
 
-        // 🟢 RESTAURATION DES RÉACTIONS APRÈS LE F5
+        const uniqueClientIds = [...new Set(this.projectsList.map(p => p.clientId).filter(id => id != null))];
+        
+        uniqueClientIds.forEach(id => {
+          if (id && !this.clientDetailsMap[id]) {
+            this.userService.getUserById(id).subscribe({
+              next: (user) => {
+                this.clientDetailsMap[id] = user;
+              },
+              error: (err) => console.error(`Impossible de charger le client ${id}`, err)
+            });
+          }
+        });
+
         this.projectsList.forEach(p => {
           if (this.currentUser && p.id) {
             const savedReaction = localStorage.getItem(`reaction_${this.currentUser.id}_${p.id}`);
@@ -85,15 +186,12 @@ export class ClientFeedComponent implements OnInit {
           }
         });
 
-        this.filteredProjects = [...this.projectsList]; 
+        this.applyFilters(); 
       },
-      error: (err) => {
-        console.error("Failed to load projects", err);
-      }
+      error: (err) => console.error("Failed to load projects", err)
     });
   }
 
-  // --- LOGIQUE DE FILTRAGE ---
   applyFilters() {
     let temp = [...this.projectsList];
 
@@ -102,19 +200,13 @@ export class ClientFeedComponent implements OnInit {
       temp = temp.filter(p => p.title.toLowerCase().includes(search) || p.description.toLowerCase().includes(search));
     }
 
-    if (this.selectedExperience !== 'All') {
-      temp = temp.filter(p => p.ExperienceLevel === this.selectedExperience);
-    }
+    if (this.selectedExperience !== 'All') temp = temp.filter(p => p.ExperienceLevel === this.selectedExperience);
+    if (this.selectedCategory !== 'All') temp = temp.filter(p => p.category === this.selectedCategory);
 
-    if (this.selectedCategory !== 'All') {
-      temp = temp.filter(p => p.category === this.selectedCategory);
-    }
-
-    // Tri
     if (this.selectedSort === 'Newest') temp.sort((a, b) => (b.id || 0) - (a.id || 0));
     else if (this.selectedSort === 'Oldest') temp.sort((a, b) => (a.id || 0) - (b.id || 0));
-    else if (this.selectedSort === 'Highest Budget') temp.sort((a, b) => b.budget - a.budget);
-    else if (this.selectedSort === 'Lowest Budget') temp.sort((a, b) => a.budget - b.budget);
+    else if (this.selectedSort === 'Highest Budget') temp.sort((a, b) => (b.budget || 0) - (a.budget || 0));
+    else if (this.selectedSort === 'Lowest Budget') temp.sort((a, b) => (a.budget || 0) - (b.budget || 0));
 
     this.filteredProjects = temp;
   }
@@ -127,7 +219,6 @@ export class ClientFeedComponent implements OnInit {
     this.applyFilters();
   }
 
-  // --- FORMULAIRE ---
   getDefaultProject(): Project {
     return {
       title: '',
@@ -139,15 +230,11 @@ export class ClientFeedComponent implements OnInit {
       budget: 0,
       postedAt: '',
       status: 'OPEN',
-      clientId: this.currentUser ? this.currentUser.id : 1
+      clientId: this.currentUser ? this.currentUser.id : 1,
+      requiredCompetenceIds: [] 
     };
   }
 
-  formatEnumText(value: string | undefined): string {
-    if (!value) return '';
-    return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-  }
-  
   openProjectModal() {
     this.isProjectModalOpen = true;
     document.body.style.overflow = 'hidden';
@@ -165,14 +252,14 @@ export class ClientFeedComponent implements OnInit {
       return;
     }
 
+    this.project.requiredCompetenceIds = Array.from(this.selectedSkills);
     this.project.postedAt = new Date().toISOString().split('T')[0];
 
     this.projectService.addProject(this.project).subscribe({
       next: (response) => {
-        console.log("Created:", response);
         alert("Project created successfully 🚀");
         this.closeProjectModal();
-        this.loadProjects(); // Recharge la liste pour afficher le nouveau
+        this.loadProjects(); 
       },
       error: (err) => {
         console.error(err);
@@ -180,11 +267,20 @@ export class ClientFeedComponent implements OnInit {
       }
     });
   }
-  
+
   resetForm() {
     this.project = this.getDefaultProject();
-    if (this.currentUser) {
-       this.project.clientId = this.currentUser.id;
+    if (this.currentUser) this.project.clientId = this.currentUser.id;
+    this.selectedSkills.clear(); 
+    this.skillSearchText = '';
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.project.image = e.target.result; 
+      reader.readAsDataURL(file);
     }
   }
 
@@ -199,34 +295,23 @@ export class ClientFeedComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.project.image = e.target.result; 
-      };
-      reader.readAsDataURL(file);
-    }
+  formatEnumText(value: string | undefined): string {
+    if (!value) return '';
+    return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
   }
-  
+
   getTotalReactions(p: Project): number {
     return (p.likes || 0) + (p.loves || 0) + (p.hahas || 0) + (p.supports || 0);
   }
 
-  // 🟢 LOGIQUE DE RÉACTION AVEC SAUVEGARDE LOCALE
   react(project: Project, type: string) {
     if (!project.id) return;
 
     project.justReacted = true;
-    setTimeout(() => {
-      project.justReacted = false;
-    }, 500); 
+    setTimeout(() => project.justReacted = false, 500); 
 
-    // Annule si on clique sur la même chose
     if (project.myReaction === type) return;
 
-    // Retire l'ancienne réaction des compteurs
     if (project.myReaction) {
       if (project.myReaction === 'LIKE') project.likes = (project.likes || 1) - 1;
       if (project.myReaction === 'LOVE') project.loves = (project.loves || 1) - 1;
@@ -234,14 +319,12 @@ export class ClientFeedComponent implements OnInit {
       if (project.myReaction === 'SUPPORT') project.supports = (project.supports || 1) - 1;
     }
 
-    // Applique la nouvelle
     project.myReaction = type;
     if (type === 'LIKE') project.likes = (project.likes || 0) + 1;
     if (type === 'LOVE') project.loves = (project.loves || 0) + 1;
     if (type === 'HAHA') project.hahas = (project.hahas || 0) + 1;
     if (type === 'SUPPORT') project.supports = (project.supports || 0) + 1;
 
-    // Sauvegarde dans le localStorage (Pour résister au F5)
     if (this.currentUser) {
       localStorage.setItem(`reaction_${this.currentUser.id}_${project.id}`, type);
     }
