@@ -1,0 +1,101 @@
+<div class="layout-container">
+  
+  <aside class="sidebar-left">
+    <div class="logo-area"><h2>Catch<span>IQ</span></h2></div>
+    <nav class="side-menu">
+      <a routerLink="/ClientFeed"><i class="fa fa-stream"></i> Feed</a>
+      <a routerLink="/ClientDashboard"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a routerLink="/AllProjects" class="active"><i class="fa fa-folder-open"></i> All Projects</a>
+      <a href="#"><i class="fa fa-file-invoice-dollar"></i> Payments</a>
+      <a href="#"><i class="fa fa-cog"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="page-header">
+      <div class="header-text">
+        <h1>My Projects</h1>
+        <p>Manage your job postings and view proposals.</p>
+      </div>
+      <button class="btn-primary"><i class="fa fa-plus"></i> Post New Job</button>
+    </header>
+
+    <div class="controls-bar">
+      
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="selectedTab === 'active'" (click)="setTab('active')">
+          Active Jobs <span class="badge">2</span>
+        </button>
+        <button class="tab-btn" [class.active]="selectedTab === 'draft'" (click)="setTab('draft')">
+          Drafts <span class="badge gray">1</span>
+        </button>
+        <button class="tab-btn" [class.active]="selectedTab === 'closed'" (click)="setTab('closed')">
+          Closed <span class="badge gray">14</span>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" placeholder="Search by title...">
+      </div>
+    </div>
+
+    <div class="project-list">
+      
+      <div class="empty-state" *ngIf="filteredProjects.length === 0">
+        <i class="fa fa-folder-open"></i>
+        <p>No projects found in this category.</p>
+      </div>
+
+      <div class="project-row" *ngFor="let p of filteredProjects">
+        
+        <div class="status-strip" [ngClass]="p.status"></div>
+
+        <div class="row-content">
+          
+          <div class="col-info">
+            <h3 class="job-title"><a href="#">{{p.title}}</a></h3>
+            <div class="job-meta">
+              <span class="id">#{{p.id}}</span>
+              <span class="dot">•</span>
+              <span class="date">Posted on {{p.postedDate}}</span>
+              <span class="dot">•</span>
+              <span class="category">{{p.category}}</span>
+            </div>
+          </div>
+
+          <div class="col-metrics">
+            <div class="metric">
+              <strong>{{p.proposals}}</strong>
+              <small>Proposals</small>
+            </div>
+            <div class="metric">
+              <strong>{{p.hires}}</strong>
+              <small>Hired</small>
+            </div>
+            <div class="metric budget">
+              <strong>{{p.budget}}</strong>
+              <small>Budget</small>
+            </div>
+          </div>
+
+          <div class="col-actions">
+            <button class="btn-action edit" *ngIf="p.status === 'draft'">
+              <i class="fa fa-pen"></i> Edit
+            </button>
+            
+            <button class="btn-action view" *ngIf="p.status === 'active'" routerLink="/ProjectProposals/3">
+              View Proposals
+            </button>
+            
+            <button class="btn-icon"><i class="fa fa-ellipsis-v"></i></button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>

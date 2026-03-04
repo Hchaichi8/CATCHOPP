@@ -1,0 +1,88 @@
+<div class="dashboard-layout">
+  
+  <aside class="sidebar-left">
+    <div class="logo-area">
+      <h2 href="/ClientFeed">Catch<span>IQ</span></h2>
+    </div>
+    <nav class="side-menu">
+      <a href="/ClientDashboard"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a href="#" class="active"><i class="fa fa-users"></i> Proposals</a>
+      <a href="#"><i class="fa fa-comment-dots"></i> Messages</a>
+      <a href="#"><i class="fa fa-cog"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-header">
+      <div class="header-left">
+        <a routerLink="/ClientDashboard" class="back-link"><i class="fa fa-arrow-left"></i> Back</a>
+        <h1>Manage Proposals</h1>
+        <p>Project: <strong>Senior Angular Developer for SaaS Dashboard</strong></p>
+      </div>
+      
+      <div class="header-stats">
+        <div class="stat-pill">
+          <span class="label">Total Proposals</span>
+          <span class="value">{{proposals.length}}</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Avg Bid</span>
+          <span class="value">$51/hr</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="proposals-grid">
+      
+      <div class="freelancer-card" *ngFor="let p of proposals" [class.dimmed]="p.status === 'rejected'">
+        
+        <div class="card-badge" *ngIf="p.status === 'accepted'">
+          <i class="fa fa-check"></i> Hired
+        </div>
+        <div class="card-badge rejected" *ngIf="p.status === 'rejected'">
+          <i class="fa fa-times"></i> Rejected
+        </div>
+
+        <div class="card-top">
+          <img [src]="p.image" alt="User" class="avatar">
+          <div class="user-meta">
+            <h3>{{p.name}}</h3>
+            <p class="role">{{p.title}}</p>
+            <div class="rating">
+              <i class="fa fa-star filled"></i> {{p.rating}}
+            </div>
+          </div>
+          <div class="rate-box">
+            <span class="amount">${{p.rate}}</span>
+            <small>/hr</small>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <p class="cover-letter">"{{p.coverLetter}}"</p>
+          
+          <div class="skills-row">
+            <span class="skill-tag" *ngFor="let skill of p.skills">{{skill}}</span>
+          </div>
+        </div>
+
+        <div class="card-actions" *ngIf="p.status === 'pending'">
+          <button class="btn-refuse" (click)="updateStatus(p.id, 'rejected')">
+            <i class="fa fa-times"></i> Refuse
+          </button>
+          <button class="btn-accept" (click)="updateStatus(p.id, 'accepted')">
+            <i class="fa fa-check"></i> Accept
+          </button>
+        </div>
+
+        <div class="card-footer" *ngIf="p.status !== 'pending'">
+          <button class="btn-view">View Profile</button>
+        </div>
+
+      </div>
+      
+    </div>
+
+  </main>
+</div>
