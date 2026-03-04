@@ -20,9 +20,40 @@
             (click)="$event.stopPropagation()">
         </app-messenger>
       </div>
-      <div class="icon-btn-wrapper">
-        <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
-        <span class="badge">3</span>
+     <div class="icon-btn-wrapper" style="position: relative;">
+        <button class="nav-icon-btn" (click)="toggleNotifMenu($event)">
+          <i class="fa fa-bell"></i>
+        </button>
+        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+
+        <div class="notif-dropdown" *ngIf="isNotifOpen" style="position: absolute; top: 50px; right: -50px; width: 320px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;" (click)="$event.stopPropagation()">
+          <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+            <h3 style="margin:0; font-size: 1.1rem;">Notifications</h3>
+          </div>
+          
+          <div style="max-height: 350px; overflow-y: auto;">
+            <div *ngIf="notifications.length === 0" style="padding: 20px; text-align: center; color: gray;">
+              No notifications yet.
+            </div>
+
+            <div *ngFor="let n of notifications" 
+                 style="padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s;"
+                 [ngStyle]="{'background': n.read ? 'white' : '#f0fdf4'}"
+                 (click)="markNotifRead(n, $event)">
+              
+              <div style="display: flex; gap: 10px; align-items: start;">
+                <div style="background: var(--primary); color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <i class="fa fa-file-signature"></i>
+                </div>
+                <div>
+                  <p style="margin: 0; font-size: 0.9rem; color: #333;">{{ n.message }}</p>
+                  <small style="color: gray; font-size: 0.75rem;">{{ n.createdAt | date:'short' }}</small>
+                </div>
+                <div *ngIf="!n.read" style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; margin-top: 5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div class="nav-divider"></div>

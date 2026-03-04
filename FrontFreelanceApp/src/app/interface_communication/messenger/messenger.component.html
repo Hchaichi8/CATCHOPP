@@ -68,14 +68,44 @@
       </div>
     </div>
 
-    <div class="chat-body">
-      <div class="message-bubble" 
-           *ngFor="let msg of activeChat.history"
-           [class.me]="msg.isMe" 
-           [class.other]="!msg.isMe">
-        {{ msg.text }}
-      </div>
+<<div class="chat-body">
+  <div class="message-wrapper" 
+       *ngFor="let msg of activeChat.history"
+       [class.me]="msg.isMe" 
+       [class.other]="!msg.isMe">
+    
+    <div class="message-row" (mouseleave)="msg.showMenu = false">
+        
+        <div class="message-bubble" [class.me]="msg.isMe" [class.other]="!msg.isMe">
+          <ng-container *ngIf="!msg.isEditing">
+              {{ msg.text }}
+          </ng-container>
+          
+          <div *ngIf="msg.isEditing" class="edit-mode">
+              <input type="text" #editInput [value]="msg.text" (keyup.enter)="saveEdit(msg, editInput.value)">
+              <i class="fa fa-check text-success" (click)="saveEdit(msg, editInput.value)"></i>
+              <i class="fa fa-times text-danger" (click)="cancelEdit(msg)"></i>
+          </div>
+        </div>
+
+        <div class="msg-options-container" *ngIf="msg.isMe && !msg.isEditing">
+           <button class="options-btn" (click)="toggleMenu(msg)">
+             <i class="fa fa-ellipsis-v"></i>
+           </button>
+           
+           <div class="dropdown-menu" *ngIf="msg.showMenu">
+              <div class="dropdown-item" (click)="editMsg(msg)">
+                <i class="fa fa-pencil"></i> Edit
+              </div>
+              <div class="dropdown-item text-danger" (click)="deleteMsg(msg)">
+                <i class="fa fa-trash"></i> Delete
+              </div>
+           </div>
+        </div>
+
     </div>
+  </div>
+</div>
 
    <div class="chat-input-area">
       <i class="fa fa-plus-circle icon-add"></i>

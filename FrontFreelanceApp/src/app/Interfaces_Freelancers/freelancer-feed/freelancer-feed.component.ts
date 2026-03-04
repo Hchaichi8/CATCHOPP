@@ -1,29 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
 import { UserService } from '../../Services/user.service';
+import { Router } from '@angular/router'; 
+import { NotificationService } from '../../Services/notification.service'; 
 
 @Component({
   selector: 'app-freelancer-feed',
   templateUrl: './freelancer-feed.component.html',
   styleUrls: ['./freelancer-feed.component.css']
 })
-export class FreelancerFeedComponent implements OnInit {
+export class FreelancerFeedComponent implements OnInit, OnDestroy {
   
   isMessagesOpen: boolean = false;
   allProjects: Project[] = [];
   filteredProjects: Project[] = [];
-  
   savedProjects: Project[] = [];
-  
   currentUser: any = null;
-
   clientDetailsMap: { [key: number]: any } = {};
 
   searchText: string = '';
-  // 🟢 1. Le tri par défaut est maintenant le Matching !
   sortBy: string = 'Best Match'; 
   selectedBudget: string = 'Any';
+
+  notifications: any[] = [];
+  unreadCount: number = 0;
+  isNotifOpen: boolean = false;
+  previousUnreadCount: number = -1;
+  notifInterval: any;
 
   categories = [
     { label: 'Web Development', value: 'WEB_DEVELOPMENT', selected: false },
@@ -40,15 +44,104 @@ export class FreelancerFeedComponent implements OnInit {
 
   constructor(
     private projectService: ProjectServiceService,
-    private userService: UserService 
+    private userService: UserService,
+    private router: Router,
+    private notificationService: NotificationService,
+    private eRef: ElementRef
   ) { }
 
   ngOnInit(): void {
     this.loadUserData(); 
+
+    this.notifInterval = setInterval(() => {
+      if (this.currentUser) {
+        this.loadNotifications();
+      }
+    }, 10000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.notifInterval) {
+      clearInterval(this.notifInterval);
+    }
+  }
+
+  playNotifSound() {
+    try {
+      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, context.currentTime); 
+      oscillator.frequency.exponentialRampToValueAtTime(440, context.currentTime + 0.1); 
+
+      gainNode.gain.setValueAtTime(1, context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5); 
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.5); 
+    } catch (e) {
+      console.error("Audio Web API bloquée :", e);
+    }
+  }
+
+
+  loadNotifications() {
+    if(this.currentUser) {
+      this.notificationService.getNotifications(this.currentUser.id).subscribe({
+        next: (data) => {
+          this.notifications = data;
+          this.unreadCount = this.notifications.filter(n => n.read === false || n.isRead === false).length;
+
+          
+          if (this.previousUnreadCount !== -1 && this.unreadCount > this.previousUnreadCount) {
+            this.playNotifSound();
+          }
+          this.previousUnreadCount = this.unreadCount;
+        },
+        error: (err) => console.error("Erreur chargement notifications", err)
+      });
+    }
+  }
+
+  toggleNotifMenu(event: Event) {
+    event.stopPropagation();
+    this.isNotifOpen = !this.isNotifOpen;
+    this.isMessagesOpen = false;
+  }
+
+  markNotifRead(notif: any, event: Event) {
+    event.stopPropagation(); 
+    this.isNotifOpen = false;
+
+    if (notif.read === false || notif.isRead === false) {
+      this.notificationService.markAsRead(notif.id).subscribe(() => {
+        notif.read = true;
+        notif.isRead = true;
+        this.unreadCount = this.notifications.filter(n => n.read === false || n.isRead === false).length;
+        
+        this.router.navigate(['/FreelancerContracts']);
+      });
+    } else {
+      this.router.navigate(['/FreelancerContracts']);
+    }
   }
 
   toggleMessages() {
     this.isMessagesOpen = !this.isMessagesOpen;
+    this.isNotifOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.isMessagesOpen = false;
+      this.isNotifOpen = false; 
+    }
   }
 
   loadUserData() {
@@ -67,6 +160,7 @@ export class FreelancerFeedComponent implements OnInit {
                 this.currentUser = user;
                 this.loadSavedProjects(); 
                 this.loadProjects(); 
+                this.loadNotifications(); // 🟢 On charge les notifs au démarrage
               },
               error: (err) => {
                 console.error("Erreur Backend Profil :", err);
@@ -107,7 +201,6 @@ export class FreelancerFeedComponent implements OnInit {
   getMatchPercentage(project: any): number {
     const reqSkills = project.requiredCompetenceIds || [];
     if (reqSkills.length === 0) return 0; 
-
     const mySkillIds = this.currentUser?.competenceIds || [];
     if (mySkillIds.length === 0) return 0; 
 
@@ -122,9 +215,9 @@ export class FreelancerFeedComponent implements OnInit {
   }
 
   getMatchColor(percentage: number): string {
-    if (percentage >= 80) return '#10b981'; // Vert
-    if (percentage >= 50) return '#f59e0b'; // Orange
-    return '#ef4444'; // Rouge
+    if (percentage >= 80) return '#10b981'; 
+    if (percentage >= 50) return '#f59e0b'; 
+    return '#ef4444'; 
   }
 
   applyFilters() {
@@ -155,11 +248,9 @@ export class FreelancerFeedComponent implements OnInit {
       });
     }
 
-    // 🟢 2. LA MAGIE DU TRI : On trie les projets selon l'option choisie !
     if (this.sortBy === 'Best Match') {
       temp.sort((a, b) => {
         const matchDiff = this.getMatchPercentage(b) - this.getMatchPercentage(a);
-        // Si les deux projets ont le même %, on met le plus récent en premier
         if (matchDiff === 0) return (b.id || 0) - (a.id || 0);
         return matchDiff;
       });
@@ -180,7 +271,7 @@ export class FreelancerFeedComponent implements OnInit {
   clearFilters() {
     this.searchText = '';
     this.selectedBudget = 'Any';
-    this.sortBy = 'Best Match'; // 🟢 On remet le tri par défaut quand on efface les filtres
+    this.sortBy = 'Best Match'; 
     this.categories.forEach(c => c.selected = false);
     this.jobTypes.forEach(t => t.selected = false);
     this.applyFilters();

@@ -6,18 +6,20 @@ import SockJS from 'sockjs-client';
 
 @Injectable({
   providedIn: 'root'
-})export class ChatService {
+})
+export class ChatService {
 
   private apiUrl = 'http://localhost:8086/chat'; 
   private stompClient: Client | null = null;
   
- 
   public messageSubject: Subject<any> = new Subject<any>();
+  public updateSubject: Subject<any> = new Subject<any>(); // 🟢 NOUVEAU
+  public deleteSubject: Subject<any> = new Subject<any>(); // 🟢 NOUVEAU
 
   constructor(private http: HttpClient) { }
 
   // ==========================================
-  // 1. PARTIE HTTP (Historique et Conversations)
+  // 1. PARTIE HTTP 
   // ==========================================
 
   getConversations(userId: string): Observable<any[]> {
@@ -32,22 +34,28 @@ import SockJS from 'sockjs-client';
     return this.http.post<any>(`${this.apiUrl}/conversation/create?user1=${user1}&user2=${user2}`, {});
   }
 
+  // 🟢 NOUVEAU: Mettre à jour un message
+  updateMessage(id: number, content: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/messages/${id}`, { content });
+  }
+
+  // 🟢 NOUVEAU: Supprimer un message
+  deleteMessage(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/messages/${id}`);
+  }
+
   // ==========================================
-  // 2. PARTIE WEBSOCKET (Temps Réel)
+  // 2. PARTIE WEBSOCKET 
   // ==========================================
 
   connect(userId: string) {
-    // Si on est déjà connecté, on ne fait rien
     if (this.stompClient && this.stompClient.active) {
       return;
     }
 
-    // Configuration du téléphone (WebSocket)
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8086/ws'), // L'URL de ton backend
-      debug: (str) => {
-        console.log(str); // Utile pour voir si ça se connecte bien !
-      },
+      webSocketFactory: () => new SockJS('http://localhost:8086/ws'), 
+      debug: (str) => { console.log(str); },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -56,12 +64,24 @@ import SockJS from 'sockjs-client';
     this.stompClient.onConnect = (frame) => {
       console.log('✅ Connecté au WebSocket en tant que User : ' + userId);
       
-      // 🟢 On écoute notre canal privé pour recevoir les messages des autres
+      // Écoute des nouveaux messages
       this.stompClient?.subscribe(`/user/${userId}/queue/messages`, (message: Message) => {
         if (message.body) {
-          const parsedMessage = JSON.parse(message.body);
-          // On envoie le nouveau message à notre composant Angular pour qu'il l'affiche
-          this.messageSubject.next(parsedMessage); 
+          this.messageSubject.next(JSON.parse(message.body)); 
+        }
+      });
+
+      // 🟢 NOUVEAU: Écoute des messages modifiés
+      this.stompClient?.subscribe(`/user/${userId}/queue/updates`, (message: Message) => {
+        if (message.body) {
+          this.updateSubject.next(JSON.parse(message.body)); 
+        }
+      });
+
+      // 🟢 NOUVEAU: Écoute des messages supprimés
+      this.stompClient?.subscribe(`/user/${userId}/queue/deletes`, (message: Message) => {
+        if (message.body) {
+          this.deleteSubject.next(JSON.parse(message.body)); 
         }
       });
     };
@@ -70,15 +90,13 @@ import SockJS from 'sockjs-client';
       console.error('❌ Erreur WebSocket: ' + frame.headers['message']);
     };
 
-    // On lance la connexion !
     this.stompClient.activate();
   }
 
-  // Méthode pour envoyer un message en direct
   sendMessage(chatMessage: any) {
     if (this.stompClient && this.stompClient.active) {
       this.stompClient.publish({
-        destination: '/app/chat', // L'URL définie dans le @MessageMapping du backend
+        destination: '/app/chat', 
         body: JSON.stringify(chatMessage)
       });
     } else {

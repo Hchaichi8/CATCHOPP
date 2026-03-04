@@ -1,16 +1,17 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ProjectServiceService } from '../../Services/project-service.service';
 import { UserService } from '../../Services/user.service';
 import { CompetanceService } from '../../Services/competance.service';
-import { Router } from '@angular/router'; // 🟢 Ajout du Router
+import { Router } from '@angular/router'; 
+import { NotificationService } from '../../Services/notification.service';
 
 @Component({
   selector: 'app-client-feed',
   templateUrl: './client-feed.component.html',
   styleUrls: ['./client-feed.component.css']
 })
-export class ClientFeedComponent implements OnInit {
+export class ClientFeedComponent implements OnInit, OnDestroy {
 
   isProjectModalOpen: boolean = false;
   isMessagesOpen: boolean = false;
@@ -32,33 +33,113 @@ export class ClientFeedComponent implements OnInit {
   selectedSkills: Set<number> = new Set();
   skillSearchText: string = '';
 
-  // 🟢 NOUVELLES VARIABLES POUR LA RECHERCHE DE FREELANCERS
   allFreelancers: any[] = [];
   filteredFreelancers: any[] = [];
   showFreelancerDropdown: boolean = false;
+
+  notifications: any[] = [];
+  unreadCount: number = 0;
+  isNotifOpen: boolean = false;
+
+  previousUnreadCount: number = -1; 
+  notifInterval: any;
 
   constructor(
     private eRef: ElementRef,
     private projectService: ProjectServiceService,
     private userService: UserService,
     private competenceService: CompetanceService,
-    private router: Router // 🟢 Injection du Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.loadUserData(); 
     this.loadSkills(); 
-    this.loadAllFreelancers(); // 🟢 On charge les freelancers pour la barre de recherche
+    this.loadAllFreelancers(); 
+
+    this.notifInterval = setInterval(() => {
+      if (this.currentUser) {
+        this.loadNotifications();
+      }
+    }, 10000);
   }
 
-  // ==========================================
-  // 🟢 LOGIQUE DE RECHERCHE FREELANCER
-  // ==========================================
+  ngOnDestroy(): void {
+    if (this.notifInterval) {
+      clearInterval(this.notifInterval);
+    }
+  }
+
+  playNotifSound() {
+    try {
+      const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+
+      oscillator.type = 'sine'; // Son doux
+      oscillator.frequency.setValueAtTime(880, context.currentTime); // Note A5
+      oscillator.frequency.exponentialRampToValueAtTime(440, context.currentTime + 0.1); 
+
+      gainNode.gain.setValueAtTime(1, context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5); // Fondu
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.5); // Le son dure 0.5 seconde
+    } catch (e) {
+      console.error("Audio Web API non supportée ou bloquée :", e);
+    }
+  }
+
+  loadNotifications() {
+    if(this.currentUser) {
+      this.notificationService.getNotifications(this.currentUser.id).subscribe({
+        next: (data) => {
+          this.notifications = data;
+          this.unreadCount = this.notifications.filter(n => n.read === false || n.isRead === false).length;
+
+          if (this.previousUnreadCount !== -1 && this.unreadCount > this.previousUnreadCount) {
+            this.playNotifSound();
+          }
+
+          this.previousUnreadCount = this.unreadCount;
+        },
+        error: (err) => console.error("Erreur chargement notifications", err)
+      });
+    }
+  }
+
+  toggleNotifMenu(event: Event) {
+    event.stopPropagation();
+    this.isNotifOpen = !this.isNotifOpen;
+    this.isMessagesOpen = false; 
+  }
+
+ markNotifRead(notif: any, event: Event) {
+    event.stopPropagation(); 
+    
+    this.isNotifOpen = false;
+
+    if (notif.read === false || notif.isRead === false) {
+      this.notificationService.markAsRead(notif.id).subscribe(() => {
+        notif.read = true;
+        notif.isRead = true;
+        this.unreadCount = this.notifications.filter(n => n.read === false || n.isRead === false).length;
+        
+        // 🟢 Redirection vers la page AllProjects
+        this.router.navigate(['/AllProjects']);
+      });
+    } else {
+      this.router.navigate(['/AllProjects']);
+    }
+  }
+
   loadAllFreelancers() {
-    // On suppose que ton UserService a une méthode getAllUsers() (sinon il faudra l'ajouter backend/frontend)
     this.userService.getAllUsers().subscribe({
       next: (users: any[]) => {
-        // On ne garde que les utilisateurs qui ont le rôle FREELANCER
         this.allFreelancers = users.filter(u => u.role === 'FREELANCER');
       },
       error: (err) => console.error("Erreur chargement des freelancers", err)
@@ -66,17 +147,14 @@ export class ClientFeedComponent implements OnInit {
   }
 
   onGlobalSearch() {
-    // 1. On filtre les projets du Feed (ancienne logique)
     this.applyFilters();
-
-    // 2. On filtre les Freelancers pour le menu déroulant
     const query = this.searchText.trim().toLowerCase();
     
     if (query.length > 0) {
       this.filteredFreelancers = this.allFreelancers.filter(f => 
         (f.firstName && f.firstName.toLowerCase().includes(query)) ||
         (f.lastName && f.lastName.toLowerCase().includes(query)) ||
-        (f.bio && f.bio.toLowerCase().includes(query)) // Cherche aussi dans leur Bio !
+        (f.bio && f.bio.toLowerCase().includes(query)) 
       );
       this.showFreelancerDropdown = true;
     } else {
@@ -85,20 +163,15 @@ export class ClientFeedComponent implements OnInit {
   }
 
   hideFreelancerDropdown() {
-    // Petit délai pour laisser le temps au clic de s'exécuter avant de cacher la liste
     setTimeout(() => {
       this.showFreelancerDropdown = false;
     }, 200);
   }
 
   goToFreelancerProfile(freelancerId: number) {
-    // Redirige vers le profil public du freelancer
     this.router.navigate(['/FreelancerProfil', freelancerId]);
   }
 
-  // ==========================================
-  // RESTE DU CODE (Ne change pas)
-  // ==========================================
   loadSkills() {
     this.competenceService.getAllCompetances().subscribe({
       next: (data) => {
@@ -142,6 +215,8 @@ export class ClientFeedComponent implements OnInit {
                 this.currentUser = user;
                 this.project.clientId = user.id; 
                 this.loadProjects(); 
+                
+                this.loadNotifications(); 
               },
               error: (err) => {
                 console.error("Erreur Backend Profil :", err);
@@ -292,6 +367,7 @@ export class ClientFeedComponent implements OnInit {
   clickout(event: any) {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.isMessagesOpen = false;
+      this.isNotifOpen = false; 
     }
   }
 

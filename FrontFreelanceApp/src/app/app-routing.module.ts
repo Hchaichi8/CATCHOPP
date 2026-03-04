@@ -64,8 +64,7 @@ const routes: Routes = [
  {path:'ProjectProposals/:id',component:ProjectProposalsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'AllProjects',component:AllProjectsComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientProfil/:id',component:ClientProfileComponent,  },
-  {path:'ClientProfil',component:ClientProfileComponent,  },
-
+ {path:'ClientProfil',component:ClientProfileComponent,  },
  {path:'VirtualContract',component:VirtualContractComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientDetailProject/:id',component:DetailclientprojectComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },
  {path:'ClientProfileManager',component:ClientProfilManagerComponent,  canActivate: [authGuard], data: { role: 'CLIENT' } },

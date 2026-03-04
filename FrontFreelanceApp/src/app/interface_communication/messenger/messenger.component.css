@@ -57,6 +57,60 @@
 .chat-actions i { 
   font-size: 16px; color: #198754; margin-left: 14px; cursor: pointer; 
 }
+/* --- MESSAGE BUBBLES --- */
+
+/* Base style for all bubbles */
+.message-bubble {
+  max-width: 85%;
+  padding: 8px 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
+  box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+}
+
+/* Sent by ME (The WhatsApp Green) */
+.message-bubble.me {
+  background-color: #dcf8c6; /* Light Green */
+  color: #050505;
+  border-radius: 18px 18px 4px 18px; /* Rounded with a tail on right */
+  align-self: flex-end;
+}
+
+/* Sent by THE OTHER (The White/Gray) */
+.message-bubble.other {
+  background-color: #ffffff; /* Pure White */
+  color: #050505;
+  border-radius: 18px 18px 18px 4px; /* Rounded with a tail on left */
+  border: 1px solid #e5e7eb;
+  align-self: flex-start;
+}
+
+/* Adjust the wrappers to align correctly */
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.message-wrapper.me {
+  align-items: flex-end;
+}
+
+.message-wrapper.other {
+  align-items: flex-start;
+}
+
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background-color: #e5ddd5; 
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 /* Chat Body */
 .chat-body {
@@ -67,6 +121,97 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+/* 🟢 Layout pour la ligne de message */
+.message-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+.message-wrapper.me .message-row {
+  flex-direction: row-reverse; /* Aligne tout à droite pour vos messages */
+}
+
+/* 🟢 Conteneur des options (3 points) */
+.msg-options-container {
+  position: relative;
+  margin: 0 10px;
+}
+.options-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px 8px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+/* Afficher le bouton au survol du message entier */
+.message-row:hover .options-btn {
+  opacity: 1;
+}
+.options-btn:hover {
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* 🟢 Le menu Dropdown */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 50%; /* Centre un peu le menu sous les 3 points */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 100;
+  min-width: 120px;
+  padding: 5px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+  transition: background 0.2s;
+}
+.dropdown-item:hover {
+  background: #f0f2f5;
+}
+.text-danger { color: #dc3545 !important; }
+.text-success { color: #28a745 !important; }
+
+/* 🟢 Mode Édition */
+.edit-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.edit-mode input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+  color: inherit;
+  padding: 2px 5px;
+  outline: none;
+  font-size: 1rem;
+}
+.edit-mode input:focus {
+  border-bottom-color: #0084ff;
+}
+.edit-mode i {
+  cursor: pointer;
+  font-size: 1.1rem;
 }
 
 .message-bubble {
