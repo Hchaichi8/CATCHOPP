@@ -105,7 +105,6 @@ The platform is organized into 5 comprehensive modules:
 ### Additional Technologies
 - RESTful API architecture
 - JWT Authentication
-- CORS configuration
 - Microservices architecture
 
 ## Architecture
@@ -114,20 +113,27 @@ The application follows a microservices architecture with:
 - **Frontend**: Angular SPA (Single Page Application)
 - **Backend Microservices**:
   - Community Microservice (Groups, Clubs, Events, Posts)
-  - Project Microservice (Freelance management)
+  - Project Microservice (Project & Submissions Management, Contracts & Payments )
+  - Subscribe Microservice 
+  - Communication Microservice
+  - Freelancer Microservise (Freelancer & Skills Management )
 - **Database**: MySQL with separate schemas per microservice
 
 ## Contributors
 
 This project was developed by a team of 4th year engineering students at Esprit School of Engineering:
-- [Add team member names here]
+-Islem Bouchaala 
+-Amna Gaied
+-Ghassen Hachaichi
+-Ayoub Somrani
+-Hazem Ouasli
 
 ## Academic Context
 
 **Developed at Esprit School of Engineering – Tunisia**  
 PIDEV – 4SAE7 | 2025–2026
 
-**Supervised by**: [Add supervisor name]
+**Supervised by**: CatchOpp
 
 ## Getting Started
 
@@ -154,8 +160,8 @@ CREATE DATABASE catchopp_project;
 3. Update `application.properties` in each microservice:
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/catchopp_community
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+spring.datasource.username=root
+spring.datasource.password=
 ```
 
 4. Run Community Microservice:
@@ -191,79 +197,7 @@ ng serve
 
 The application will be available at `http://localhost:4200`
 
-## API Documentation
-
-Detailed API documentation is available in:
-- [Community Microservice API Documentation](CatchOPP/CommunityMicroService/API_DOCUMENTATION_EVENTS_COMMUNITIES.md)
-
 ### Key Endpoints
-
-#### Groups
-- `GET /api/groups` - Get all groups
-- `POST /api/groups` - Create a new group
-- `PUT /api/groups/{id}` - Update a group
-- `DELETE /api/groups/{id}` - Delete a group
-
-#### Clubs
-- `GET /api/clubs` - Get all clubs
-- `POST /api/clubs` - Create a new club
-- `PUT /api/clubs/{id}/pause` - Pause a club
-- `PUT /api/clubs/{id}/unpause` - Unpause a club
-
-#### Events
-- `GET /api/events` - Get all events
-- `POST /api/events` - Create a new event
-- `PUT /api/events/{id}` - Update an event
-
-#### Posts
-- `GET /api/posts/group/{groupId}` - Get posts by group
-- `GET /api/posts/club/{clubId}` - Get posts by club
-- `POST /api/posts` - Create a new post
-
-## Project Structure
-
-```
-CATCHOPP/
-├── CatchOPP/
-│   ├── CommunityMicroService/
-│   │   ├── src/main/java/tn/esprit/communitymicroservice/
-│   │   │   ├── controllers/
-│   │   │   ├── services/
-│   │   │   ├── repositories/
-│   │   │   ├── entities/
-│   │   │   └── config/
-│   │   └── pom.xml
-│   └── ProjectMicroService/
-└── FrontFreelanceApp/
-    ├── src/app/
-    │   ├── interfaces_events/
-    │   ├── Interfaces_Client/
-    │   ├── Interfaces_Freelancers/
-    │   └── Interfaces_Authentification/
-    └── package.json
-```
-
-## Key Features Implementation
-
-### Club Management
-- Clubs can be paused/unpaused by administrators
-- Status badges (ACTIVE/PAUSED) displayed on all club cards
-- Notifications sent when club status changes
-
-### Separate Post Systems
-- Groups have their own isolated post collection
-- Clubs maintain independent post feeds
-- Posts are filtered by `group_id` or `club_id`
-
-### Event System
-- Events use "Join" terminology instead of "Attend"
-- Dedicated event details page with full information
-- Event status management (APPROVED, PENDING, REJECTED)
-
-### Notification System
-- Real-time toast notifications
-- Notification bell with unread count
-- Activity logging in admin dashboard
 
 ## Testing
 
