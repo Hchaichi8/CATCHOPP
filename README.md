@@ -164,12 +164,6 @@ spring.datasource.username=root
 spring.datasource.password=
 ```
 
-4. Run Community Microservice:
-```bash
-cd CatchOPP/CommunityMicroService
-mvn clean install
-mvn spring-boot:run
-```
 
 The backend will start on `http://localhost:8089`
 
@@ -185,12 +179,7 @@ cd FrontFreelanceApp
 npm install
 ```
 
-3. Update API configuration in `src/app/interfaces_events/api.config.ts`:
-```typescript
-export const API_BASE_URL = 'http://localhost:8089/api';
-```
-
-4. Run the development server:
+3. Run the development server:
 ```bash
 ng serve
 ```
@@ -199,13 +188,6 @@ The application will be available at `http://localhost:4200`
 
 ### Key Endpoints
 
-## Testing
-
-Run backend tests:
-```bash
-cd CatchOPP/CommunityMicroService
-mvn test
-```
 
 Run frontend tests:
 ```bash
@@ -213,12 +195,6 @@ cd FrontFreelanceApp
 ng test
 ```
 
-## Deployment
-
-The application can be deployed using:
-- **Frontend**: Vercel, Netlify, or GitHub Pages
-- **Backend**: Heroku, AWS, or DigitalOcean
-- **Database**: MySQL on cloud providers (AWS RDS, DigitalOcean)
 
 ## Troubleshooting
 
