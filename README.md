@@ -8,12 +8,7 @@ CATCHOPP is a comprehensive full-stack web application that connects freelancers
 
 ## Features
 
-### Freelance Management
-- Project posting and bidding system
-- Proposal management
-- Virtual contract generation
-- Client and freelancer dashboards
-- Project tracking and milestone management
+
 
 ### Community & Social Features
 - **Groups**: Create and join public/private groups
@@ -23,7 +18,7 @@ CATCHOPP is a comprehensive full-stack web application that connects freelancers
 - **Notifications**: Real-time notification system
 
 ### Admin Dashboard
-- User management
+
 - Group and club moderation
 - Event approval system
 - Analytics and reporting
@@ -50,7 +45,6 @@ CATCHOPP is a comprehensive full-stack web application that connects freelancers
 ### Additional Technologies
 - RESTful API architecture
 - JWT Authentication
-- CORS configuration
 - Microservices architecture
 
 ## Architecture
@@ -59,20 +53,15 @@ The application follows a microservices architecture with:
 - **Frontend**: Angular SPA (Single Page Application)
 - **Backend Microservices**:
   - Community Microservice (Groups, Clubs, Events, Posts)
-  - Project Microservice (Freelance management)
 - **Database**: MySQL with separate schemas per microservice
 
-## Contributors
 
-This project was developed by a team of 4th year engineering students at Esprit School of Engineering:
-- [Add team member names here]
 
 ## Academic Context
 
 **Developed at Esprit School of Engineering – Tunisia**  
 PIDEV – 4SAE7 | 2025–2026
 
-**Supervised by**: [Add supervisor name]
 
 ## Getting Started
 
@@ -99,8 +88,8 @@ CREATE DATABASE catchopp_project;
 3. Update `application.properties` in each microservice:
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/catchopp_community
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+spring.datasource.username=root
+spring.datasource.password=
 ```
 
 4. Run Community Microservice:
@@ -136,10 +125,7 @@ ng serve
 
 The application will be available at `http://localhost:4200`
 
-## API Documentation
 
-Detailed API documentation is available in:
-- [Community Microservice API Documentation](CatchOPP/CommunityMicroService/API_DOCUMENTATION_EVENTS_COMMUNITIES.md)
 
 ### Key Endpoints
 
@@ -224,12 +210,7 @@ cd FrontFreelanceApp
 ng test
 ```
 
-## Deployment
 
-The application can be deployed using:
-- **Frontend**: Vercel, Netlify, or GitHub Pages
-- **Backend**: Heroku, AWS, or DigitalOcean
-- **Database**: MySQL on cloud providers (AWS RDS, DigitalOcean)
 
 ## Troubleshooting
 
