@@ -159,7 +159,7 @@ CREATE DATABASE catchopp_project;
 
 3. Update `application.properties` in each microservice:
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/catchopp_community
+spring.datasource.url=jdbc:mysql://localhost:3306/catchopp
 spring.datasource.username=root
 spring.datasource.password=
 ```
