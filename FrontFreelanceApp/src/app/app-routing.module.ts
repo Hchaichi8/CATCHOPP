@@ -15,6 +15,14 @@ import { ClientProfileComponent } from './Interfaces_Client/client-profile/clien
 import { VirtualContractComponent } from './Interfaces_Client/virtual-contract/virtual-contract.component';
 import { FreelancerFeedComponent } from './Interfaces_Freelancers/freelancer-feed/freelancer-feed.component';
 import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-jobs/freelancer-jobs.component';
+import { GroupListComponent } from './interfaces_events/group-list/group-list.component';
+import { GroupPageComponent } from './interfaces_events/group-page/group-page.component';
+import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
+import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
+import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
+import { ClubComponent } from './interfaces_events/club/club.component';
+import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
+import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
 
 const routes: Routes = [
 
@@ -42,8 +50,17 @@ const routes: Routes = [
 {path:'FreelancerJobs',component:FreelancerJobsComponent, },
 
 
-
-   
+ 
+// Events & Communities routes
+{ path: 'Groups', redirectTo: 'groups', pathMatch: 'full' }, // Redirect uppercase to lowercase
+{ path: 'groups', component: GroupListComponent },
+{ path: 'groups/:id', component: GroupPageComponent },
+{ path: 'events', component: EventsListComponent },
+{ path: 'events/:id', component: EventDetailsComponent },
+{ path: 'clubs', component: ClubsListComponent },
+{ path: 'clubs/:id', component: ClubComponent },
+{ path: 'ClubDashboard', component: ClubDashboardComponent },
+{ path: 'admin/dashboard', component: AdminDashboardComponent }
 ];
 
 @NgModule({
