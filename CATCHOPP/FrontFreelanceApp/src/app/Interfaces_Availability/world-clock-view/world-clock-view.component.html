@@ -1,0 +1,63 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#10b981"/>
+        <text x="50" y="65" font-size="50" font-weight="bold" fill="white" text-anchor="middle">C</text>
+      </svg>
+      <span class="logo-text">Catch<span class="opp-text">OPP</span></span>
+    </div>
+    <div class="nav-actions">
+      <a routerLink="/WorldClock" class="nav-link active"><i class="fa fa-globe"></i> World Clock</a>
+      <a routerLink="/ClientFeed" class="nav-link"><i class="fa fa-th-large"></i> Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container" *ngIf="!loading">
+  <div class="hero">
+    <h1><i class="fa fa-globe-americas"></i> Horloge mondiale</h1>
+    <p>Voyez quand vos freelancers sont joignables. Chaque carte affiche leur heure locale et statut.</p>
+  </div>
+
+  <div class="clock-strip">
+    <div class="clock-cell">
+      <span class="clock-label">Votre heure</span>
+      <span class="clock-value">{{ currentTime | date:'HH:mm:ss' }}</span>
+    </div>
+  </div>
+
+  <div class="grid" *ngIf="worldData.length">
+    <div *ngFor="let item of worldData" class="freelancer-card" [attr.data-status]="getStatusClass(item.status)">
+      <div class="card-header">
+        <div class="avatar"><span>U{{ item.userId }}</span></div>
+        <div class="meta">
+          <h4>Freelancer #{{ item.userId }}</h4>
+          <span class="tz">{{ getTzCity(item.timezone) }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(item.status)">{{ getStatusLabel(item.status) }}</span>
+      </div>
+      <div class="card-body">
+        <div class="time-display">
+          <i class="fa fa-clock"></i>
+          <strong>{{ getLocalTime(item.timezone) }}</strong>
+          <small>heure locale</small>
+        </div>
+        <p class="custom-msg" *ngIf="item.customStatusMessage">{{ item.customStatusMessage }}</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn-invite"><i class="fa fa-envelope"></i> Contacter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!loading && !worldData.length">
+    <i class="fa fa-globe"></i>
+    <p>Aucun freelancer n'a configuré sa disponibilité pour l'instant.</p>
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">
+  <i class="fa fa-spinner fa-spin"></i> Chargement...
+</div>
+

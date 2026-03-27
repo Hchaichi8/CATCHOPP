@@ -1,0 +1,70 @@
+/* Global styles + Dark mode */
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --text-main: #111827;
+  --text-body: #4b5563;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+}
+
+.dark-theme {
+  --primary: #34d399;
+  --primary-dark: #10b981;
+  --bg: #111827;
+  --surface: #1f2937;
+  --text-main: #f9fafb;
+  --text-body: #d1d5db;
+  --text-muted: #9ca3af;
+  --border: #374151;
+}
+
+
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  transition: background 0.2s, color 0.2s;
+}
+
+
+/* ========================================
+   CatchOPP Logo Branding - Global Styles
+   ======================================== */
+
+.brand-logo {
+  height: 40px;
+  width: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--text-main);
+  margin-left: 8px;
+}
+
+.logo-text .opp-text {
+  color: #d4af37; /* Gold color for OPP */
+  font-weight: 800;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-brand:hover {
+  opacity: 0.9;
+}
+
+/* Sidebar logo (for client pages) */
+.logo-area h2 .opp-text {
+  color: #d4af37;
+  font-weight: 800;
+}

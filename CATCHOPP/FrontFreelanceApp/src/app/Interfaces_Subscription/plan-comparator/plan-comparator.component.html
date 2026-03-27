@@ -1,0 +1,47 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+      <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#10b981"/>
+        <text x="50" y="65" font-size="50" font-weight="bold" fill="white" text-anchor="middle">C</text>
+      </svg>
+      <span class="logo-text">Catch<span class="opp-text">OPP</span></span>
+    </div>
+    <div class="nav-actions">
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+      <app-notification-center></app-notification-center>
+      <a routerLink="/SubscriptionPlans" class="nav-link"><i class="fa fa-crown"></i> Plans</a>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+  <div class="page-header">
+    <h1>Compare Plans</h1>
+    <p>Choose the best plan for your needs. Premium includes AI CV generator.</p>
+  </div>
+
+  <div class="table-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="feature-col">Feature</th>
+          <th *ngFor="let p of plans" [class.popular]="p.popular">
+            <div class="plan-name">{{ p.name }}</div>
+            <div class="plan-price">${{ p.price }}/mo</div>
+            <a [routerLink]="['/SubscriptionCheckout', p.id]" class="btn-sub">Subscribe</a>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of features">
+          <td class="feature-col">{{ f.name }}</td>
+          <td>{{ f.base }}</td>
+          <td>{{ f.premium }}</td>
+          <td>{{ f.enterprise }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

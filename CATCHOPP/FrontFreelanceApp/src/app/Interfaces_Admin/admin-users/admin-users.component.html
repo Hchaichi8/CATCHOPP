@@ -1,0 +1,95 @@
+<div class="admin-layout">
+  <header class="admin-header">
+    <div class="logo" routerLink="/">
+      <span class="logo-mark">C</span>
+      <span class="logo-text">Catch<span>OPP</span> Admin</span>
+    </div>
+    <nav class="admin-nav">
+      <a routerLink="/AdminStatistics" class="nav-link"><i class="fa fa-chart-bar"></i> Statistics</a>
+      <a routerLink="/AdminSubscriptions" class="nav-link"><i class="fa fa-users"></i> Subscriptions</a>
+      <a routerLink="/AdminPlans" class="nav-link"><i class="fa fa-crown"></i> Plans</a>
+      <a routerLink="/AdminUsers" class="nav-link active"><i class="fa fa-user-cog"></i> Users</a>
+      <a routerLink="/AdminCertifications" class="nav-link"><i class="fa fa-award"></i> Certifications</a>
+      <a routerLink="/AdminPromoCodes" class="nav-link"><i class="fa fa-tag"></i> Promo Codes</a>
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+      <app-notification-center></app-notification-center>
+    </nav>
+  </header>
+
+  <main class="admin-main">
+    <div class="page-header">
+      <div>
+        <h1>Users</h1>
+        <p>Create, edit and manage users (for CRUD testing).</p>
+      </div>
+      <button class="btn-primary" (click)="openCreate()"><i class="fa fa-plus"></i> Create User</button>
+    </div>
+
+    <p class="msg" *ngIf="message">{{ message }}</p>
+
+    <div class="loading-row" *ngIf="loading">
+      <i class="fa fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <section class="table-card" *ngIf="!loading && users.length">
+      <div class="table-header-row">
+        <span>ID</span>
+        <span>Name</span>
+        <span>Email</span>
+        <span>Role</span>
+        <span>Actions</span>
+      </div>
+      <div class="table-row" *ngFor="let user of users">
+        <div class="cell">{{ user.id }}</div>
+        <div class="cell">{{ user.firstName }} {{ user.lastName }}</div>
+        <div class="cell">{{ user.email }}</div>
+        <div class="cell"><span class="badge" [ngClass]="user.role.toLowerCase()">{{ user.role }}</span></div>
+        <div class="cell actions">
+          <button class="btn-sm" (click)="openEdit(user)"><i class="fa fa-edit"></i> Edit</button>
+          <button class="btn-sm btn-danger" (click)="deleteUser(user)"><i class="fa fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="empty-row" *ngIf="!loading && !users.length">
+      No users. Start UserMicroService (port 8081) and create users.
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" [class.active]="showForm">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>{{ editingUser ? 'Edit User' : 'Create User' }}</h2>
+      <button class="close-btn" (click)="closeForm()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="form.email" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" [(ngModel)]="form.firstName" placeholder="John">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" [(ngModel)]="form.lastName" placeholder="Doe">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="form.password" placeholder="Password (for new users)">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select [(ngModel)]="form.role">
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeForm()">Cancel</button>
+      <button class="btn-primary" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>

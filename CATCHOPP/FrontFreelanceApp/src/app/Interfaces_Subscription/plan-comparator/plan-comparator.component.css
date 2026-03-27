@@ -1,0 +1,24 @@
+:host { --primary: #10b981; --surface: #ffffff; --text-main: #111827; --text-muted: #9ca3af; --border: #e5e7eb; font-family: 'Poppins', sans-serif; }
+.navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+.nav-container { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+.nav-brand { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.logo-mark { width: 32px; height: 32px; border-radius: 6px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.logo-text span { color: var(--primary); }
+.nav-actions { display: flex; align-items: center; gap: 16px; }
+.nav-link { color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+.nav-link:hover { color: var(--primary); }
+.main-container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+.page-header { text-align: center; margin-bottom: 32px; }
+.page-header h1 { margin: 0 0 8px; font-size: 2rem; }
+.page-header p { margin: 0; color: var(--text-muted); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table th, .compare-table td { padding: 14px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+.compare-table th { background: #f9fafb; font-weight: 600; }
+.compare-table th.popular { background: rgba(16, 185, 129, 0.1); border: 2px solid var(--primary); }
+.feature-col { text-align: left !important; font-weight: 500; }
+.plan-name { font-size: 1.1rem; margin-bottom: 4px; }
+.plan-price { color: var(--primary); font-weight: 700; margin-bottom: 10px; }
+.btn-sub { display: inline-block; padding: 8px 20px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.btn-sub:hover { opacity: 0.9; }
+.compare-table td { font-size: 0.9rem; }

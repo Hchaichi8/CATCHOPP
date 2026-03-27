@@ -1,0 +1,69 @@
+<div class="auth-container">
+  <div class="split-box">
+    <div class="form-section">
+      <div class="inner-form">
+        <a routerLink="/LoginFreelancer" class="back-link"><i class="fa fa-arrow-left"></i> Back to selection</a>
+        
+        <!-- Referral Banner -->
+        <div class="referral-banner" *ngIf="showReferralBanner">
+          <div class="referral-icon">🎁</div>
+          <div class="referral-content">
+            <h3>Welcome! You've been referred!</h3>
+            <p>Sign up now and get <strong>20% OFF</strong> your first subscription!</p>
+          </div>
+        </div>
+        
+        <div class="header-area">
+          <span class="badge">Join as Expert</span>
+          <h1>Create Freelancer Account</h1>
+          <p>Showcase your skills and find your next big gig.</p>
+        </div>
+
+        <form (ngSubmit)="onRegister()">
+          <div class="input-row">
+            <div class="input-field">
+              <label>First Name</label>
+              <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="John" required>
+            </div>
+            <div class="input-field">
+              <label>Last Name</label>
+              <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Doe" required>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label>Email Address</label>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="john@example.com" required>
+          </div>
+          
+          <div class="input-field">
+            <label>Password</label>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="At least 8 characters" required>
+          </div>
+
+          <div class="terms">
+            <label>
+              <input type="checkbox" [(ngModel)]="agreeToTerms" name="agreeToTerms"> 
+              I agree to the <span>Terms of Service</span> and <span>Privacy Policy</span>.
+            </label>
+          </div>
+
+          <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+          <button type="submit" class="btn-auth freelancer-btn" [disabled]="loading">
+            {{ loading ? 'Creating Account...' : 'Create My Account' }}
+          </button>
+        </form>
+
+        <p class="switch-text">Already have an account? <a routerLink="/login-freelancer">Log In</a></p>
+      </div>
+    </div>
+
+    <div class="visual-section register-freelancer-bg">
+      <div class="visual-overlay">
+        <h2>Your talent deserves to be seen by the world.</h2>
+        <p>Join over 50,000+ professionals already working on CatchOPP.</p>
+      </div>
+    </div>
+  </div>
+</div>

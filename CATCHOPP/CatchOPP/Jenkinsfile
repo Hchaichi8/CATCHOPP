@@ -1,0 +1,105 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_USER = 'your-dockerhub-username'
+        IMAGE_PREFIX = "${DOCKER_USER}/catchopp"
+    }
+
+    tools {
+        jdk 'jdk'
+        maven 'mvn'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'devops',
+                    url: 'https://github.com/AyoubSomrani/devops.git'
+            }
+        }
+
+        stage('Build - UserMicroService') {
+            steps {
+                dir('UserMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build - SubscriptionMicroService') {
+            steps {
+                dir('SubscriptionMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build - SkillTestsMicroService') {
+            steps {
+                dir('SkillTestsMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build - ReferralMicroService') {
+            steps {
+                dir('ReferralMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build - ProjectMicroService') {
+            steps {
+                dir('ProjectMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh "docker build -t ${IMAGE_PREFIX}-user:latest ./UserMicroService"
+                sh "docker build -t ${IMAGE_PREFIX}-subscription:latest ./SubscriptionMicroService"
+                sh "docker build -t ${IMAGE_PREFIX}-skilltests:latest ./SkillTestsMicroService"
+                sh "docker build -t ${IMAGE_PREFIX}-referral:latest ./ReferralMicroService"
+                sh "docker build -t ${IMAGE_PREFIX}-project:latest ./ProjectMicroService"
+                sh "docker build -t ${IMAGE_PREFIX}-gateway:latest ./gateway"
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'TokenDevOps',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${IMAGE_PREFIX}-user:latest
+                        docker push ${IMAGE_PREFIX}-subscription:latest
+                        docker push ${IMAGE_PREFIX}-skilltests:latest
+                        docker push ${IMAGE_PREFIX}-referral:latest
+                        docker push ${IMAGE_PREFIX}-project:latest
+                        docker push ${IMAGE_PREFIX}-gateway:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo '✅ All images built and pushed successfully!'
+        }
+        failure {
+            echo '❌ Build failed. Check the logs above.'
+        }
+    }
+}

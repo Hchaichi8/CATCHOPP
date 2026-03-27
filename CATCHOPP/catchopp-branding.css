@@ -1,0 +1,83 @@
+/* ========================================
+   CatchOPP Branding Styles
+   Add this to src/styles.css or import it
+   ======================================== */
+
+/* Logo Image */
+.brand-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  margin-right: 8px;
+}
+
+/* Logo Text */
+.logo-text {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #1f2937;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* "OPP" in Gold */
+.logo-text .opp-text {
+  color: #d4af37; /* Gold color */
+  font-weight: 800;
+  margin-left: 0;
+}
+
+/* Nav Brand Container */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-brand:hover .logo-text {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+/* Sidebar Logo (for client pages) */
+.logo-area h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.logo-area h2 .opp-text {
+  color: #d4af37;
+  font-weight: 800;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .brand-logo {
+    height: 32px;
+  }
+  
+  .logo-text {
+    font-size: 1.1rem;
+  }
+}
+
+/* Dark Mode Support (if you have dark mode) */
+[data-theme="dark"] .logo-text {
+  color: #f3f4f6;
+}
+
+[data-theme="dark"] .logo-text .opp-text {
+  color: #ffd700; /* Brighter gold for dark mode */
+}
+
+[data-theme="dark"] .logo-area h2 {
+  color: #f3f4f6;
+}
+
+[data-theme="dark"] .logo-area h2 .opp-text {
+  color: #ffd700;
+}
