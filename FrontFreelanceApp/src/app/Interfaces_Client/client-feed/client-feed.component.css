@@ -268,6 +268,135 @@
 .btn-cancel:hover { background: #f3f4f6; color: var(--text-main); }
 .btn-publish { padding: 10px 32px; background: var(--primary); border: none; border-radius: 8px; font-weight: 600; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(25, 135, 84, 0.25); transition: 0.2s; }
 .btn-publish:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-publish-soft {
+  background: #d97706 !important;
+  box-shadow: 0 4px 6px rgba(217, 119, 6, 0.35) !important;
+}
+.btn-publish-soft:hover { background: #b45309 !important; }
+
+.scope-ai-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.btn-scope-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #c7d2fe;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  color: #3730a3;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-scope-ai:hover:not(:disabled) {
+  border-color: #818cf8;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+.btn-scope-ai:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.scope-ai-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 280px;
+  line-height: 1.35;
+}
+
+.scope-ai-panel {
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.scope-ai-panel.scope-warn {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #78350f;
+}
+.scope-ai-panel.scope-ok {
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+}
+.scope-ai-panel:not(.scope-ok):not(.scope-warn) {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.scope-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.scope-head strong {
+  flex: 1;
+  min-width: 200px;
+  font-weight: 700;
+}
+.scope-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.scope-badge.ai {
+  background: #4f46e5;
+  color: white;
+}
+.scope-badge.local {
+  background: #64748b;
+  color: white;
+}
+.scope-quality {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+.scope-quality span {
+  text-transform: capitalize;
+  font-weight: 700;
+}
+.scope-sub {
+  margin: 10px 0 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+.scope-list {
+  margin: 0 0 8px;
+  padding-left: 1.2rem;
+}
+.scope-list.unreal li {
+  list-style-type: circle;
+}
+.scope-suggestions p {
+  margin: 12px 0 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.scope-suggestions ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.scope-suggestions li {
+  margin-bottom: 4px;
+}
 
 /* --- RESPONSIVE --- */
 @media (max-width: 1200px) {

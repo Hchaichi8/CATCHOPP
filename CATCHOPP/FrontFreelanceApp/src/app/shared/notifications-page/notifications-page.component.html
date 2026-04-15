@@ -1,0 +1,71 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-brand" routerLink="/FreelancerFeed">
+      <span class="logo-text">Catch<span class="opp-text">OPP</span></span>
+    </div>
+    <div class="nav-actions">
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+      <app-notification-center></app-notification-center>
+      <a routerLink="/FreelancerFeed" class="nav-link">Home</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1>Notifications</h1>
+    <p class="subtitle">
+      Use the app at <strong>http://localhost:4200</strong> for this screen. Port
+      <strong>8081</strong> is the User API only (JSON), not the notification UI.
+    </p>
+  </div>
+
+  <div *ngIf="!loggedIn" class="card hint">
+    <p>Log in to see your notifications.</p>
+    <a routerLink="/LoginFreelancer" class="btn-primary">Log in</a>
+  </div>
+
+  <div *ngIf="loggedIn" class="card">
+    <div class="toolbar">
+      <span class="meta">{{ (notif.unreadCount$ | async) ?? 0 }} unread</span>
+      <button type="button" class="btn-ghost" (click)="notif.refresh()">Refresh</button>
+      <button type="button" class="btn-ghost" (click)="notif.seedDemoSamples()">Load sample notifications</button>
+      <button type="button" class="btn-ghost" (click)="markAllRead()">Mark all read</button>
+    </div>
+
+    <div class="list">
+      <div
+        *ngFor="let n of (notif.notifications$ | async) || []"
+        class="row"
+        [class.unread]="!n.read"
+        (click)="onRowClick(n)"
+      >
+        <i class="fa" [ngClass]="iconClass(n.type)"></i>
+        <div class="body">
+          <div class="title">{{ n.title }}</div>
+          <div class="msg">{{ n.message }}</div>
+          <div class="date">{{ formatDate(n.date) }}</div>
+        </div>
+        <button
+          type="button"
+          class="btn-check"
+          *ngIf="!n.read"
+          (click)="markRead(n, $event)"
+          title="Mark read"
+        >
+          ✓
+        </button>
+      </div>
+      <div *ngIf="((notif.notifications$ | async)?.length ?? 0) === 0" class="empty">
+        <p>
+          No notifications yet. Real ones are created when something happens in the app: a client receives a
+          <strong>new proposal</strong>, you <strong>finish a skill test</strong>, a <strong>referral</strong> completes, or
+          the subscription service warns about <strong>expiry</strong> (other microservices must be running and call User MS).
+        </p>
+        <p>
+          To verify the inbox here, click <strong>Load sample notifications</strong> above (adds four demo items once).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,224 @@
+<div class="chat-app">
+
+  <!-- Sidebar -->
+  <div class="sidebar" [class.collapsed]="!sidebarOpen">
+    <div class="sidebar-header">
+      <button class="btn-new-chat" (click)="newConversation()">
+        <i class="fa fa-plus"></i>
+        <span *ngIf="sidebarOpen">New Chat</span>
+      </button>
+      <button class="btn-toggle-sidebar" (click)="sidebarOpen = !sidebarOpen">
+        <i class="fa" [class.fa-chevron-left]="sidebarOpen" [class.fa-chevron-right]="!sidebarOpen"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-list" *ngIf="sidebarOpen">
+      <div class="sidebar-label">Recent Chats</div>
+      <div class="search-wrap">
+        <i class="fa fa-search"></i>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search chats..." class="search-input">
+      </div>
+
+      <!-- Pinned Messages Section -->
+      <div class="pinned-section" *ngIf="pinnedMessages.length > 0">
+        <div class="sidebar-label pinned-label" (click)="showPinned = !showPinned" style="cursor:pointer">
+          <i class="fa fa-thumbtack"></i> Pinned ({{ pinnedMessages.length }})
+          <i class="fa" [class.fa-chevron-down]="showPinned" [class.fa-chevron-right]="!showPinned" style="margin-left:auto"></i>
+        </div>
+        <div *ngIf="showPinned">
+          <div *ngFor="let pin of pinnedMessages" class="pinned-item">
+            <div class="pinned-text">{{ pin.content | slice:0:60 }}{{ pin.content.length > 60 ? '...' : '' }}</div>
+            <button class="btn-unpin" (click)="unpinMessage(pin)" title="Unpin">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngFor="let conv of filteredConversations"
+        class="conv-item"
+        [class.active]="conv.id === activeConvId"
+        (click)="loadConversation(conv.id)"
+      >
+        <div class="conv-icon"><i class="fa fa-comments"></i></div>
+        <div class="conv-info">
+          <div class="conv-title">{{ conv.title }}</div>
+          <div class="conv-date">{{ formatDate(conv.updatedAt) }}</div>
+        </div>
+        <button class="btn-delete-conv" (click)="deleteConversation(conv.id, $event)" title="Delete">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-empty" *ngIf="filteredConversations.length === 0">
+        No conversations found
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chat-main">
+
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="header-left">
+        <a routerLink="/SkillTests" class="back-link"><i class="fa fa-arrow-left"></i></a>
+        <div class="ai-avatar-header" [class.speaking]="isSpeaking" [class.mood-happy]="currentMood === 'happy'" [class.mood-strict]="currentMood === 'strict'" [class.mood-celebrating]="currentMood === 'celebrating'">
+          <span class="mood-emoji">{{ moodEmoji[currentMood] }}</span>
+          <div class="speaking-rings" *ngIf="isSpeaking">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="header-info">
+          <h1>ALO ALO — AI Career Coach</h1>
+          <div class="status-row">
+            <span class="status-dot" [class.speaking-dot]="isSpeaking" [class.listening-dot]="isListening"></span>
+            <span class="status-text mood-status">{{ moodLabel[currentMood] }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Roast Mode Toggle -->
+        <button
+          class="btn-roast"
+          [class.active]="roastMode"
+          (click)="toggleRoastMode()"
+          title="Toggle Roast Mode 🔥"
+        >
+          🔥 {{ roastMode ? 'Roast ON' : 'Roast' }}
+        </button>
+
+        <button *ngIf="voiceSupported && speechSupported" class="btn-voice-mode" [class.active]="voiceMode" (click)="toggleVoiceMode()">
+          <i class="fa" [class.fa-volume-up]="voiceMode" [class.fa-volume-mute]="!voiceMode"></i>
+          <span>{{ voiceMode ? 'Voice ON' : 'Voice OFF' }}</span>
+        </button>
+        <a routerLink="/AiVideoCall" class="btn-video-call">
+          <i class="fa fa-video"></i> Video Call
+        </a>
+        <button class="btn-icon" (click)="clearChat()" title="Clear current chat">
+          <i class="fa fa-eraser"></i>
+        </button>
+        <button class="btn-icon" (click)="newConversation()" title="New conversation">
+          <i class="fa fa-plus"></i>
+        </button>
+        <div class="premium-badge" *ngIf="hasAccess">
+          <i class="fa fa-crown"></i> Premium
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Banner -->
+    <div class="voice-banner" *ngIf="voiceMode && hasAccess">
+      <i class="fa fa-microphone"></i>
+      <span>Voice mode active — ALO ALO will speak responses and listen after each answer</span>
+      <button class="btn-stop-voice" (click)="stopSpeaking()" *ngIf="isSpeaking">
+        <i class="fa fa-stop"></i> Stop
+      </button>
+    </div>
+
+    <!-- Roast Mode Banner -->
+    <div class="roast-banner" *ngIf="roastMode">
+      🔥 <strong>Roast Mode Active</strong> — ALO ALO will be brutally honest and funny. Brace yourself!
+    </div>
+
+    <!-- Checking -->
+    <div class="checking" *ngIf="checkingAccess">
+      <i class="fa fa-spinner fa-spin"></i> Checking access...
+    </div>
+
+    <!-- Gate -->
+    <div class="gate" *ngIf="!checkingAccess && !hasAccess">
+      <div class="gate-icon"><i class="fa fa-lock"></i></div>
+      <h2>Premium Feature</h2>
+      <p>AI Career Coach is available for <strong>Premium</strong> and <strong>Enterprise</strong> subscribers.</p>
+      <a routerLink="/SubscriptionPlans" class="btn-upgrade">
+        <i class="fa fa-crown"></i> Upgrade to Premium
+      </a>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-container" *ngIf="!checkingAccess && hasAccess">
+
+      <!-- Messages -->
+      <div class="messages-area">
+
+        <!-- Suggestions -->
+        <div class="suggestions" *ngIf="messages.length <= 1">
+          <p class="suggestions-label">Try asking:</p>
+          <div class="suggestion-chips">
+            <button *ngFor="let s of suggestions" class="chip" (click)="useSuggestion(s)">{{ s }}</button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div *ngFor="let m of messages" class="message-wrapper" [ngClass]="m.role">
+          <div class="message-row" *ngIf="m.role === 'assistant'">
+            <div class="avatar ai" [class.pulse]="isSpeaking && m === messages[messages.length-1]">
+              <span>{{ moodEmoji[currentMood] }}</span>
+            </div>
+            <div class="bubble ai-bubble">
+              <div class="sender-name">ALO ALO</div>
+              <div class="bubble-text" [innerHTML]="formatMessage(m.content)"></div>
+              <div class="msg-actions">
+                <button class="btn-speak-msg" (click)="speak(m.content)" title="Read aloud" *ngIf="speechSupported">
+                  <i class="fa fa-volume-up"></i>
+                </button>
+                <button class="btn-pin-msg" (click)="pinMessage(m)" [class.pinned]="isPinned(m)" title="{{ isPinned(m) ? 'Unpin' : 'Pin message' }}">
+                  <i class="fa fa-thumbtack"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="message-row user-row" *ngIf="m.role === 'user'">
+            <div class="bubble user-bubble">
+              <div class="sender-name">You</div>
+              <div class="bubble-text">{{ m.content }}</div>
+              <div class="msg-actions user-actions">
+                <button class="btn-pin-msg" (click)="pinMessage(m)" [class.pinned]="isPinned(m)" title="{{ isPinned(m) ? 'Unpin' : 'Pin message' }}">
+                  <i class="fa fa-thumbtack"></i>
+                </button>
+              </div>
+            </div>
+            <div class="avatar user"><i class="fa fa-user"></i></div>
+          </div>
+        </div>
+
+        <!-- Typing -->
+        <div class="message-row" *ngIf="loading">
+          <div class="avatar ai"><span>🤔</span></div>
+          <div class="bubble ai-bubble typing-bubble">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+
+        <div #messagesEnd></div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-area">
+        <div class="input-wrapper" [class.listening]="isListening" [class.roast-input]="roastMode">
+          <button *ngIf="voiceSupported" class="btn-mic" [class.active]="isListening" (click)="toggleListening()" [disabled]="loading">
+            <i class="fa" [class.fa-stop]="isListening" [class.fa-microphone]="!isListening"></i>
+          </button>
+          <textarea
+            [(ngModel)]="inputText"
+            (keydown)="onKeydown($event)"
+            [placeholder]="roastMode ? '🔥 Ask for a roast...' : isListening ? 'Listening... speak now' : 'Ask me anything...'"
+            rows="1"
+            [disabled]="loading"
+          ></textarea>
+          <button class="btn-send" (click)="send()" [disabled]="loading || !inputText.trim()">
+            <i class="fa" [class.fa-spinner]="loading" [class.fa-spin]="loading" [class.fa-paper-plane]="!loading"></i>
+          </button>
+        </div>
+        <div class="listening-wave" *ngIf="isListening">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="input-hint" *ngIf="!isListening">
+          Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

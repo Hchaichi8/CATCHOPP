@@ -166,7 +166,13 @@
     <div class="modal-body">
       <div class="form-group">
         <label>Project Title</label>
-        <input type="text" class="form-control" placeholder="e.g. Build an E-commerce App for IOS">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="e.g. Build an E-commerce App for IOS"
+          [(ngModel)]="projectTitle"
+          name="projectTitle"
+        />
       </div>
 
       <div class="form-row">
@@ -190,7 +196,55 @@
 
       <div class="form-group">
         <label>Description</label>
-        <textarea class="form-control text-area" placeholder="Describe deliverables, timeline, and requirements..."></textarea>
+        <textarea
+          class="form-control text-area"
+          placeholder="Describe deliverables, timeline, budget, and technical requirements..."
+          [(ngModel)]="projectDescription"
+          name="projectDescription"
+          rows="6"
+        ></textarea>
+      </div>
+
+      <div class="scope-ai-row">
+        <button type="button" class="btn-scope-ai" [disabled]="scopeLoading" (click)="analyzeScope()">
+          <i class="fa fa-magic"></i>
+          {{ scopeLoading ? 'Analyzing…' : 'Check scope with AI' }}
+        </button>
+        <span class="scope-ai-hint">Detects vague or unrealistic scope before you publish.</span>
+      </div>
+
+      <div class="scope-ai-panel" *ngIf="scopeError" role="alert">
+        <i class="fa fa-exclamation-triangle"></i> {{ scopeError }}
+      </div>
+
+      <div
+        class="scope-ai-panel"
+        *ngIf="scopeResult && !scopeError"
+        [class.scope-ok]="scopeResult.readyToPost"
+        [class.scope-warn]="!scopeResult.readyToPost"
+        role="status"
+      >
+        <div class="scope-head">
+          <span class="scope-badge" [class.ai]="scopeResult.aiUsed" [class.local]="!scopeResult.aiUsed">
+            {{ scopeResult.aiUsed ? 'AI' : 'Quick check' }}
+          </span>
+          <strong>{{ scopeResult.headline }}</strong>
+        </div>
+        <p class="scope-quality">Status: <span>{{ scopeResult.quality }}</span></p>
+        <p class="scope-sub" *ngIf="scopeResult.missing?.length">Gaps to address:</p>
+        <ul class="scope-list" *ngIf="scopeResult.missing?.length">
+          <li *ngFor="let m of scopeResult.missing">{{ m }}</li>
+        </ul>
+        <p class="scope-sub" *ngIf="scopeResult.unrealisticNotes?.length">Scope realism:</p>
+        <ul class="scope-list unreal" *ngIf="scopeResult.unrealisticNotes?.length">
+          <li *ngFor="let u of scopeResult.unrealisticNotes">{{ u }}</li>
+        </ul>
+        <div class="scope-suggestions" *ngIf="scopeResult.suggestions?.length">
+          <p>Suggestions</p>
+          <ul>
+            <li *ngFor="let s of scopeResult.suggestions">{{ s }}</li>
+          </ul>
+        </div>
       </div>
 
       <div class="form-group">
@@ -225,7 +279,13 @@
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="closeModal()">Save Draft</button>
-      <button class="btn-publish">Publish Project</button>
+      <button
+        class="btn-publish"
+        [class.btn-publish-soft]="scopeResult && !scopeResult.readyToPost"
+        title="Add detail if AI flagged gaps"
+      >
+        Publish Project
+      </button>
     </div>
 
   </div>

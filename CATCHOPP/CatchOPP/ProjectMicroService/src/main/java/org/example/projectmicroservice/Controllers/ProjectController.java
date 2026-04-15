@@ -1,8 +1,11 @@
 package org.example.projectmicroservice.Controllers;
 
+import org.example.projectmicroservice.Dto.ProjectScopeAnalysisDto;
+import org.example.projectmicroservice.Dto.ProjectScopeRequest;
 import org.example.projectmicroservice.Entities.Project;
 import org.example.projectmicroservice.Entities.Proposal;
 import org.example.projectmicroservice.Entities.StatusProposal;
+import org.example.projectmicroservice.Services.ProjectScopeAiService;
 import org.example.projectmicroservice.Services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,18 @@ public class ProjectController {
 
     @Autowired
     private ProjectService service;
+
+    @Autowired
+    private ProjectScopeAiService projectScopeAiService;
+
+    /** AI-assisted check: vague scope, missing budget/timeline/tech, unrealistic expectations */
+    @PostMapping("/ai/analyze-scope")
+    public ProjectScopeAnalysisDto analyzeProjectScope(@RequestBody ProjectScopeRequest body) {
+        if (body == null) {
+            body = new ProjectScopeRequest();
+        }
+        return projectScopeAiService.analyze(body.getTitle(), body.getDescription());
+    }
 
     @PostMapping("/newproject")
     public Project createProject(@RequestBody Project project) {

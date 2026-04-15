@@ -12,13 +12,315 @@
       <app-notification-center></app-notification-center>
       <a routerLink="/SkillTests" class="nav-link active"><i class="fa fa-graduation-cap"></i> Skill Tests</a>
       <a routerLink="/MyCertifications" class="nav-link"><i class="fa fa-award"></i> My Certifications</a>
+      <a
+        *ngIf="currentUserId"
+        [routerLink]="['/LeagueProfile', currentUserId]"
+        class="nav-link nav-link-league"
+        title="Arena profile, avatar, cheers &amp; following"
+      >
+        <i class="fa fa-shield"></i> League profile
+      </a>
+      <div class="nav-points" *ngIf="dash" title="Total gamification points">
+        <i class="fa fa-star"></i> {{ dash.totalPoints }} pts
+      </div>
       <a routerLink="/FreelancerFeed" class="nav-link"><i class="fa fa-briefcase"></i> Jobs</a>
     </div>
   </div>
 </nav>
 
 <div class="main-container">
-  <!-- AI-generated test section - Gemini/OpenAI -->
+  <section id="arena" class="arena-section" *ngIf="currentUserId">
+    <div class="arena-header">
+      <div>
+        <span class="arena-kicker">Gamification 2.0</span>
+        <h2 class="arena-title"><i class="fa fa-trophy"></i> Arena &amp; Leagues</h2>
+        <p class="arena-sub">
+          Daily challenges fuel your league XP. Top performers promote every Monday; bottom five risk demotion — Duolingo-style competition.
+        </p>
+      </div>
+      <button type="button" class="btn-arena-refresh" (click)="refreshDashboard()" [disabled]="dashLoading">
+        <i class="fa" [ngClass]="dashLoading ? 'fa-spinner fa-spin' : 'fa-refresh'"></i> Sync
+      </button>
+    </div>
+    <p class="arena-error" *ngIf="dashError">{{ dashError }}</p>
+
+    <div class="arena-grid" *ngIf="dash">
+      <article class="league-card" [ngClass]="tierClass(dash.leagueTier)">
+        <div class="league-card-inner">
+          <div class="league-badge-row">
+            <span class="league-icon"><i class="fa fa-shield"></i></span>
+            <div>
+              <h3>{{ tierLabel(dash.leagueTier) }} League</h3>
+              <p class="league-caption">Your weekly bracket</p>
+            </div>
+          </div>
+          <div class="league-stats">
+            <div class="stat">
+              <span class="stat-label">Weekly XP</span>
+              <span class="stat-value">{{ dash.weeklyLeagueXp }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Rank in league</span>
+              <span class="stat-value">#{{ dash.rankInTier }} <span class="stat-of">/ {{ dash.playersInTier }}</span></span>
+            </div>
+          </div>
+          <div class="ai-interview-cta" *ngIf="dash">
+            <button
+              type="button"
+              class="btn-ai-interview"
+              (click)="openAiInterview()"
+              [disabled]="!hasAiAccess"
+              title="AI Interview Simulator (Premium/Enterprise)"
+            >
+              <i class="fa fa-robot"></i> AI Interview Simulator
+            </button>
+            <a
+              routerLink="/AiCoach"
+              class="btn-ai-coach"
+              [class.disabled]="!hasAiAccess"
+              (click)="!hasAiAccess && $event.preventDefault()"
+              title="AI Career Coach — chat freely (Premium/Enterprise)"
+            >
+              <i class="fa fa-comments"></i> AI Career Coach
+            </a>
+            <a
+              routerLink="/AiVideoCall"
+              class="btn-ai-video"
+              [class.disabled]="!hasAiAccess"
+              (click)="!hasAiAccess && $event.preventDefault()"
+              title="Video Call with AI Coach (Premium/Enterprise)"
+            >
+              <i class="fa fa-video"></i> Video Call with ALO ALO
+            </a>
+            <div class="ai-interview-hint" *ngIf="!hasAiAccess">
+              Unlock with Premium/Enterprise subscription
+            </div>
+          </div>
+          <div class="subscriber-ribbon" *ngIf="dash.activeSubscriber">
+            <i class="fa fa-bolt"></i> Subscriber boost active (+25% challenge points &amp; weekly bonus)
+          </div>
+          <p class="reset-line"><i class="fa fa-calendar"></i> Next league reset: <strong>{{ formatReset(dash.nextLeagueReset) }}</strong></p>
+          <div class="mini-board">
+            <h4>Top in your league</h4>
+            <ul>
+              <li *ngFor="let row of dash.leagueTopPlayers; let i = index" [class.is-you]="isMe(row.userId)">
+                <a class="mini-board-link" [routerLink]="['/LeagueProfile', row.userId]">
+                  <span class="pos">{{ i + 1 }}</span>
+                  <img class="mini-avatar" [src]="avatarUrl(row.userId, row.avatarUrl)" alt="" />
+                  <span class="who">{{ miniBoardLabel(row) }}</span>
+                  <span class="xp">{{ row.weeklyLeagueXp }} XP</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="challenges-card">
+        <div class="challenges-card-inner">
+          <h3><i class="fa fa-bullseye"></i> Daily challenges</h3>
+          <p class="challenges-hint">New set every calendar day. Complete all three for the <strong>Daily Triad</strong> badge.</p>
+          <div class="challenge-row" *ngFor="let c of dash.dailyChallenges">
+            <div class="challenge-top">
+              <span class="challenge-title">{{ c.title }}</span>
+              <span class="challenge-pts">+{{ c.pointsReward }} pts</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="challengePct(c)"></div>
+            </div>
+            <div class="challenge-meta">
+              {{ c.currentCount }} / {{ c.targetCount }}
+              <span class="done" *ngIf="c.completed"><i class="fa fa-check-circle"></i> Done</span>
+            </div>
+          </div>
+          <div class="challenge-actions">
+            <button type="button" class="btn-chal secondary" (click)="onSimulateApply()">
+              +1 apply <span class="hint">(track job applications)</span>
+            </button>
+            <button type="button" class="btn-chal secondary" (click)="onMarkProfileDone()">
+              I completed my profile
+            </button>
+          </div>
+          <p class="chal-footnote">Passing a skill test today credits automatically. Wire <code>recordApply</code> from your jobs flow for production.</p>
+        </div>
+      </article>
+
+      <article class="badges-card">
+        <h3><i class="fa fa-certificate"></i> Badges &amp; rewards</h3>
+        <p>Earned from milestones, subscriptions, and streaks.</p>
+        <div class="badge-chips">
+          <span class="chip" *ngFor="let b of dash.badges">{{ formatBadge(b) }}</span>
+          <span class="chip muted" *ngIf="!dash.badges?.length">No badges yet — complete challenges!</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="arena-login-hint" *ngIf="!currentUserId">
+    <p><a routerLink="/LoginFreelancer">Log in</a> to unlock Arena, daily challenges, and leagues.</p>
+  </section>
+
+  <section class="leagues-explorer" *ngIf="leaguesOverview as ov">
+    <div class="explorer-head">
+      <div>
+        <span class="explorer-kicker">Competition</span>
+        <h2 class="explorer-title"><i class="fa fa-globe"></i> All leagues &amp; how promotion works</h2>
+        <p class="explorer-lead">
+          You only race against freelancers in <strong>your current league</strong>. Bronze → Silver → Gold → Diamond. There is
+          <strong>no fixed point number</strong> to promote: it is <strong>rank-based</strong> each week.
+        </p>
+      </div>
+    </div>
+
+    <div class="rules-grid">
+      <article class="rules-card">
+        <h3><i class="fa fa-book"></i> Rules</h3>
+        <p class="rules-summary">{{ ov.rules.summary }}</p>
+        <ul class="rules-list">
+          <li>
+            <strong>Promotion:</strong> {{ ov.rules.howPromotionWorks }}
+          </li>
+          <li>
+            <strong>Demotion:</strong> {{ ov.rules.howDemotionWorks }}
+          </li>
+          <li>
+            <strong>Schedule:</strong> {{ ov.rules.resetScheduleHuman }}
+          </li>
+          <li>
+            <strong>Numbers:</strong> Top <strong>{{ ov.rules.promoteTopCount }}</strong> promote · Bottom
+            <strong>{{ ov.rules.demoteBottomCount }}</strong> demote
+            <span *ngIf="ov.rules.mustHavePositiveWeeklyXpToPromote"> · need &gt; 0 weekly XP to promote</span>
+          </li>
+        </ul>
+      </article>
+      <article class="prizes-card">
+        <h3><i class="fa fa-gift"></i> Weekly podium prizes <span class="per-league">(each league)</span></h3>
+        <p class="prizes-intro">
+          Every Monday, before promotions, the <strong>top 3</strong> weekly XP holders in <em>each</em> tier (Bronze, Silver,
+          Gold, Diamond) receive:
+        </p>
+        <table class="prizes-table">
+          <thead>
+            <tr>
+              <th>Place</th>
+              <th>Prize</th>
+              <th>Bonus points</th>
+              <th>Badge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pz of ov.rules.weeklyTopPrizes" [ngClass]="medalClass(pz.place)">
+              <td><span class="place-badge">{{ pz.place }}</span></td>
+              <td>{{ pz.title }}</td>
+              <td class="pts-cell">+{{ pz.bonusPoints }}</td>
+              <td class="badge-cell">{{ pz.badgeDescription }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+    </div>
+
+    <div class="tier-switcher">
+      <span class="switcher-label">Browse live leaderboards:</span>
+      <div class="tier-pills">
+        <button
+          type="button"
+          *ngFor="let t of ov.tiers"
+          class="tier-pill"
+          [class.active]="explorerTier === t.tier"
+          [ngClass]="tierClass(t.tier)"
+          (click)="setExplorerTier(t.tier)"
+        >
+          {{ t.displayName }}
+          <span class="count">{{ t.memberCount }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="explorer-board" *ngIf="explorerSnapshot as snap">
+      <div class="board-head">
+        <h3>{{ snap.displayName }} League — this week</h3>
+        <p class="board-meta">{{ snap.memberCount }} freelancer(s) · showing top {{ snap.topPlayers.length }}</p>
+      </div>
+      <div class="board-table-wrap">
+        <table class="board-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Weekly XP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let row of snap.topPlayers">
+              <tr
+                [class.is-you]="currentUserId && row.userId === currentUserId"
+                [ngClass]="medalClass(row.rank)"
+              >
+                <td>{{ row.rank }}</td>
+                <td class="player-cell">
+                  <div class="player-line">
+                    <a class="player-profile-hit" [routerLink]="['/LeagueProfile', row.userId]">
+                      <img class="lb-avatar" [src]="avatarUrl(row.userId, row.avatarUrl)" alt="" />
+                      <div class="player-info">
+                        <span class="name-link">{{ playerLabel(row) }}</span>
+                        <span class="streak-pill" *ngIf="row.streakDays > 0"
+                          ><i class="fa fa-fire"></i> {{ row.streakDays }}d</span
+                        >
+                        <span class="loc" *ngIf="row.location">{{ row.location }}</span>
+                      </div>
+                    </a>
+                    <div class="player-actions" *ngIf="currentUserId && row.userId !== currentUserId">
+                      <button type="button" class="btn-follow" (click)="onFollow(row)">
+                        {{ row.isFollowing ? 'Following' : 'Follow' }}
+                      </button>
+                      <button type="button" class="btn-cheer" (click)="toggleEncourage(row)">Cheer</button>
+                    </div>
+                  </div>
+                  <div *ngIf="encourageTargetUserId === row.userId" class="encourage-box">
+                    <div class="encourage-gif-row">
+                      <button
+                        type="button"
+                        class="btn-cheer btn-gif"
+                        (click)="showGifPicker = !showGifPicker"
+                      >
+                        <i class="fa fa-photo"></i> GIF
+                      </button>
+                      <span class="encourage-muted" *ngIf="showGifPicker">Pick a GIF</span>
+                    </div>
+
+                    <div class="encourage-gif-picker" *ngIf="showGifPicker">
+                      <button
+                        type="button"
+                        class="encourage-gif-thumb"
+                        *ngFor="let g of gifSuggestions"
+                        (click)="applyGif(g)"
+                        title="Send GIF"
+                      >
+                        <img [src]="g" alt="" />
+                      </button>
+                    </div>
+                    <textarea
+                      [(ngModel)]="encourageText"
+                      rows="2"
+                      maxlength="1000"
+                      placeholder="Send a short encouragement…"
+                    ></textarea>
+                    <button type="button" class="btn-send-cheer" (click)="sendEncourage(row)">Send</button>
+                  </div>
+                </td>
+                <td class="xp-col">{{ row.weeklyLeagueXp }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+        <p class="board-empty" *ngIf="!snap.topPlayers?.length">No one in this league yet — be the first.</p>
+      </div>
+    </div>
+  </section>
+  <p class="overview-error" *ngIf="overviewError">{{ overviewError }}</p>
+
+  <!-- AI-generated test section -->
   <div class="ai-generate-card">
     <h2><i class="fa fa-magic"></i> AI-Generated Skill Test</h2>
     <p *ngIf="hasAiAccess">Choose a category and let our AI create a personalized test for you.</p>
@@ -51,6 +353,7 @@
   <div class="tests-grid">
     <div *ngFor="let t of filteredTests" class="test-card">
       <div class="card-badge">{{ t.category }}</div>
+      <div class="difficulty-badge" [ngClass]="getDifficulty(t)">{{ getDifficulty(t) }}</div>
       <h3>{{ t.title }}</h3>
       <p>{{ t.description }}</p>
       <div class="meta">
@@ -62,4 +365,3 @@
     </div>
   </div>
 </div>
-

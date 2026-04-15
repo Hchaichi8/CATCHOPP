@@ -1,0 +1,536 @@
+<nav class="lp-nav">
+  <div class="lp-nav-inner">
+    <button type="button" class="lp-back" (click)="backToLeagues()">
+      <i class="fa fa-arrow-left"></i> Skill Tests &amp; Leagues
+    </button>
+    <div class="lp-nav-links" *ngIf="currentUserId">
+      <a routerLink="/SkillTests" class="lp-nav-tab"><i class="fa fa-graduation-cap"></i> Skill Tests</a>
+      <a routerLink="/MyCertifications" class="lp-nav-tab"><i class="fa fa-award"></i> My Certifications</a>
+      <span class="lp-nav-tab active"><i class="fa fa-shield"></i> League profile</span>
+    </div>
+    <div class="lp-nav-actions">
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+      <a routerLink="/FreelancerFeed" class="lp-nav-link">Jobs</a>
+    </div>
+  </div>
+</nav>
+
+<div class="lp-page" *ngIf="!loading && profile as p">
+  <header class="lp-hero" [attr.data-tier]="(p.leagueTier || 'BRONZE').toLowerCase()">
+    <div class="lp-hero-inner">
+      <div class="lp-avatar-wrap">
+        <button *ngIf="isOwnProfile" type="button" class="lp-avatar-btn" (click)="openAvatarModal()" title="Edit avatar">
+          <img class="lp-avatar" [src]="avatarDisplayUrl(p.userId, p.avatarUrl)" alt="" />
+        </button>
+        <img *ngIf="!isOwnProfile" class="lp-avatar" [src]="avatarDisplayUrl(p.userId, p.avatarUrl)" alt="" />
+        <span class="lp-tier-badge">{{ tierLabel(p.leagueTier) }}</span>
+      </div>
+      <div class="lp-hero-text">
+        <h1>{{ p.displayName }}</h1>
+        <p class="lp-location" *ngIf="p.location">
+          <i class="fa fa-map-marker"></i> {{ p.location }}
+        </p>
+        <p class="lp-location muted" *ngIf="!p.location">Location not set</p>
+        <div class="lp-hero-actions" *ngIf="currentUserId">
+          <button
+            *ngIf="!isOwnProfile"
+            type="button"
+            class="lp-btn primary"
+            (click)="followToggle()"
+          >
+            {{ p.viewerIsFollowing ? 'Following' : 'Follow' }}
+          </button>
+          <span *ngIf="isOwnProfile" class="lp-you-pill">Your league profile</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="lp-layout">
+    <section class="lp-card lp-avatar-card" *ngIf="isOwnProfile">
+      <h2 class="lp-card-title">Your avatar</h2>
+      <p class="lp-muted small lp-avatar-lead">
+        This picture appears on leaderboards and here on your league profile. Tap the button to open the avatar studio
+        (skin, hair, clothes, face).
+      </p>
+      <div class="lp-avatar-showcase">
+        <div class="lp-avatar-large-wrap">
+          <img
+            class="lp-avatar-large"
+            [src]="avatarDisplayUrl(p.userId, p.avatarUrl)"
+            alt="Your league avatar"
+          />
+        </div>
+        <div class="lp-avatar-cta-col">
+          <button type="button" class="lp-btn-avatar-create" (click)="openAvatarModal()">
+            <i class="fa fa-user-circle"></i> Create &amp; edit avatar
+          </button>
+          <span class="lp-avatar-hint">Duolingo-style editor · saved when you press Done in the studio</span>
+        </div>
+      </div>
+
+      <h2 class="lp-card-title lp-subtitle">Name &amp; location</h2>
+      <div class="lp-form-row">
+        <label>Display name</label>
+        <input [(ngModel)]="editDraft.displayName" maxlength="120" />
+      </div>
+      <div class="lp-form-row">
+        <label>Country / region</label>
+        <input [(ngModel)]="editDraft.location" maxlength="120" placeholder="e.g. Tunisia, Canada" />
+      </div>
+      <button type="button" class="lp-btn-save-profile" (click)="saveIdentity()" [disabled]="savingProfile">
+        {{ savingProfile ? 'Saving…' : 'Save name & location' }}
+      </button>
+    </section>
+
+    <section class="lp-card lp-stats-card">
+      <h2 class="lp-card-title">Arena snapshot</h2>
+      <div class="lp-stat-grid">
+        <div class="lp-stat">
+          <span class="lp-stat-value">{{ p.streakDays }}</span>
+          <span class="lp-stat-label">Day streak</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat-value">{{ p.weeklyLeagueXp }}</span>
+          <span class="lp-stat-label">Weekly league XP</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat-value">{{ p.totalPoints }}</span>
+          <span class="lp-stat-label">Career points</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat-value">{{ p.followersCount }}</span>
+          <span class="lp-stat-label">Followers</span>
+        </div>
+        <div class="lp-stat">
+          <span class="lp-stat-value">{{ p.followingCount }}</span>
+          <span class="lp-stat-label">Following</span>
+        </div>
+        <div class="lp-stat wide">
+          <span class="lp-stat-value subtle"
+            ><i class="fa fa-arrow-up"></i> {{ p.promotionsTotal }} &nbsp; <i class="fa fa-arrow-down"></i>
+            {{ p.demotionsTotal }}</span
+          >
+          <span class="lp-stat-label">Promotion / demotion history</span>
+        </div>
+      </div>
+      <p class="lp-hint">
+        Rankings reset weekly. Streaks grow when you complete daily challenges — stay consistent like Duolingo.
+      </p>
+
+      <div class="lp-weekly-xp-card" *ngIf="weeklyXp as ws">
+        <div class="lp-weekly-head">
+          <h3>XP this week</h3>
+          <span class="lp-muted small" *ngIf="weeklyXpLoading">Loading…</span>
+        </div>
+        <div class="lp-weekly-legend">
+          <span class="dot you"></span> {{ ws.profileDisplayName || 'You' }}
+          <span class="xp">{{ seriesTotal(ws.profileXpSeries) }} XP</span>
+          <span *ngIf="ws.comparisonDisplayName">
+            <span class="dot other"></span> {{ ws.comparisonDisplayName }}
+            <span class="xp">{{ seriesTotal(ws.comparisonXpSeries) }} XP</span>
+          </span>
+        </div>
+        <svg class="lp-xp-graph" viewBox="0 0 320 170" preserveAspectRatio="none">
+          <line x1="0" y1="130" x2="300" y2="130" class="axis"></line>
+          <polyline
+            [attr.points]="chartPoints(ws.profileXpSeries, chartMaxValue(ws))"
+            class="line-you"
+          ></polyline>
+          <polyline
+            *ngIf="ws.comparisonXpSeries?.length"
+            [attr.points]="chartPoints(ws.comparisonXpSeries, chartMaxValue(ws))"
+            class="line-other"
+          ></polyline>
+          <circle
+            *ngFor="let v of ws.profileXpSeries; let i = index"
+            [attr.cx]="chartDotX(i, ws.profileXpSeries.length)"
+            [attr.cy]="chartDotY(v, chartMaxValue(ws))"
+            r="3"
+            class="dot-you"
+          ></circle>
+          <circle
+            *ngFor="let v of ws.comparisonXpSeries; let i = index"
+            [attr.cx]="chartDotX(i, ws.comparisonXpSeries.length)"
+            [attr.cy]="chartDotY(v, chartMaxValue(ws))"
+            r="3"
+            class="dot-other"
+          ></circle>
+          <text
+            *ngFor="let lb of ws.labels; let i = index"
+            [attr.x]="chartDotX(i, ws.labels.length)"
+            y="155"
+            text-anchor="middle"
+            class="x-label"
+          >{{ lb }}</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="lp-card lp-following-card">
+      <h2 class="lp-card-title">Following</h2>
+      <p class="lp-muted" *ngIf="followingLoading">Loading…</p>
+      <ul class="lp-following-list" *ngIf="!followingLoading && following.length">
+        <li *ngFor="let u of following">
+          <a [routerLink]="['/LeagueProfile', u.userId]" class="lp-follow-row">
+            <img [src]="avatarDisplayUrl(u.userId, u.avatarUrl)" alt="" />
+            <div>
+              <span class="lp-fn">{{ u.displayName }}</span>
+              <span class="lp-ft">{{ tierLabel(u.leagueTier) }} league</span>
+              <span class="lp-ft" *ngIf="u.streakDays > 0"><i class="fa fa-fire"></i> {{ u.streakDays }}d streak</span>
+              <span class="lp-ft"><b>{{ u.weeklyLeagueXp }}</b> weekly XP</span>
+            </div>
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+      <p class="lp-muted" *ngIf="!followingLoading && !following.length">Not following anyone yet.</p>
+    </section>
+
+    <section class="lp-card lp-following-card" *ngIf="isOwnProfile">
+      <h2 class="lp-card-title">Followers</h2>
+      <p class="lp-muted" *ngIf="followersLoading">Loading…</p>
+      <ul class="lp-following-list" *ngIf="!followersLoading && followers.length">
+        <li *ngFor="let u of followers">
+          <a [routerLink]="['/LeagueProfile', u.userId]" class="lp-follow-row">
+            <img [src]="avatarDisplayUrl(u.userId, u.avatarUrl)" alt="" />
+            <div>
+              <span class="lp-fn">{{ u.displayName }}</span>
+              <span class="lp-ft">{{ tierLabel(u.leagueTier) }} league</span>
+              <span class="lp-ft" *ngIf="u.streakDays > 0"><i class="fa fa-fire"></i> {{ u.streakDays }}d streak</span>
+              <span class="lp-ft"><b>{{ u.weeklyLeagueXp }}</b> weekly XP</span>
+            </div>
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+      <p class="lp-muted" *ngIf="!followersLoading && !followers.length">No followers yet.</p>
+    </section>
+
+    <section class="lp-card lp-comments-card">
+      <h2 class="lp-card-title">Public cheers</h2>
+      <p class="lp-muted small">Visible to everyone. Encourage competitors and celebrate wins.</p>
+
+      <div class="lp-compose" *ngIf="currentUserId && !isOwnProfile">
+        <textarea
+          [(ngModel)]="encourageText"
+          rows="3"
+          maxlength="600"
+          placeholder="Write a short public message…"
+        ></textarea>
+        <div class="lp-gif-row">
+          <button type="button" class="lp-btn ghost" (click)="showGifPicker = !showGifPicker">
+            <i class="fa fa-photo"></i> GIF
+          </button>
+          <span class="lp-muted small" *ngIf="showGifPicker">Tap a GIF to send</span>
+        </div>
+        <div class="lp-gif-picker" *ngIf="showGifPicker">
+          <button
+            type="button"
+            class="lp-gif-thumb"
+            *ngFor="let g of gifSuggestions"
+            (click)="applyGif(g)"
+            title="Send GIF"
+          >
+            <img [src]="g" alt="" />
+          </button>
+        </div>
+        <button
+          type="button"
+          class="lp-btn primary"
+          (click)="postEncourage()"
+          [disabled]="postingEncourage || !encourageText.trim()"
+        >
+          {{ postingEncourage ? 'Sending…' : 'Post' }}
+        </button>
+      </div>
+      <p class="lp-muted small" *ngIf="!currentUserId">
+        <a routerLink="/LoginFreelancer">Log in</a> to post a cheer.
+      </p>
+
+      <div
+        class="lp-comments-scroll"
+        #commentsScroll
+        (scroll)="onCommentsScroll(commentsScroll)"
+      >
+        <div *ngFor="let c of comments" class="lp-comment">
+          <div class="lp-comment-head">
+            <strong>{{ c.fromDisplayName }}</strong>
+            <span class="lp-comment-time">{{ formatCheerDate(c.createdAt) }}</span>
+          </div>
+          <ng-container *ngIf="editingEncouragementId !== c.id; else editBlock">
+            <img *ngIf="isGifMessage(c.message)" class="lp-comment-gif" [src]="c.message" alt="" />
+            <p *ngIf="!isGifMessage(c.message)" class="lp-comment-body">{{ c.message }}</p>
+
+            <div class="lp-reactions" *ngIf="currentUserId">
+              <button
+                type="button"
+                *ngFor="let em of reactionPalette"
+                class="lp-react-btn"
+                [class.lp-react-mine]="c.viewerReaction === em"
+                (click)="toggleReaction(c, em)"
+              >
+                <span class="lp-react-emoji">{{ em }}</span>
+                <span class="lp-react-n" *ngIf="reactionCount(c, em) > 0">{{ reactionCount(c, em) }}</span>
+              </button>
+            </div>
+
+            <div class="lp-reactions-readonly" *ngIf="!currentUserId && (c.reactions?.length || 0) > 0">
+              <span *ngFor="let r of c.reactions" class="lp-react-pill">{{ r.emoji }} {{ r.count }}</span>
+            </div>
+
+            <div class="lp-comment-actions" *ngIf="canManageComment(c)">
+              <button type="button" class="lp-btn-action" (click)="startEditComment(c)">
+                Edit
+              </button>
+              <button
+                type="button"
+                class="lp-btn-action lp-btn-danger"
+                (click)="deleteComment(c)"
+                [disabled]="deleteLoadingId === c.id"
+              >
+                {{ deleteLoadingId === c.id ? 'Deleting…' : 'Delete' }}
+              </button>
+            </div>
+          </ng-container>
+
+          <ng-template #editBlock>
+            <textarea
+              [(ngModel)]="editingMessage"
+              class="lp-edit-text"
+              rows="2"
+              maxlength="1000"
+            ></textarea>
+            <div class="lp-comment-actions">
+              <button type="button" class="lp-btn-action" (click)="saveEditComment()" [disabled]="editSaving">
+                {{ editSaving ? 'Saving…' : 'Save' }}
+              </button>
+              <button type="button" class="lp-btn-action lp-btn-muted" (click)="cancelEditComment()">
+                Cancel
+              </button>
+            </div>
+          </ng-template>
+        </div>
+        <p class="lp-muted" *ngIf="!comments.length && !commentsLoading">No cheers yet — be the first.</p>
+        <p class="lp-muted center" *ngIf="commentsLoading">Loading…</p>
+        <p class="lp-muted center small" *ngIf="comments.length && !commentsHasMore && !commentsLoading">
+          End of thread · {{ comments.length }} message(s)
+        </p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="lp-loading" *ngIf="loading">
+  <i class="fa fa-spinner fa-spin"></i> Loading profile…
+</div>
+<p class="lp-error" *ngIf="error">{{ error }}</p>
+
+<div class="lp-avatar-modal" *ngIf="avatarModalOpen">
+  <div class="lp-avatar-modal-backdrop" (click)="closeAvatarModal()"></div>
+  <div class="lp-avatar-modal-panel" role="dialog" aria-modal="true">
+    <header class="lp-am-head">
+      <button type="button" class="lp-am-close" (click)="closeAvatarModal()" aria-label="Close">
+        <i class="fa fa-times"></i>
+      </button>
+      <h2>Create avatar</h2>
+      <button type="button" class="lp-am-done" (click)="saveAvatarFromModal()" [disabled]="savingProfile">
+        {{ savingProfile ? 'Saving…' : 'Done' }}
+      </button>
+    </header>
+    <div class="lp-am-body">
+      <div class="lp-am-preview">
+        <div class="lp-am-preview-box">
+          <img [src]="studioPreviewUrl()" alt="Preview" />
+        </div>
+        <label class="lp-am-seed-label">Character seed</label>
+        <div class="lp-am-seed-row">
+          <input [(ngModel)]="studioState.seed" maxlength="80" />
+          <button type="button" class="lp-btn ghost" (click)="randomizeStudio()">Random</button>
+        </div>
+      </div>
+      <div class="lp-am-side">
+        <nav class="lp-am-tabs">
+          <button type="button" [class.active]="studioTab === 'skin'" (click)="studioTab = 'skin'">Skin</button>
+          <button type="button" [class.active]="studioTab === 'hair'" (click)="studioTab = 'hair'">Hair</button>
+          <button type="button" [class.active]="studioTab === 'face'" (click)="studioTab = 'face'">Face</button>
+          <button type="button" [class.active]="studioTab === 'clothes'" (click)="studioTab = 'clothes'">Clothes</button>
+          <button type="button" [class.active]="studioTab === 'extras'" (click)="studioTab = 'extras'">Extras</button>
+        </nav>
+
+        <div *ngIf="studioTab === 'skin'" class="lp-am-section">
+          <h3>Skin tone</h3>
+          <div class="lp-swatch-grid">
+            <button
+              type="button"
+              *ngFor="let s of skinSwatches"
+              class="lp-swatch"
+              [class.active]="studioState.skinColor === s.hex"
+              [style.background]="'#' + s.hex"
+              [title]="s.label"
+              (click)="studioState.skinColor = s.hex"
+            ></button>
+          </div>
+        </div>
+
+        <div *ngIf="studioTab === 'hair'" class="lp-am-section">
+          <h3>Hairstyle</h3>
+          <select [(ngModel)]="studioState.top" class="lp-am-select">
+            <option *ngFor="let h of hairTops" [value]="h.value">{{ h.label }}</option>
+          </select>
+          <h3>Hair color</h3>
+          <div class="lp-swatch-grid lp-swatch-sm">
+            <button
+              type="button"
+              *ngFor="let hex of hairColors"
+              class="lp-swatch"
+              [class.active]="studioState.hairColor === hex"
+              [style.background]="'#' + hex"
+              (click)="studioState.hairColor = hex"
+            ></button>
+          </div>
+        </div>
+
+        <div *ngIf="studioTab === 'face'" class="lp-am-section">
+          <h3>Eyes</h3>
+          <select [(ngModel)]="studioState.eyes" class="lp-am-select">
+            <option *ngFor="let e of eyes" [value]="e">{{ e }}</option>
+          </select>
+          <h3>Eyebrows</h3>
+          <select [(ngModel)]="studioState.eyebrows" class="lp-am-select">
+            <option *ngFor="let b of eyebrows" [value]="b">{{ b }}</option>
+          </select>
+          <h3>Mouth</h3>
+          <select [(ngModel)]="studioState.mouth" class="lp-am-select">
+            <option *ngFor="let m of mouths" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+
+        <div *ngIf="studioTab === 'clothes'" class="lp-am-section">
+          <h3>Outfit</h3>
+          <select [(ngModel)]="studioState.clothing" class="lp-am-select">
+            <option *ngFor="let cl of clothing" [value]="cl.value">{{ cl.label }}</option>
+          </select>
+          <h3>Clothes color</h3>
+          <div class="lp-swatch-grid lp-swatch-sm">
+            <button
+              type="button"
+              *ngFor="let hex of clothesColors"
+              class="lp-swatch"
+              [class.active]="studioState.clothesColor === hex"
+              [style.background]="'#' + hex"
+              (click)="studioState.clothesColor = hex"
+            ></button>
+          </div>
+        </div>
+
+        <div *ngIf="studioTab === 'extras'" class="lp-am-section">
+          <h3>Background</h3>
+          <div class="lp-swatch-grid lp-swatch-sm">
+            <button
+              type="button"
+              *ngFor="let hex of bgColors"
+              class="lp-swatch"
+              [class.active]="studioState.backgroundColor === hex"
+              [style.background]="'#' + hex"
+              (click)="studioState.backgroundColor = hex"
+            ></button>
+          </div>
+          <h3>Glasses</h3>
+          <div class="lp-toggle-row">
+            <button type="button" [class.active]="studioState.accessoriesProbability === 0" (click)="setGlassesNone()">
+              None
+            </button>
+            <button type="button" [class.active]="studioState.accessoriesProbability > 0" (click)="setGlassesOn()">
+              On
+            </button>
+          </div>
+          <select *ngIf="studioState.accessoriesProbability > 0" [(ngModel)]="studioState.accessories" class="lp-am-select">
+            <option *ngFor="let a of accessories" [value]="a">{{ a }}</option>
+          </select>
+          <h3>Facial hair</h3>
+          <div class="lp-toggle-row">
+            <button type="button" [class.active]="studioState.facialHairProbability === 0" (click)="setBeardNone()">
+              None
+            </button>
+            <button type="button" [class.active]="studioState.facialHairProbability > 0" (click)="setBeardOn()">
+              On
+            </button>
+          </div>
+          <select *ngIf="studioState.facialHairProbability > 0" [(ngModel)]="studioState.facialHair" class="lp-am-select">
+            <option *ngFor="let f of facialHairOpts" [value]="f">{{ f }}</option>
+          </select>
+
+          <h3>From your photo</h3>
+          <div class="lp-photo-ai-block">
+            <div class="lp-photo-top-actions">
+              <button type="button" class="lp-photo-open-btn" (click)="openCamera()">
+                <i class="fa fa-camera"></i> Take photo
+              </button>
+              <label for="lpPhotoInput" class="lp-photo-open-btn upload">
+                <i class="fa fa-upload"></i> Upload photo
+              </label>
+            </div>
+            <input
+              id="lpPhotoInput"
+              type="file"
+              accept="image/*"
+              class="lp-photo-input"
+              (change)="onPhotoSelected($event)"
+            />
+
+            <div class="lp-camera-wrap" *ngIf="cameraOpen">
+              <video id="lpCameraVideo" autoplay playsinline muted></video>
+              <div class="lp-camera-actions">
+                <button type="button" class="lp-btn primary" (click)="takePhotoFromCamera()">Capture</button>
+                <button type="button" class="lp-btn ghost" (click)="stopCamera()">Cancel</button>
+              </div>
+            </div>
+            <div class="lp-photo-ai-preview" *ngIf="photoPreviewUrl">
+              <img [src]="photoPreviewUrl" alt="Uploaded photo preview" />
+            </div>
+            <div class="lp-style-intensity">
+              <label for="lpStyleIntensity">Cartoon style intensity: <b>{{ styleIntensity }}</b></label>
+              <input
+                id="lpStyleIntensity"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                [(ngModel)]="styleIntensity"
+              />
+            </div>
+            <div class="lp-style-intensity">
+              <label for="lpGenderPref">Gender preference</label>
+              <select id="lpGenderPref" class="lp-am-select" [(ngModel)]="genderPreference">
+                <option value="auto">Auto (AI infer)</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="neutral">Neutral</option>
+              </select>
+            </div>
+            <button
+              type="button"
+              class="lp-btn primary lp-photo-transform-btn"
+              (click)="transformAvatarFromPhoto()"
+              [disabled]="photoTransforming || !photoBase64"
+            >
+              {{ photoTransforming ? 'Transforming…' : 'Transform & Use' }}
+            </button>
+            <p class="lp-muted small" *ngIf="aiTransformEngine">
+              Engine: {{ aiTransformEngine }}
+              <span class="lp-ai-badge" [class.ok]="aiTransformUsed" [class.fail]="!aiTransformUsed">
+                {{ aiTransformUsed ? 'AI used' : 'Fallback used' }}
+              </span>
+            </p>
+            <p class="lp-muted small" *ngIf="photoTransformStatus">{{ photoTransformStatus }}</p>
+            <p class="lp-muted small" *ngIf="!photoTransformStatus">
+              Upload a photo. We generate a DiceBear avatar seed from it (AI fallback).
+              Press <strong>Done</strong> to save.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

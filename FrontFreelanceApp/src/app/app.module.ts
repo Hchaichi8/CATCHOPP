@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -20,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { VirtualContractComponent } from './Interfaces_Client/virtual-contract/virtual-contract.component';
 import { FreelancerFeedComponent } from './Interfaces_Freelancers/freelancer-feed/freelancer-feed.component';
 import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-jobs/freelancer-jobs.component';
+import { NotificationsPageComponent } from './shared/notifications-page/notifications-page.component';
 
 @NgModule({
   declarations: [
@@ -41,13 +44,14 @@ import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-job
         VirtualContractComponent,
         FreelancerFeedComponent,
         FreelancerJobsComponent,
-        
+        NotificationsPageComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    CommonModule
-    
+    CommonModule,
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

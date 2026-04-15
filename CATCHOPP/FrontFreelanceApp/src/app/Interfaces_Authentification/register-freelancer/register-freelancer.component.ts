@@ -106,7 +106,11 @@ export class RegisterFreelancerComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        const body = error.error;
+        this.errorMessage =
+          typeof body === 'string' && body.trim()
+            ? body
+            : body?.message || 'Registration failed. Please try again.';
         this.loading = false;
       }
     });

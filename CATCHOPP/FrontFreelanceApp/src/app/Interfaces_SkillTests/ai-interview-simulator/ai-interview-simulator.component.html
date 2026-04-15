@@ -1,0 +1,219 @@
+<div class="interview-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/SkillTests" class="back-btn"><i class="fa fa-arrow-left"></i> Back to Skill Tests</a>
+      <h1><i class="fa fa-robot"></i> AI Interview Simulator</h1>
+      <p class="subtitle">Practice your pitch with a real AI client before applying. Get honest feedback and a score.</p>
+    </div>
+    <div class="header-badge" *ngIf="hasAiAccess">
+      <i class="fa fa-crown"></i> Premium Feature
+    </div>
+  </div>
+
+  <!-- Subscription Gate -->
+  <div class="gate-card" *ngIf="!subscriptionLoading && !hasAiAccess">
+    <div class="gate-icon"><i class="fa fa-lock"></i></div>
+    <h2>Premium Feature</h2>
+    <p>AI Interview Simulator is available for <strong>Premium</strong> and <strong>Enterprise</strong> subscribers.</p>
+    <a routerLink="/SubscriptionPlans" class="btn-upgrade">
+      <i class="fa fa-crown"></i> Upgrade Now
+    </a>
+  </div>
+
+  <div class="loading-check" *ngIf="subscriptionLoading">
+    <i class="fa fa-spinner fa-spin"></i> Checking subscription...
+  </div>
+
+  <!-- Main Content (only if has access) -->
+  <div class="interview-layout" *ngIf="!subscriptionLoading && hasAiAccess">
+
+    <!-- Setup Panel (shown before interview starts) -->
+    <div class="setup-panel" *ngIf="!sessionId">
+      <div class="setup-card">
+        <div class="setup-header">
+          <i class="fa fa-sliders-h"></i>
+          <h2>Interview Setup</h2>
+          <p>Configure your mock interview session</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label><i class="fa fa-briefcase"></i> Project Title</label>
+            <input [(ngModel)]="projectTitle" type="text" placeholder="e.g. Senior Angular Developer for SaaS Dashboard" />
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-user-tie"></i> Your Role</label>
+            <input [(ngModel)]="role" type="text" placeholder="e.g. Frontend Freelancer" />
+          </div>
+          <div class="form-group full-width">
+            <label><i class="fa fa-code"></i> Your Skills (comma-separated)</label>
+            <input [(ngModel)]="skillsCsv" type="text" placeholder="e.g. Angular, TypeScript, RxJS" />
+          </div>
+        </div>
+
+        <div class="setup-info">
+          <div class="info-item">
+            <i class="fa fa-question-circle"></i>
+            <span>5 questions tailored to your role and skills</span>
+          </div>
+          <div class="info-item">
+            <i class="fa fa-comments"></i>
+            <span>Real-time AI feedback after each answer</span>
+          </div>
+          <div class="info-item">
+            <i class="fa fa-star"></i>
+            <span>Final score out of 100 with detailed evaluation</span>
+          </div>
+        </div>
+
+        <div class="error-msg" *ngIf="error">
+          <i class="fa fa-exclamation-circle"></i> {{ error }}
+        </div>
+
+        <button class="btn-start" (click)="startInterview()" [disabled]="loading">
+          <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-play'"></i>
+          {{ loading ? 'Starting Interview...' : 'Start AI Interview' }}
+        </button>
+      </div>
+
+      <!-- Tips Card -->
+      <div class="tips-card">
+        <h3><i class="fa fa-lightbulb"></i> Tips for a great interview</h3>
+        <ul>
+          <li><i class="fa fa-check"></i> Be specific — mention concrete steps, timelines, and deliverables</li>
+          <li><i class="fa fa-check"></i> Address risks — show you anticipate problems</li>
+          <li><i class="fa fa-check"></i> Communicate clearly — write as if speaking to a real client</li>
+          <li><i class="fa fa-check"></i> Use examples — reference past projects or experience</li>
+          <li><i class="fa fa-check"></i> Be concise — 3-5 sentences per answer is ideal</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Active Interview -->
+    <div class="active-interview" *ngIf="sessionId">
+
+      <!-- Progress Bar -->
+      <div class="progress-header">
+        <div class="progress-info">
+          <span class="progress-label">Question {{ currentQuestion }} of {{ totalQuestions }}</span>
+          <span class="progress-pct">{{ (currentQuestion / totalQuestions * 100) | number:'1.0-0' }}% complete</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="currentQuestion / totalQuestions * 100"></div>
+        </div>
+        <div class="interview-meta">
+          <span><i class="fa fa-briefcase"></i> {{ projectTitle }}</span>
+          <span><i class="fa fa-user"></i> {{ role }}</span>
+          <span><i class="fa fa-code"></i> {{ skills.join(', ') }}</span>
+        </div>
+      </div>
+
+      <!-- Chat Window -->
+      <div class="chat-window">
+        <div class="messages-container" #messagesContainer>
+
+          <!-- Welcome message -->
+          <div class="message-row ai-row">
+            <div class="avatar ai-avatar"><i class="fa fa-robot"></i></div>
+            <div class="bubble ai-bubble system-bubble">
+              <div class="bubble-label">AI Interviewer</div>
+              <p>Welcome! I'm your AI interview coach. I'll ask you {{ totalQuestions }} questions about the <strong>{{ projectTitle }}</strong> project. Answer as if you're pitching to a real client. I'll give you feedback after each answer.</p>
+            </div>
+          </div>
+
+          <!-- Dynamic messages -->
+          <ng-container *ngFor="let m of messages">
+            <!-- AI message -->
+            <div class="message-row ai-row" *ngIf="m.role !== 'user'">
+              <div class="avatar ai-avatar"><i class="fa fa-robot"></i></div>
+              <div class="bubble" [ngClass]="m.role === 'system' ? 'system-bubble' : m.text.includes('improve') || m.text.includes('Improve') || m.text.includes('feedback') ? 'feedback-bubble' : 'ai-bubble'">
+                <div class="bubble-label">{{ m.role === 'system' ? 'System' : 'AI Interviewer' }}</div>
+                <p>{{ m.text }}</p>
+              </div>
+            </div>
+
+            <!-- User message -->
+            <div class="message-row user-row" *ngIf="m.role === 'user'">
+              <div class="bubble user-bubble">
+                <div class="bubble-label">You</div>
+                <p>{{ m.text }}</p>
+              </div>
+              <div class="avatar user-avatar"><i class="fa fa-user"></i></div>
+            </div>
+          </ng-container>
+
+          <!-- AI thinking indicator -->
+          <div class="message-row ai-row" *ngIf="loading">
+            <div class="avatar ai-avatar"><i class="fa fa-robot"></i></div>
+            <div class="bubble ai-bubble thinking-bubble">
+              <div class="bubble-label">AI Interviewer</div>
+              <div class="thinking-dots">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Answer Composer -->
+        <div class="composer" *ngIf="!finished">
+          <div class="composer-hint">
+            <i class="fa fa-info-circle"></i>
+            Write a detailed answer — the AI reads and evaluates every word you write
+          </div>
+          <div class="composer-input">
+            <textarea
+              [(ngModel)]="answerText"
+              placeholder="Write your answer here... Be specific about your approach, timeline, risks, and deliverables."
+              rows="4"
+              (keydown.control.enter)="sendAnswer()"
+            ></textarea>
+            <div class="composer-footer">
+              <span class="char-count" [class.warning]="answerText.length < 50">
+                {{ answerText.length }} chars {{ answerText.length < 50 ? '(write more for better evaluation)' : '' }}
+              </span>
+              <button class="btn-send" (click)="sendAnswer()" [disabled]="loading || !answerText.trim() || answerText.trim().length < 10">
+                <i class="fa fa-paper-plane"></i> Send Answer
+                <span class="shortcut">Ctrl+Enter</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Final Result -->
+        <div class="result-card" *ngIf="finished">
+          <div class="result-header">
+            <div class="score-circle" [ngClass]="getScoreClass()">
+              <span class="score-number">{{ finalScore }}</span>
+              <span class="score-label">/100</span>
+            </div>
+            <div class="result-info">
+              <h2>Interview Completed!</h2>
+              <p class="score-verdict">{{ getScoreVerdict() }}</p>
+            </div>
+          </div>
+
+          <div class="result-tips">
+            <h3><i class="fa fa-lightbulb"></i> What to do next</h3>
+            <ul>
+              <li *ngIf="finalScore !== null && finalScore < 60"><i class="fa fa-arrow-right"></i> Review the feedback above and practice again</li>
+              <li *ngIf="finalScore !== null && finalScore >= 60"><i class="fa fa-arrow-right"></i> You're ready — apply to this project with confidence</li>
+              <li><i class="fa fa-arrow-right"></i> Take skill tests to strengthen your profile</li>
+              <li><i class="fa fa-arrow-right"></i> Practice with different project types</li>
+            </ul>
+          </div>
+
+          <div class="result-actions">
+            <button class="btn-retry" (click)="retryInterview()">
+              <i class="fa fa-redo"></i> Practice Again
+            </button>
+            <a routerLink="/FreelancerFeed" class="btn-apply">
+              <i class="fa fa-briefcase"></i> Browse Jobs
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

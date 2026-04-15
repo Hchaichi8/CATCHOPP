@@ -37,7 +37,38 @@
 
 .search-box { position: relative; }
 .search-box i { position: absolute; left: 12px; top: 10px; color: var(--text-muted); }
-.search-box input { padding: 8px 10px 8px 35px; border-radius: 8px; border: 1px solid var(--border); background: white; outline: none; }
+.search-box input { padding: 8px 42px 8px 35px; border-radius: 8px; border: 1px solid var(--border); background: white; outline: none; min-width: 320px; }
+
+.mic-btn {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s ease;
+}
+.mic-btn:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  color: var(--text-main);
+  background: #f8fafc;
+}
+.mic-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mic-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #ecfdf5;
+}
 
 /* Project List */
 .project-list { display: flex; flex-direction: column; gap: 16px; }

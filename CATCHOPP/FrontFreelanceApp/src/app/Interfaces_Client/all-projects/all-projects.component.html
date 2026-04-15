@@ -37,7 +37,21 @@
 
       <div class="search-box">
         <i class="fa fa-search"></i>
-        <input type="text" placeholder="Search by title...">
+        <input
+          type="text"
+          placeholder="Search by title or say: 'Angular projects under 500'"
+          [(ngModel)]="searchQuery"
+        >
+        <button
+          type="button"
+          class="mic-btn"
+          [class.active]="voiceListening"
+          [disabled]="!voiceSupported"
+          (click)="toggleVoice()"
+          title="Voice search"
+        >
+          <i class="fa" [ngClass]="voiceListening ? 'fa-microphone-slash' : 'fa-microphone'"></i>
+        </button>
       </div>
     </div>
 

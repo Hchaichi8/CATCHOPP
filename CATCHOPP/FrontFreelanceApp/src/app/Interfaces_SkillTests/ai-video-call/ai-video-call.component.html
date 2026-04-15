@@ -1,0 +1,195 @@
+<div class="call-page">
+
+  <!-- Pre-call screen -->
+  <div class="pre-call" *ngIf="!callActive">
+    <div class="pre-call-card">
+      <div class="ai-preview">
+        <div class="ai-avatar-large">
+          <i class="fa fa-robot"></i>
+        </div>
+        <div class="signal-rings">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <h1>Video Call with ALO ALO</h1>
+      <p>Your AI Career Coach is ready to talk. Ask anything about freelancing, interviews, or proposals — in real conversation.</p>
+
+      <div class="features-list">
+        <div class="feature"><i class="fa fa-microphone"></i> Speak naturally — ALO ALO listens</div>
+        <div class="feature"><i class="fa fa-volume-up"></i> ALO ALO responds with voice</div>
+        <div class="feature"><i class="fa fa-video"></i> Your camera is shown</div>
+        <div class="feature"><i class="fa fa-comments"></i> Full conversation history</div>
+      </div>
+
+      <div class="gate-msg" *ngIf="!checkingAccess && !hasAccess">
+        <i class="fa fa-lock"></i>
+        Premium/Enterprise subscription required.
+        <a routerLink="/SubscriptionPlans">Upgrade</a>
+      </div>
+
+      <button
+        class="btn-start-call"
+        (click)="startCall()"
+        [disabled]="checkingAccess || !hasAccess"
+      >
+        <i class="fa fa-video"></i>
+        {{ checkingAccess ? 'Checking...' : 'Start Video Call' }}
+      </button>
+
+      <a routerLink="/AiCoach" class="btn-text-only">
+        <i class="fa fa-comments"></i> Prefer text chat instead
+      </a>
+    </div>
+  </div>
+
+  <!-- Active Call -->
+  <div class="call-screen" *ngIf="callActive">
+
+    <!-- Top bar -->
+    <div class="call-topbar">
+      <div class="call-info">
+        <div class="call-dot"></div>
+        <span class="call-label">Live Call</span>
+        <span class="call-timer">{{ callDurationFormatted }}</span>
+      </div>
+      <div class="call-title">ALO ALO — AI Career Coach</div>
+      <button class="btn-end-call" (click)="endCall()">
+        <i class="fa fa-phone-slash"></i> End Call
+      </button>
+    </div>
+
+    <!-- Reaction animations overlay -->
+    <div class="reactions-overlay">
+      <div
+        *ngFor="let r of activeReactions"
+        class="reaction-emoji"
+        [style.left.%]="r.x"
+        [style.top.%]="r.y"
+      >{{ r.emoji }}</div>
+    </div>
+
+    <!-- Video area -->
+    <div class="video-area">
+
+      <!-- MAIN video (AI or User depending on swap) -->
+      <div class="main-video-container" (click)="swapCameras()" title="Click to swap">
+
+        <!-- AI Avatar (main when userIsMain=false) -->
+        <div class="ai-video-wrapper" [class.is-main]="!userIsMain" [class.is-pip]="userIsMain">
+          <canvas #canvas [width]="userIsMain ? 320 : 960" [height]="userIsMain ? 240 : 720" class="ai-canvas"></canvas>
+          <div class="pip-label" *ngIf="userIsMain">ALO ALO</div>
+          <div class="swap-hint" *ngIf="!userIsMain"><i class="fa fa-exchange-alt"></i> Click to swap</div>
+        </div>
+
+        <!-- User camera (main when userIsMain=true) -->
+        <div class="user-video-wrapper" [class.is-main]="userIsMain" [class.is-pip]="!userIsMain" [class.camera-off]="isCameraOff">
+          <video #userVideo autoplay muted playsinline class="user-video"></video>
+          <div class="camera-off-overlay" *ngIf="isCameraOff">
+            <i class="fa fa-video-slash"></i>
+          </div>
+          <div class="pip-label" *ngIf="!userIsMain">You</div>
+          <div class="swap-hint" *ngIf="userIsMain"><i class="fa fa-exchange-alt"></i> Click to swap</div>
+        </div>
+      </div>
+
+      <div class="ai-status-overlay" *ngIf="isListening">
+        <div class="listening-indicator">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span>Listening...</span>
+      </div>
+    </div>
+
+    <!-- Transcript bubble -->
+    <div class="transcript-area">
+      <div class="transcript-bubble user-transcript" *ngIf="transcript">
+        <i class="fa fa-microphone"></i> {{ transcript }}
+      </div>
+      <div class="transcript-bubble ai-transcript" *ngIf="lastAiText && isSpeaking">
+        <i class="fa fa-robot"></i> {{ lastAiText | slice:0:120 }}{{ lastAiText.length > 120 ? '...' : '' }}
+      </div>
+    </div>
+
+    <!-- Recent messages -->
+    <div class="messages-strip">
+      <div
+        *ngFor="let m of recentMessages"
+        class="strip-msg"
+        [ngClass]="m.role"
+      >
+        <span class="strip-who">{{ m.role === 'user' ? 'You' : 'ALO ALO' }}:</span>
+        <span class="strip-text">{{ m.content | slice:0:80 }}{{ m.content.length > 80 ? '...' : '' }}</span>
+      </div>
+    </div>
+
+    <!-- Text input bar -->
+    <div class="text-input-bar" *ngIf="callActive">
+      <input
+        type="text"
+        class="text-msg-input"
+        [(ngModel)]="textInput"
+        (keydown)="onTextInputKeydown($event)"
+        placeholder="Type a message to ALO ALO..."
+        [disabled]="aiThinking"
+        autocomplete="off"
+      />
+      <button
+        class="btn-send-text"
+        (click)="sendTypedMessage()"
+        [disabled]="!textInput.trim() || aiThinking"
+        title="Send message"
+      >
+        <i class="fa fa-paper-plane"></i>
+      </button>
+    </div>
+
+    <!-- Controls -->
+    <div class="call-controls">
+      <button class="ctrl-btn" [class.off]="isMuted" (click)="toggleMute()">
+        <i class="fa" [class.fa-microphone-slash]="isMuted" [class.fa-microphone]="!isMuted"></i>
+        <span>{{ isMuted ? 'Unmute' : 'Mute' }}</span>
+      </button>
+
+      <button class="ctrl-btn" [class.off]="isCameraOff" (click)="toggleCamera()">
+        <i class="fa" [class.fa-video-slash]="isCameraOff" [class.fa-video]="!isCameraOff"></i>
+        <span>{{ isCameraOff ? 'Cam Off' : 'Camera' }}</span>
+      </button>
+
+      <button class="ctrl-btn" [class.active-blur]="isBlurred" (click)="toggleBlur()" title="Background blur">
+        <i class="fa fa-magic"></i>
+        <span>{{ isBlurred ? 'Unblur' : 'Blur' }}</span>
+      </button>
+
+      <button class="ctrl-btn" [class.active-screen]="isScreenSharing" (click)="toggleScreenShare()" title="Share screen">
+        <i class="fa fa-desktop"></i>
+        <span>{{ isScreenSharing ? 'Stop Share' : 'Share' }}</span>
+      </button>
+
+      <button class="ctrl-btn" [class.recording]="isRecording" (click)="toggleRecording()" title="Record session">
+        <i class="fa" [class.fa-circle]="!isRecording" [class.fa-stop-circle]="isRecording"></i>
+        <span>{{ isRecording ? 'Stop Rec' : 'Record' }}</span>
+      </button>
+
+      <button class="ctrl-btn speak-btn" [class.active]="isListening" (click)="isListening ? stopListening() : startListening()" [disabled]="isMuted || isSpeaking || aiThinking">
+        <i class="fa" [class.fa-stop]="isListening" [class.fa-microphone]="!isListening"></i>
+        <span>{{ isListening ? 'Stop' : isSpeaking ? 'Wait...' : 'Speak' }}</span>
+      </button>
+
+      <!-- Interrupt button — visible only when ALO ALO is speaking -->
+      <button class="ctrl-btn interrupt-btn" *ngIf="isSpeaking" (click)="stopSpeaking()" title="Interrupt ALO ALO">
+        <i class="fa fa-hand-paper"></i>
+        <span>Interrupt</span>
+      </button>
+
+      <button class="ctrl-btn look-btn" (click)="analyzeUserCameraNow()" [disabled]="aiThinking || isCameraOff" title="ALO ALO looks at you now">
+        <i class="fa fa-eye"></i>
+        <span>Look</span>
+      </button>
+
+      <button class="ctrl-btn end-btn" (click)="endCall()">
+        <i class="fa fa-phone-slash"></i>
+        <span>End</span>
+      </button>
+    </div>
+  </div>
+</div>

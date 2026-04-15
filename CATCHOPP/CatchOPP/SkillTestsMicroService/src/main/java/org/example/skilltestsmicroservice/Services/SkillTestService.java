@@ -2,16 +2,20 @@ package org.example.skilltestsmicroservice.Services;
 
 import org.example.skilltestsmicroservice.DTO.QuestionDTO;
 import org.example.skilltestsmicroservice.Entities.Certification;
+import org.example.skilltestsmicroservice.Integration.UserInAppNotificationClient;
 import org.example.skilltestsmicroservice.Entities.SkillTest;
 import org.example.skilltestsmicroservice.Entities.TestQuestion;
 import org.example.skilltestsmicroservice.Repositories.CertificationRepository;
 import org.example.skilltestsmicroservice.Repositories.SkillTestRepository;
 import org.example.skilltestsmicroservice.Repositories.TestQuestionRepository;
+import org.example.skilltestsmicroservice.Services.gamification.GamificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +38,12 @@ public class SkillTestService {
 
     @Autowired
     private AiQuestionGeneratorService aiGenerator;
+
+    @Autowired
+    private UserInAppNotificationClient userInAppNotificationClient;
+
+    @Autowired
+    private GamificationService gamificationService;
 
     public List<SkillTest> getAllTests() {
         return testRepo.findAll();
@@ -131,7 +141,36 @@ public class SkillTestService {
         cert.setScore(score);
         cert.setPassed(passed);
 
-        return certRepo.save(cert);
+        Certification saved = certRepo.save(cert);
+        String resultTitle = passed ? "You passed the skill test" : "Skill test completed";
+        String resultBody = String.format(
+                "Your score: %d%% on \"%s\". %s",
+                score,
+                test.getTitle() != null ? test.getTitle() : "the test",
+                passed ? "Congratulations!" : "Keep practicing—you can try again anytime."
+        );
+        String titleParam = URLEncoder.encode(
+                test.getTitle() != null ? test.getTitle() : "Skill Test",
+                StandardCharsets.UTF_8
+        );
+        String resultLink = "/SkillTestResult/" + test.getId()
+                + "?score=" + score + "&passed=" + passed + "&title=" + titleParam;
+        userInAppNotificationClient.send(
+                userId,
+                "TEST_RESULT",
+                resultTitle,
+                resultBody,
+                resultLink,
+                "TEST_RESULT:" + saved.getId()
+        );
+        if (passed) {
+            try {
+                gamificationService.onSkillTestPassed(userId);
+            } catch (Exception ignored) {
+                // avoid failing certification if gamification DB not ready
+            }
+        }
+        return saved;
     }
 
     public List<Certification> getUserCertifications(Long userId) {

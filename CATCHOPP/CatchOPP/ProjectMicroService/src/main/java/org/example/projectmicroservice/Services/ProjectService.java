@@ -4,6 +4,7 @@ package org.example.projectmicroservice.Services;
 import org.example.projectmicroservice.Entities.Project;
 import org.example.projectmicroservice.Entities.Proposal;
 import org.example.projectmicroservice.Entities.StatusProposal;
+import org.example.projectmicroservice.Integration.UserInAppNotificationClient;
 import org.example.projectmicroservice.Repositories.ProjectRepository;
 import org.example.projectmicroservice.Repositories.ProposalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ProjectService {
 
     @Autowired
     private ProposalRepository proposalRepo;
+
+    @Autowired
+    private UserInAppNotificationClient userInAppNotificationClient;
 
     // --- Project Methods ---
     public Project createProject(Project project) {
@@ -36,7 +40,19 @@ public class ProjectService {
     public Proposal createProposal(Long projectId, Proposal proposal) {
         Project project = getProjectById(projectId);
         proposal.setProject(project);
-        return proposalRepo.save(proposal);
+        Proposal saved = proposalRepo.save(proposal);
+        if (project.getClientId() != null) {
+            String title = project.getTitle() != null ? project.getTitle() : "your project";
+            userInAppNotificationClient.send(
+                    project.getClientId(),
+                    "PROPOSAL_NEW",
+                    "New proposal on your project",
+                    "A freelancer submitted a proposal on \"" + title + "\".",
+                    "/ProjectProposals/" + projectId,
+                    null
+            );
+        }
+        return saved;
     }
 
     public List<Proposal> getProposalsForProject(Long projectId) {

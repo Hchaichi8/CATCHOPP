@@ -43,14 +43,9 @@ export class UserService {
     }
   }
 
-  // Authentication Methods
-  register(user: User): Observable<User | null> {
-    return this.http.post<User>(`${API}/register`, user).pipe(
-      catchError((error) => {
-        console.error('Registration error:', error);
-        return of(null);
-      })
-    );
+  /** Propagates HTTP errors so signup forms can show backend messages (e.g. email already used). */
+  register(user: User): Observable<User> {
+    return this.http.post<User>(`${API}/register`, user);
   }
 
   login(email: string, password: string): Observable<LoginResponse | null> {
@@ -162,8 +157,13 @@ export class UserService {
   private getUserDataFromToken(token: string): User | null {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+      const rawId = payload.id;
+      const id =
+        rawId != null && rawId !== ''
+          ? Number(rawId)
+          : undefined;
       return {
-        id: payload.id,
+        id: id !== undefined && Number.isFinite(id) ? id : undefined,
         email: payload.sub,
         role: payload.role,
         firstName: '',

@@ -8,17 +8,44 @@
       <span class="logo-text">Catch<span class="opp-text">OPP</span></span>
     </div>
     <div class="quiz-title">{{ testTitle }}</div>
+
+    <!-- Circular Timer -->
+    <div class="timer-wrap" *ngIf="!loading" [class.warning]="timerWarning" [class.danger]="timerDanger">
+      <svg class="timer-svg" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="28" fill="none" stroke="#e5e7eb" stroke-width="5"/>
+        <circle
+          cx="35" cy="35" r="28"
+          fill="none"
+          [attr.stroke]="timerColor"
+          stroke-width="5"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="timerCircleTotal"
+          [attr.stroke-dashoffset]="timerCircleTotal - timerCircleDash"
+          transform="rotate(-90 35 35)"
+          style="transition: stroke-dashoffset 1s linear, stroke 0.5s"
+        />
+      </svg>
+      <div class="timer-text">
+        <span class="timer-min">{{ timerMinutes }}</span>:<span class="timer-sec">{{ timerSeconds }}</span>
+      </div>
+    </div>
   </div>
 </nav>
 
 <div class="main-container">
+  <!-- Progress + answered count -->
   <div class="progress-wrap">
     <div class="progress-bar"><div class="fill" [style.width.%]="progress"></div></div>
-    <span class="progress-text">Question {{ currentIndex + 1 }} of {{ questions.length }}</span>
+    <span class="progress-text">
+      Question {{ currentIndex + 1 }} of {{ questions.length }}
+      <span class="answered-count">({{ answeredCount }}/{{ questions.length }} answered)</span>
+    </span>
   </div>
 
   <div *ngIf="loading" class="loading">Loading test...</div>
+
   <div class="question-card" *ngIf="!loading && questions[currentIndex]">
+    <div class="question-number">Question {{ currentIndex + 1 }}</div>
     <h2>{{ questions[currentIndex].questionText }}</h2>
     <div class="options">
       <button class="option" [class.selected]="answers[questions[currentIndex].id!] === 'A'" (click)="selectAnswer(questions[currentIndex].id!, 'A')">
@@ -36,12 +63,28 @@
     </div>
   </div>
 
+  <!-- Question dots navigation -->
+  <div class="question-dots" *ngIf="!loading">
+    <button
+      *ngFor="let q of questions; let i = index"
+      class="dot"
+      [class.current]="i === currentIndex"
+      [class.answered]="answers[q.id!]"
+      (click)="currentIndex = i"
+      [title]="'Question ' + (i+1)"
+    ></button>
+  </div>
+
   <div class="nav-buttons">
-    <button class="btn" (click)="prev()" [disabled]="currentIndex === 0"><i class="fa fa-arrow-left"></i> Previous</button>
-    <button *ngIf="currentIndex < questions.length - 1" class="btn primary" (click)="next()">Next <i class="fa fa-arrow-right"></i></button>
+    <button class="btn" (click)="prev()" [disabled]="currentIndex === 0">
+      <i class="fa fa-arrow-left"></i> Previous
+    </button>
+    <button *ngIf="currentIndex < questions.length - 1" class="btn primary" (click)="next()">
+      Next <i class="fa fa-arrow-right"></i>
+    </button>
     <button *ngIf="currentIndex === questions.length - 1" class="btn primary" (click)="submit()" [disabled]="submitting">
-      {{ submitting ? 'Submitting...' : 'Submit' }} <i class="fa" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+      {{ submitting ? 'Submitting...' : 'Submit Test' }}
+      <i class="fa" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
     </button>
   </div>
 </div>
-

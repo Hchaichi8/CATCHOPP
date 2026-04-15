@@ -25,6 +25,7 @@ import { AdminStatisticsComponent } from './Interfaces_Admin/admin-statistics/ad
 import { AdminPromoCodesComponent } from './Interfaces_Admin/admin-promo-codes/admin-promo-codes.component';
 import { PlanComparatorComponent } from './Interfaces_Subscription/plan-comparator/plan-comparator.component';
 import { SkillTestsListComponent } from './Interfaces_SkillTests/skill-tests-list/skill-tests-list.component';
+import { LeagueProfileComponent } from './Interfaces_SkillTests/league-profile/league-profile.component';
 import { SkillTestTakeComponent } from './Interfaces_SkillTests/skill-test-take/skill-test-take.component';
 import { SkillTestResultComponent } from './Interfaces_SkillTests/skill-test-result/skill-test-result.component';
 import { MyCertificationsComponent } from './Interfaces_SkillTests/my-certifications/my-certifications.component';
@@ -37,6 +38,10 @@ import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/a
 import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
+import { NotificationsPageComponent } from './shared/notifications-page/notifications-page.component';
+import { AiInterviewSimulatorComponent } from './Interfaces_SkillTests/ai-interview-simulator/ai-interview-simulator.component';
+import { AiChatComponent } from './Interfaces_SkillTests/ai-chat/ai-chat.component';
+import { AiVideoCallComponent } from './Interfaces_SkillTests/ai-video-call/ai-video-call.component';
 import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -82,9 +87,13 @@ const routes: Routes = [
 
 // Skill Tests & Certifications
 {path:'SkillTests',component:SkillTestsListComponent, },
+{path:'LeagueProfile/:userId',component:LeagueProfileComponent, },
 {path:'SkillTestTake/:id',component:SkillTestTakeComponent, },
 {path:'SkillTestResult/:id',component:SkillTestResultComponent, },
 {path:'MyCertifications',component:MyCertificationsComponent, },
+{path:'AIInterviewSimulator',component:AiInterviewSimulatorComponent, },
+{path:'AiCoach',component:AiChatComponent, },
+{path:'AiVideoCall',component:AiVideoCallComponent, },
 
 // Referral & Affiliate Program
 {path:'ReferralDashboard',component:ReferralDashboardComponent, },
@@ -99,7 +108,11 @@ const routes: Routes = [
 
 // Rewards & Promo Codes
 {path:'rewards',component:RewardsDashboardComponent, },
-{path:'rewards/spin-wheel',component:SpinWheelComponent, }
+{path:'rewards/spin-wheel',component:SpinWheelComponent, },
+
+// In-app notification inbox (Angular UI — not the API on :8081)
+{ path: 'notifications', redirectTo: 'Notifications', pathMatch: 'full' },
+{ path: 'Notifications', component: NotificationsPageComponent },
 ];
 
 @NgModule({

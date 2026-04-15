@@ -22,3 +22,54 @@
 .btn { padding: 12px 24px; border-radius: 8px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: 600; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Timer */
+.timer-wrap {
+  position: relative;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+}
+.timer-svg { width: 64px; height: 64px; }
+.timer-text {
+  position: absolute;
+  font-size: 12px; font-weight: 700;
+  color: #111827;
+  display: flex; align-items: center;
+}
+.timer-wrap.warning .timer-text { color: #d97706; }
+.timer-wrap.danger .timer-text { color: #ef4444; animation: blink 0.5s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Question dots */
+.question-dots {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-bottom: 20px;
+}
+.dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 11px; font-weight: 600; color: #6b7280;
+  transition: all 0.2s;
+}
+.dot.answered { background: #10b981; border-color: #10b981; color: #fff; }
+.dot.current { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+
+/* Question number */
+.question-number { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.answered-count { color: #10b981; font-weight: 600; margin-left: 8px; }
+
+/* Nav buttons */
+.nav-buttons { display: flex; gap: 12px; justify-content: space-between; }
+.btn { padding: 12px 24px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 14px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.btn:hover:not(:disabled) { background: #f3f4f6; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary { background: #10b981; color: #fff; border-color: #10b981; }
+.btn.primary:hover:not(:disabled) { background: #059669; }
+
+/* Brand logo */
+.brand-logo { width: 32px; height: 32px; }
+.logo-text { font-weight: 700; font-size: 1.1rem; }
+.opp-text { color: #d4af37; }

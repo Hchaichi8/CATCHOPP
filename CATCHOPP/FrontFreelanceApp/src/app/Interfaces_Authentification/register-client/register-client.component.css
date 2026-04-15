@@ -4,6 +4,16 @@
   --text-dark: #2d3436;
 }
 
+.auth-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
 .auth-container {
   height: 100vh;
   display: flex;

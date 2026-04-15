@@ -115,6 +115,18 @@
       </div>
 
       <div class="card-footer-action">
+        <button
+          class="btn-ai-interview"
+          routerLink="/AIInterviewSimulator"
+          [queryParams]="{
+            projectId: 1001,
+            title: 'Senior Angular Developer for SaaS Dashboard',
+            role: 'Frontend Freelancer',
+            skills: 'Angular,TypeScript,RxJS'
+          }"
+        >
+          <i class="fa fa-robot"></i> Practice AI Interview
+        </button>
         <button class="btn-view-details" routerLink="/submit-proposal">View Details</button>
       </div>
     </div>
@@ -151,6 +163,18 @@
       </div>
 
       <div class="card-footer-action">
+        <button
+          class="btn-ai-interview"
+          routerLink="/AIInterviewSimulator"
+          [queryParams]="{
+            projectId: 1002,
+            title: 'UI/UX Designer for Fintech Mobile App',
+            role: 'UI UX Freelancer',
+            skills: 'Figma,UI Design,Mobile App'
+          }"
+        >
+          <i class="fa fa-robot"></i> Practice AI Interview
+        </button>
         <button class="btn-view-details" routerLink="/submit-proposal">View Details</button>
       </div>
     </div>

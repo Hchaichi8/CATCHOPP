@@ -3,47 +3,51 @@
     <div class="form-section">
       <div class="inner-form">
         <a routerLink="/LoginClient" class="back-link"><i class="fa fa-arrow-left"></i> Back to selection</a>
-        
+
         <div class="header-area">
           <span class="badge client-badge">Join as Client</span>
           <h1>Hire the Best Talent.</h1>
           <p>Create a company account to start posting jobs.</p>
         </div>
 
-        <form>
+        <form (ngSubmit)="onSubmit()">
+          <div class="auth-alert" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+
           <div class="input-field">
             <label>Company / Full Name</label>
-            <input type="text" placeholder="e.g. Acme Corp">
+            <input type="text" name="fullName" [(ngModel)]="fullName" placeholder="e.g. Acme Corp" required />
           </div>
 
           <div class="input-field">
             <label>Work Email</label>
-            <input type="email" placeholder="manager@acme.com">
+            <input type="email" name="email" [(ngModel)]="email" placeholder="manager@acme.com" required />
           </div>
-          
+
           <div class="input-field">
             <label>Password</label>
-            <input type="password" placeholder="Secure password">
+            <input type="password" name="password" [(ngModel)]="password" placeholder="Secure password" required />
           </div>
 
           <div class="terms">
             <label>
-              <input type="checkbox"> 
-              I agree to the <span>CatchIQ Hiring Terms</span>.
+              <input type="checkbox" name="agreeTerms" [(ngModel)]="agreeTerms" />
+              I agree to the <span>CatchOPP Hiring Terms</span>.
             </label>
           </div>
 
-          <button class="btn-auth client-btn">Get Started for Free</button>
+          <button type="submit" class="btn-auth client-btn" [disabled]="submitting">
+            {{ submitting ? 'Creating account…' : 'Get Started for Free' }}
+          </button>
         </form>
 
-        <p class="switch-text">Hiring for a company? <a routerLink="/login-client">Log In</a></p>
+        <p class="switch-text">Already have an account? <a routerLink="/LoginClient">Log In</a></p>
       </div>
     </div>
 
     <div class="visual-section register-client-bg">
       <div class="visual-overlay">
         <h2>Build your dream team in minutes.</h2>
-        <p>Access the world's most skilled freelancers under one roof.</p>
+        <p>Access skilled freelancers under one roof.</p>
       </div>
     </div>
   </div>

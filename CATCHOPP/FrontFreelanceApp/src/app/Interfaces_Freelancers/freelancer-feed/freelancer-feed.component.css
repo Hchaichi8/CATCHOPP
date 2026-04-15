@@ -72,7 +72,25 @@
   padding-top: 16px;
   border-top: 1px solid #f3f4f6;
   display: flex;
-  justify-content: flex-end; /* Aligns button to the right */
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-ai-interview {
+  background: #111827;
+  border: 1px solid #111827;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-ai-interview:hover {
+  background: #1f2937;
+  border-color: #1f2937;
 }
 
 .btn-view-details {

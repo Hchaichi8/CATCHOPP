@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = 'your-dockerhub-username'
-        IMAGE_PREFIX = "${DOCKER_USER}/catchopp"
+        DOCKER_USER   = 'bunnybanou'
+        IMAGE_NAME    = 'bunnybanou/catchopp-user'
+        SONARQUBE_URL = 'http://localhost:9000'
     }
 
     tools {
@@ -15,63 +16,58 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'devops',
-                    url: 'https://github.com/AyoubSomrani/devops.git'
+                git branch: 'gestion_sub',
+                    url: 'https://github.com/Hchaichi8/CATCHOPP.git'
             }
         }
 
-        stage('Build - UserMicroService') {
+        stage('Build Maven') {
             steps {
-                dir('UserMicroService') {
+                dir('CATCHOPP/CatchOPP/UserMicroService') {
                     sh 'mvn clean package -DskipTests'
                 }
             }
         }
 
-        stage('Build - SubscriptionMicroService') {
+        stage('Unit Tests') {
             steps {
-                dir('SubscriptionMicroService') {
-                    sh 'mvn clean package -DskipTests'
+                dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
+                    sh 'mvn test'
+                }
+            }
+            post {
+                always {
+                    junit 'CATCHOPP/CatchOPP/SkillTestsMicroService/target/surefire-reports/*.xml'
                 }
             }
         }
 
-        stage('Build - SkillTestsMicroService') {
+        stage('SonarQube Analysis') {
             steps {
-                dir('SkillTestsMicroService') {
-                    sh 'mvn clean package -DskipTests'
+                dir('CATCHOPP/CatchOPP/UserMicroService') {
+                    withCredentials([string(credentialsId: 'sonar_pi', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            mvn sonar:sonar \
+                            -Dsonar.projectKey=catchopp-user-service \
+                            -Dsonar.projectName='CatchOPP UserMicroService' \
+                            -Dsonar.host.url=${SONARQUBE_URL} \
+                            -Dsonar.login=${SONAR_TOKEN} \
+                            -Dsonar.java.binaries=target/classes
+                        """
+                    }
                 }
             }
         }
 
-        stage('Build - ReferralMicroService') {
+        stage('Build Docker Image') {
             steps {
-                dir('ReferralMicroService') {
-                    sh 'mvn clean package -DskipTests'
+                dir('CATCHOPP/CatchOPP/UserMicroService') {
+                    sh 'docker build -t bunnybanou/catchopp-user:latest .'
                 }
             }
         }
 
-        stage('Build - ProjectMicroService') {
-            steps {
-                dir('ProjectMicroService') {
-                    sh 'mvn clean package -DskipTests'
-                }
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                sh "docker build -t ${IMAGE_PREFIX}-user:latest ./UserMicroService"
-                sh "docker build -t ${IMAGE_PREFIX}-subscription:latest ./SubscriptionMicroService"
-                sh "docker build -t ${IMAGE_PREFIX}-skilltests:latest ./SkillTestsMicroService"
-                sh "docker build -t ${IMAGE_PREFIX}-referral:latest ./ReferralMicroService"
-                sh "docker build -t ${IMAGE_PREFIX}-project:latest ./ProjectMicroService"
-                sh "docker build -t ${IMAGE_PREFIX}-gateway:latest ./gateway"
-            }
-        }
-
-        stage('Push Docker Images') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'TokenDevOps',
@@ -80,12 +76,7 @@ pipeline {
                 )]) {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push ${IMAGE_PREFIX}-user:latest
-                        docker push ${IMAGE_PREFIX}-subscription:latest
-                        docker push ${IMAGE_PREFIX}-skilltests:latest
-                        docker push ${IMAGE_PREFIX}-referral:latest
-                        docker push ${IMAGE_PREFIX}-project:latest
-                        docker push ${IMAGE_PREFIX}-gateway:latest
+                        docker push bunnybanou/catchopp-user:latest
                         docker logout
                     '''
                 }
@@ -96,10 +87,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ All images built and pushed successfully!'
+            echo '✅ Build, SonarQube analysis and push successful!'
         }
         failure {
-            echo '❌ Build failed. Check the logs above.'
+            echo '❌ Build failed. Check the logs.'
         }
     }
 }

@@ -6,6 +6,7 @@ import org.example.referralmicroservice.Entities.ReferralReward;
 import org.example.referralmicroservice.Repositories.ReferralCodeRepository;
 import org.example.referralmicroservice.Repositories.ReferralRepository;
 import org.example.referralmicroservice.Repositories.ReferralRewardRepository;
+import org.example.referralmicroservice.Integration.UserInAppNotificationClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class ReferralService {
 
     @Autowired
     private ReferralRewardRepository rewardRepo;
+
+    @Autowired
+    private UserInAppNotificationClient userInAppNotificationClient;
 
     public String getOrCreateReferralCode(Long userId) {
         return codeRepo.findByUserId(userId)
@@ -67,7 +71,16 @@ public class ReferralService {
         r.setReferralCode(code);
         r.setReferralCodeRef(rc);
         r.setStatus("COMPLETED");
-        return referralRepo.save(r);
+        Referral saved = referralRepo.save(r);
+        userInAppNotificationClient.send(
+                rc.getUserId(),
+                "REFERRAL_SIGNUP",
+                "Someone signed up with your referral code",
+                "User #" + referredUserId + " completed signup using your code.",
+                "/ReferralDashboard",
+                "REFERRAL_SIGNUP:" + saved.getId()
+        );
+        return saved;
     }
 
     public Referral getReferralById(Long id) {

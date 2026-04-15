@@ -15,6 +15,7 @@ import { ClientProfileComponent } from './Interfaces_Client/client-profile/clien
 import { VirtualContractComponent } from './Interfaces_Client/virtual-contract/virtual-contract.component';
 import { FreelancerFeedComponent } from './Interfaces_Freelancers/freelancer-feed/freelancer-feed.component';
 import { FreelancerJobsComponent } from './Interfaces_Freelancers/freelancer-jobs/freelancer-jobs.component';
+import { NotificationsPageComponent } from './shared/notifications-page/notifications-page.component';
 
 const routes: Routes = [
 
@@ -41,9 +42,8 @@ const routes: Routes = [
 {path:'FreelancerFeed',component:FreelancerFeedComponent, },
 {path:'FreelancerJobs',component:FreelancerJobsComponent, },
 
-
-
-   
+{ path: 'notifications', redirectTo: 'Notifications', pathMatch: 'full' },
+{ path: 'Notifications', component: NotificationsPageComponent },
 ];
 
 @NgModule({

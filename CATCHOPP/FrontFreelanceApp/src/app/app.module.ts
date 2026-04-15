@@ -33,9 +33,11 @@ import { AdminStatisticsComponent } from './Interfaces_Admin/admin-statistics/ad
 import { AdminPromoCodesComponent } from './Interfaces_Admin/admin-promo-codes/admin-promo-codes.component';
 import { PlanComparatorComponent } from './Interfaces_Subscription/plan-comparator/plan-comparator.component';
 import { NotificationCenterComponent } from './shared/notification-center/notification-center.component';
+import { NotificationsPageComponent } from './shared/notifications-page/notifications-page.component';
 import { DarkModeToggleComponent } from './shared/dark-mode-toggle/dark-mode-toggle.component';
 import { NgChartsModule } from 'ng2-charts';
 import { SkillTestsListComponent } from './Interfaces_SkillTests/skill-tests-list/skill-tests-list.component';
+import { LeagueProfileComponent } from './Interfaces_SkillTests/league-profile/league-profile.component';
 import { SkillTestTakeComponent } from './Interfaces_SkillTests/skill-test-take/skill-test-take.component';
 import { SkillTestResultComponent } from './Interfaces_SkillTests/skill-test-result/skill-test-result.component';
 import { MyCertificationsComponent } from './Interfaces_SkillTests/my-certifications/my-certifications.component';
@@ -48,6 +50,9 @@ import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/a
 import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
+import { AiInterviewSimulatorComponent } from './Interfaces_SkillTests/ai-interview-simulator/ai-interview-simulator.component';
+import { AiChatComponent } from './Interfaces_SkillTests/ai-chat/ai-chat.component';
+import { AiVideoCallComponent } from './Interfaces_SkillTests/ai-video-call/ai-video-call.component';
 
 @NgModule({
   declarations: [
@@ -79,8 +84,10 @@ import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.c
         AdminPromoCodesComponent,
         PlanComparatorComponent,
         NotificationCenterComponent,
+        NotificationsPageComponent,
         DarkModeToggleComponent,
         SkillTestsListComponent,
+        LeagueProfileComponent,
         SkillTestTakeComponent,
         SkillTestResultComponent,
         MyCertificationsComponent,
@@ -92,7 +99,10 @@ import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.c
         AdminSkillTestsComponent,
         AiCvGeneratorComponent,
         RewardsDashboardComponent,
-        SpinWheelComponent
+        SpinWheelComponent,
+        AiInterviewSimulatorComponent,
+        AiChatComponent,
+        AiVideoCallComponent
   ],
   imports: [
     BrowserModule,

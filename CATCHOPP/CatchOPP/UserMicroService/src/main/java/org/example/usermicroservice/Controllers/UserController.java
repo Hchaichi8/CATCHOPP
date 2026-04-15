@@ -57,7 +57,8 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
+    /** Numeric id only so paths like /User/notifications are not captured as {id}. */
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
@@ -88,7 +89,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepo;
 
-    @PostMapping("/{userId}/competences")
+    @PostMapping("/{userId:\\d+}/competences")
     public ResponseEntity<?> addCompetencesToUser(@PathVariable Long userId, @RequestBody List<Long> competenceIds) {
         try {
             User user = userRepo.findById(userId)
@@ -105,7 +106,7 @@ public class UserController {
             return ResponseEntity.internalServerError().body("ERREUR BACKEND USER : " + e.getMessage());
         }
     }
-    @PostMapping("/{id}/upload-cv")
+    @PostMapping("/{id:\\d+}/upload-cv")
     public ResponseEntity<?> uploadCv(@PathVariable Long id, @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         System.out.println("🚨 [USER-MS] Début de l'upload du CV pour le User ID: " + id);
         try {

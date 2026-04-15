@@ -12,19 +12,76 @@
 
 <div class="result-container">
   <div class="result-card" [class.passed]="passed" [class.failed]="!passed">
-    <div class="icon-wrap">
-      <i class="fa" [ngClass]="passed ? 'fa-trophy' : 'fa-times-circle'"></i>
+
+    <!-- Score circle -->
+    <div class="score-wrap">
+      <svg viewBox="0 0 120 120" class="score-svg">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+        <circle
+          cx="60" cy="60" r="50"
+          fill="none"
+          [attr.stroke]="passed ? '#10b981' : '#ef4444'"
+          stroke-width="8"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="314"
+          [attr.stroke-dashoffset]="314 - (314 * score / 100)"
+          transform="rotate(-90 60 60)"
+          style="transition: stroke-dashoffset 1s ease"
+        />
+      </svg>
+      <div class="score-inner">
+        <i class="fa" [ngClass]="passed ? 'fa-trophy' : 'fa-times-circle'" [style.color]="passed ? '#10b981' : '#ef4444'"></i>
+        <span class="score-value">{{ score }}%</span>
+      </div>
     </div>
-    <h1>{{ passed ? 'Congratulations!' : 'Keep Practicing' }}</h1>
+
+    <h1>{{ passed ? '🎉 Congratulations!' : '💪 Keep Practicing' }}</h1>
     <p class="test-name">{{ testTitle }}</p>
-    <div class="score-circle" [class.passed]="passed">
-      <span class="score-value">{{ score }}%</span>
+    <p class="message">
+      {{ passed
+        ? 'You passed! Your certification has been added to your profile.'
+        : 'You need at least 70% to pass. Review the material and try again!' }}
+    </p>
+
+    <!-- Certificate Preview (only if passed) -->
+    <div class="certificate-preview" *ngIf="passed" id="certificate">
+      <div class="cert-header">
+        <div class="cert-logo">
+          <svg viewBox="0 0 100 100" width="40" height="40">
+            <circle cx="50" cy="50" r="45" fill="#10b981"/>
+            <text x="50" y="65" font-size="50" font-weight="bold" fill="white" text-anchor="middle">C</text>
+          </svg>
+          <span>Catch<span style="color:#d4af37">OPP</span></span>
+        </div>
+        <div class="cert-badge"><i class="fa fa-certificate"></i></div>
+      </div>
+      <div class="cert-body">
+        <p class="cert-label">This certifies that</p>
+        <h2 class="cert-name">{{ userName }}</h2>
+        <p class="cert-label">has successfully completed</p>
+        <h3 class="cert-test">{{ testTitle }}</h3>
+        <div class="cert-score">Score: <strong>{{ score }}%</strong></div>
+        <div class="cert-date">{{ today }}</div>
+      </div>
+      <div class="cert-footer">
+        <div class="cert-seal"><i class="fa fa-award"></i> Verified</div>
+      </div>
     </div>
-    <p class="message">{{ passed ? 'You passed! Your certification has been added to your profile.' : 'You need at least 70% to pass. Try again when you\'re ready.' }}</p>
+
+    <!-- Actions -->
     <div class="actions">
-      <a routerLink="/SkillTests" class="btn">Browse More Tests</a>
-      <a routerLink="/MyCertifications" class="btn primary">View My Certifications</a>
+      <a routerLink="/SkillTests" class="btn">
+        <i class="fa fa-list"></i> All Tests
+      </a>
+      <a [routerLink]="['/SkillTestTake', testId]" class="btn retry" *ngIf="!passed">
+        <i class="fa fa-redo"></i> Retry Test
+      </a>
+      <button class="btn download" *ngIf="passed" (click)="downloadCertificate()">
+        <i class="fa fa-download"></i> Download Certificate
+      </button>
+      <a routerLink="/MyCertifications" class="btn primary" *ngIf="passed">
+        <i class="fa fa-award"></i> My Certifications
+      </a>
     </div>
   </div>
 </div>
-

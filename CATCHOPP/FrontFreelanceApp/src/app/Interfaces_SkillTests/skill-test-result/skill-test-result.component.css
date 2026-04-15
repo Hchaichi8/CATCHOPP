@@ -21,3 +21,53 @@
 .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .btn { padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid var(--border); color: var(--text-main); }
 .btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+
+.logo-text { font-weight: 700; } .opp-text { color: #d4af37; }
+.brand-logo { width: 32px; height: 32px; }
+.result-container { max-width: 600px; margin: 40px auto; padding: 0 16px; }
+.result-card { background: #fff; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.result-card.passed { border-top: 4px solid #10b981; }
+.result-card.failed { border-top: 4px solid #ef4444; }
+
+/* Score circle */
+.score-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 24px; }
+.score-svg { width: 120px; height: 120px; }
+.score-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.score-inner i { font-size: 20px; }
+.score-value { font-size: 22px; font-weight: 800; color: #111827; }
+
+h1 { margin: 0 0 8px; font-size: 24px; }
+.test-name { color: #6b7280; margin-bottom: 8px; font-size: 15px; }
+.message { color: #374151; margin-bottom: 24px; line-height: 1.6; }
+
+/* Certificate Preview */
+.certificate-preview {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 2px solid #10b981;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.cert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.cert-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+.cert-badge { font-size: 32px; color: #d4af37; }
+.cert-body { padding: 8px 0; }
+.cert-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0; }
+.cert-name { font-size: 22px; font-weight: 800; color: #111827; margin: 4px 0; }
+.cert-test { font-size: 16px; font-weight: 600; color: #065f46; margin: 4px 0; }
+.cert-score { font-size: 14px; color: #374151; margin: 8px 0; }
+.cert-date { font-size: 12px; color: #9ca3af; }
+.cert-footer { margin-top: 12px; }
+.cert-seal { display: inline-flex; align-items: center; gap: 6px; background: #10b981; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+/* Actions */
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.btn { padding: 10px 20px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 14px; font-weight: 600; color: #374151; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.btn:hover { background: #f3f4f6; }
+.btn.primary { background: #10b981; color: #fff; border-color: #10b981; }
+.btn.primary:hover { background: #059669; }
+.btn.retry { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.btn.retry:hover { background: #fde68a; }
+.btn.download { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.btn.download:hover { background: #dbeafe; }
