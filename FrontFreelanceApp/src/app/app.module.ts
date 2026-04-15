@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { BaseChartDirective } from 'ng2-charts'; 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeAppComponent } from './home-app/home-app.component';
@@ -48,6 +48,46 @@ import { FreelancerContractDetailsComponent } from './Interfaces_Freelancers/fre
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { OnboardingComponent } from './Interfaces_Freelancers/onboarding/onboarding.component';
 import { MessagesComponent } from './interface_communication/messages/messages.component';
+import { SubscriptionPlansComponent } from './Interfaces_Subscription/subscription-plans/subscription-plans.component';
+import { SubscriptionDetailComponent } from './Interfaces_Subscription/subscription-detail/subscription-detail.component';
+import { SubscriptionCheckoutComponent } from './Interfaces_Subscription/subscription-checkout/subscription-checkout.component';
+import { SubscriptionDashboardComponent } from './Interfaces_Subscription/subscription-dashboard/subscription-dashboard.component';
+import { AdminSubscriptionsComponent } from './Interfaces_Admin/admin-subscriptions/admin-subscriptions.component';
+import { AdminCertificationsComponent } from './Interfaces_Admin/admin-certifications/admin-certifications.component';
+import { AdminStatisticsComponent } from './Interfaces_Admin/admin-statistics/admin-statistics.component';
+import { AdminPromoCodesComponent } from './Interfaces_Admin/admin-promo-codes/admin-promo-codes.component';
+import { PlanComparatorComponent } from './Interfaces_Subscription/plan-comparator/plan-comparator.component';
+import { SkillTestsListComponent } from './Interfaces_SkillTests/skill-tests-list/skill-tests-list.component';
+import { SkillTestTakeComponent } from './Interfaces_SkillTests/skill-test-take/skill-test-take.component';
+import { SkillTestResultComponent } from './Interfaces_SkillTests/skill-test-result/skill-test-result.component';
+import { MyCertificationsComponent } from './Interfaces_SkillTests/my-certifications/my-certifications.component';
+import { ReferralDashboardComponent } from './Interfaces_Referral/referral-dashboard/referral-dashboard.component';
+import { MyAvailabilityComponent } from './Interfaces_Availability/my-availability/my-availability.component';
+import { WorldClockViewComponent } from './Interfaces_Availability/world-clock-view/world-clock-view.component';
+import { AdminPlansComponent } from './Interfaces_Admin/admin-plans/admin-plans.component';
+import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/admin-skill-tests.component';
+import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
+import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
+import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
+import { NotificationCenterComponent } from './shared/notification-center/notification-center.component';
+import { DarkModeToggleComponent } from './shared/dark-mode-toggle/dark-mode-toggle.component';
+import { GroupListComponent } from './interfaces_events/group-list/group-list.component';
+import { GroupPageComponent } from './interfaces_events/group-page/group-page.component';
+import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
+import { ClubComponent } from './interfaces_events/club/club.component';
+import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
+import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { PostReactionsComponent } from './interfaces_events/post-reactions/post-reactions.component';
+import { PostCommentsComponent } from './interfaces_events/post-comments/post-comments.component';
+import { CommentReactionsComponent } from './interfaces_events/comment-reactions/comment-reactions.component';
+import { NotificationBellComponent } from './interfaces_events/notification-bell/notification-bell.component';
+import { NotificationToastComponent } from './interfaces_events/notification-toast/notification-toast.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
+import { ClubPageComponent } from './interfaces_events/club-page/club-page.component';
+import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
+import { ClubService } from './interfaces_events';
+import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +135,52 @@ import { MessagesComponent } from './interface_communication/messages/messages.c
         WorkspaceComponent,
         OnboardingComponent,
         MessagesComponent,
+
+         SubscriptionPlansComponent,
+         SubscriptionDashboardComponent,
+         SubscriptionPlansComponent,
+        SubscriptionDetailComponent,
+        SubscriptionCheckoutComponent,
+        AdminSubscriptionsComponent,
+        AdminCertificationsComponent,
+        AdminStatisticsComponent,
+        AdminPromoCodesComponent,
+        PlanComparatorComponent,
+        NotificationCenterComponent,
+        DarkModeToggleComponent,
+        SkillTestsListComponent,
+        SkillTestTakeComponent,
+        SkillTestResultComponent,
+        MyCertificationsComponent,
+        ReferralDashboardComponent,
+        MyAvailabilityComponent,
+        WorldClockViewComponent,
+        AdminPlansComponent,
+        AdminSkillTestsComponent,
+        AiCvGeneratorComponent,
+        RewardsDashboardComponent,
+        SpinWheelComponent,
+
+        GroupListComponent,
+        GroupPageComponent,
+        AdminDashboardComponent,
+        EventsListComponent,
+        ClubComponent,
+        ClubDashboardComponent,
+        ClubsListComponent,
+        PostReactionsComponent,
+        PostCommentsComponent,
+        CommentReactionsComponent,
+        NotificationBellComponent,
+        NotificationToastComponent,
+        EventDetailsComponent,
+      
+        NotificationCenterComponent,
+        NotificationBellComponent,
+        NotificationToastComponent,
+        AdminDashboardComponent,
+        AdminFinanceComponent
+        
         
   ],
   imports: [
@@ -103,6 +189,8 @@ import { MessagesComponent } from './interface_communication/messages/messages.c
     CommonModule,
     HttpClientModule,
     FormsModule,
+    BaseChartDirective
+  
     
 ],
   providers: [],

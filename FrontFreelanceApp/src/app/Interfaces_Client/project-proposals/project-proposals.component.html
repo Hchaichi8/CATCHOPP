@@ -105,7 +105,7 @@
            <i class="fa fa-times"></i> Refuse
          </button>
          
-         <button class="btn-accept" (click)="updateStatus(p, 'ACCEPTED')">
+         <button class="btn-accept" (click)="promptAccept(p)">
            <i class="fa fa-check"></i> Accept / Hire
          </button>
          
@@ -120,4 +120,22 @@
     </div>
 
   </main>
+</div>
+
+<div class="modal-overlay" *ngIf="showConfirmPopup">
+  <div class="confirm-modal">
+    <div class="modal-icon">
+      <i class="fa fa-exclamation-triangle"></i>
+    </div>
+    <h2>Confirm Hire</h2>
+    <p>
+      Are you sure you want to hire 
+      <strong>{{ freelancersMap[proposalToAccept?.freelancerId || 0]?.firstName || 'this talent' }}</strong>? 
+      This action will automatically generate a contract and <strong>cannot be undone</strong>.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelAccept()">Cancel</button>
+      <button class="btn-confirm" (click)="confirmAccept()">Yes, Hire Talent</button>
+    </div>
+  </div>
 </div>

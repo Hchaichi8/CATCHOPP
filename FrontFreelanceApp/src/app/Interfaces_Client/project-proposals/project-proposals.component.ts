@@ -5,7 +5,6 @@ import { ProjectServiceService } from '../../Services/project-service.service';
 import { Proposal } from '../../models/proposal';
 import { UserService } from '../../Services/user.service';
 
-
 @Component({
   selector: 'app-project-proposals',
   templateUrl: './project-proposals.component.html',
@@ -24,6 +23,10 @@ export class ProjectProposalsComponent implements OnInit {
 
   currentUser: any = null; 
   freelancersMap: { [key: number]: any } = {}; 
+
+  // Modal State Variables
+  showConfirmPopup: boolean = false;
+  proposalToAccept: Proposal | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -90,7 +93,6 @@ export class ProjectProposalsComponent implements OnInit {
 
   fetchFreelancersInfo() {
     this.proposals.forEach(prop => {
-    
       if (prop.freelancerId && !this.freelancersMap[prop.freelancerId]) {
         this.userService.getUserById(prop.freelancerId).subscribe({
           next: (user) => {
@@ -115,6 +117,26 @@ export class ProjectProposalsComponent implements OnInit {
     this.shortlistedCount = this.proposals.filter(p => p.status === 'ACCEPTED').length;
   }
 
+  // --- Modal Logic Methods ---
+  promptAccept(proposal: Proposal) {
+    this.proposalToAccept = proposal;
+    this.showConfirmPopup = true;
+  }
+
+  cancelAccept() {
+    this.showConfirmPopup = false;
+    this.proposalToAccept = null;
+  }
+
+  confirmAccept() {
+    if (this.proposalToAccept) {
+      this.updateStatus(this.proposalToAccept, 'ACCEPTED'); 
+      this.showConfirmPopup = false;
+      this.proposalToAccept = null;
+    }
+  }
+
+  // --- Original Status Update Method ---
   updateStatus(proposal: Proposal, newStatus: string) {
     if (!proposal.id) return;
 
@@ -128,13 +150,23 @@ export class ProjectProposalsComponent implements OnInit {
           this.calculateStats();
         }
 
-        if (newStatus === 'ACCEPTED') {
+        if (newStatus === 'ACCEPTED' && this.projectId) {
+          this.projectService.updateProjectStatus(this.projectId, 'ACTIVE').subscribe({
+            next: (updatedProject) => {
+              console.log('Project status updated to ACTIVE');
+              this.project = updatedProject; 
+            },
+            error: (err) => console.error("Error updating project status", err)
+          });
+
           const fUser = this.freelancersMap[proposal.freelancerId];
-          const fName = fUser ? `${fUser.firstName} ${fUser.lastName || ''}`.trim() : `Freelancer #${proposal.freelancerId}`;
+          const fName = fUser 
+            ? `${fUser.firstName} ${fUser.lastName || ''}`.trim() 
+            : `Freelancer #${proposal.freelancerId}`;
 
           this.router.navigate(['/ClientCreateContract', proposal.id], {
             state: {
-              freelancerName: fName, 
+              freelancerName: fName,
               freelancerId: proposal.freelancerId,
               projectTitle: this.project?.title || 'Project',
               bidAmount: proposal.bidAmount
@@ -148,5 +180,4 @@ export class ProjectProposalsComponent implements OnInit {
       }
     });
   }
-
 }

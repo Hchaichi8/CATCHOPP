@@ -134,24 +134,43 @@ export class FreelancerContractReviewComponent implements OnInit, AfterViewInit 
     }
   }
 
-  acceptContract() {
-    if (!this.contract) return;
-    if (!this.signatureImg) return alert("Please sign the contract first.");
-    
-    this.isProcessing = true;
-    this.contractService.signContract(this.contract.id!, this.signatureImg).subscribe({
-      next: () => {
-        this.isProcessing = false;
-        alert("Contract Signed Successfully! You can now start working.");
-        this.router.navigate(['/FreelancerContracts']);
-      },
-      error: (err) => {
-        this.isProcessing = false;
-        console.error(err);
-        alert("Error signing contract. Please try again.");
-      }
-    });
+acceptContract() {
+  if (!this.contract || !this.contract.id) return;
+  if (!this.signatureImg) return alert("Please sign the contract first.");
+  
+  // Ensure we have user data to get the name
+  if (!this.currentUser) {
+    alert("User profile not loaded yet. Please wait.");
+    return;
   }
+
+  this.isProcessing = true;
+
+  // Determine the name to save (handle various user object structures)
+  const fName = this.currentUser.firstName || this.currentUser.name || '';
+  const lName = this.currentUser.lastName || '';
+  const fullName = (fName + ' ' + lName).trim();
+
+  // Prepare the payload for the backend
+  const payload = {
+    signature: this.signatureImg,
+    freelancerName: fullName // This is the field that was missing!
+  };
+
+  // Call the service with the payload instead of just a string
+  this.contractService.signContract(this.contract.id, payload).subscribe({
+    next: () => {
+      this.isProcessing = false;
+      alert("Contract Signed Successfully! You can now start working.");
+      this.router.navigate(['/FreelancerContracts']);
+    },
+    error: (err) => {
+      this.isProcessing = false;
+      console.error("Signature Error:", err);
+      alert("Error signing contract. Please try again.");
+    }
+  });
+}
 
   rejectContract() {
     if (!this.contract) return;

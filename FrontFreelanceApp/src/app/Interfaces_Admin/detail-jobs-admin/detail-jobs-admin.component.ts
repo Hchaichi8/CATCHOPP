@@ -1,10 +1,71 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ContractService } from '../../Services/contract.service';
+import { PaymentService } from '../../Services/payment.service';
+import { Contract } from '../../models/contract';
 
 @Component({
   selector: 'app-detail-jobs-admin',
   templateUrl: './detail-jobs-admin.component.html',
   styleUrl: './detail-jobs-admin.component.css'
 })
-export class DetailJobsAdminComponent {
+export class DetailJobsAdminComponent implements OnInit {
+  contractId!: number;
+  contract: Contract | null = null;
+  escrow: any = null;
+  isLoading: boolean = true;
 
+  constructor(
+    private route: ActivatedRoute,
+    private contractService: ContractService,
+    private paymentService: PaymentService
+  ) {}
+
+  ngOnInit(): void {
+    // 1. Get the ID from the URL
+    this.contractId = Number(this.route.snapshot.paramMap.get('id'));
+    
+    if (this.contractId) {
+      this.loadContractDetails();
+    }
+  }
+
+  loadContractDetails() {
+    this.isLoading = true;
+    // 2. Fetch Contract Data
+    this.contractService.getContractById(this.contractId).subscribe({
+      next: (data) => {
+        this.contract = data;
+        this.loadEscrowDetails(); // Fetch financial data once we have the contract
+      },
+      error: (err) => {
+        console.error("Error loading contract", err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadEscrowDetails() {
+    // 3. Fetch Escrow Data using the contractId
+    this.paymentService.getEscrowByContractId(this.contractId).subscribe({
+      next: (data) => {
+        this.escrow = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.warn("No escrow found for this contract", err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // Helper for Status Classes
+  getStatusClass(status: string | undefined): string {
+    if (!status) return 'open';
+    const s = status.toUpperCase();
+    if (s === 'ACTIVE') return 'active';
+    if (s === 'COMPLETED') return 'completed';
+    if (s === 'DISPUTE') return 'dispute';
+    return 'open';
+  }
 }

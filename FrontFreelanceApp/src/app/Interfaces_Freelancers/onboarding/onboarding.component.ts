@@ -7,7 +7,7 @@ import { UserService } from '../../Services/user.service';
 @Component({
   selector: 'app-onboarding',
   templateUrl: './onboarding.component.html',
-  styleUrls: ['./onboarding.component.css'] // 🟢 Correction de "styleUrl" en "styleUrls"
+  styleUrls: ['./onboarding.component.css'] 
 })
 export class OnboardingComponent implements OnInit {
   // Data Containers
@@ -109,15 +109,12 @@ export class OnboardingComponent implements OnInit {
           
           let count = 0;
           
-          // 🟢 LA LOGIQUE ULTRA-ROBUSTE POUR LE PARSING
-          // 1. On s'assure que matchedSkills est bien une liste
           const skillsArray = Array.isArray(matchedSkills) ? matchedSkills : [matchedSkills];
 
           skillsArray.forEach((skill: any) => {
             let skillName = '';
             let skillId = null;
 
-            // 2. On extrait le nom peu importe le format envoyé par le backend
             if (typeof skill === 'object' && skill !== null) {
               skillName = String(skill.nom || skill.name || skill.title || '').toLowerCase().trim();
               skillId = skill.id;
@@ -125,7 +122,6 @@ export class OnboardingComponent implements OnInit {
               skillName = skill.toLowerCase().trim();
             }
 
-            // 3. On cherche une correspondance dans notre catalogue (en ignorant les majuscules/espaces)
             if (skillName) {
               const foundInCatalog = this.allSkills.find(s => 
                 s.nom && s.nom.toLowerCase().trim() === skillName

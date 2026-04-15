@@ -1,5 +1,6 @@
 package org.example.projectmicroservice.Services;
 
+import jakarta.transaction.Transactional;
 import org.example.projectmicroservice.Entities.Contract;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ public interface ContractService {
     List<Contract> getContractsByClient(Long clientId);
 
     List<Contract> getContractsByFreelancer(Long freelancerId);
-    Contract freelancerSignContract(Long contractId, String signature);
+
+    @Transactional
+    Contract freelancerSignContract(Long contractId, String signature, String freelancerName);
+
     Contract freelancerRejectContract(Long contractId);
 }

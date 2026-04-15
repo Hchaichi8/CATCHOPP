@@ -24,121 +24,103 @@
 <div class="layout-container">
   <main class="main-content">
     
-    <header class="page-header">
-      <div class="header-text">
-        <h1>My Wallet</h1>
-        <p>Manage your earnings, withdrawals, and payment methods.</p>
-      </div>
-      <button class="btn-outline"><i class="fa fa-download"></i> Download Statement</button>
-    </header>
+    <div *ngIf="loading" class="loading-state" style="text-align: center; padding: 100px;">
+      <i class="fa fa-circle-notch fa-spin fa-3x" style="color: #3b82f6;"></i>
+      <p style="margin-top: 15px; color: #666;">Loading financial data...</p>
+    </div>
 
-    <div class="balance-grid">
-        
+    <div *ngIf="!loading && !wallet" class="no-wallet-card" style="text-align: center; padding: 60px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 40px auto; max-width: 600px;">
+      <div class="icon-circle" style="font-size: 4rem; color: #3b82f6; margin-bottom: 20px;">
+        <i class="fa fa-wallet"></i>
+      </div>
+      <h2>Activate Your Freelancer Wallet</h2>
+      <p style="color: #666; margin-bottom: 30px;">You need a wallet to receive payments and track your earnings.</p>
+      <button class="btn-action primary" (click)="initializeWallet()" style="padding: 12px 30px; font-size: 1.1rem; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 8px;">
+        Set Up My Wallet Now
+      </button>
+    </div>
+
+    <div *ngIf="!loading && wallet">
+      <header class="page-header">
+        <div class="header-text">
+          <h1>My Wallet</h1>
+          <p>Manage your earnings, withdrawals, and payment progress.</p>
+        </div>
+      </header>
+
+      <div class="balance-grid">
         <div class="card balance-card main-wallet">
             <div class="card-label">Available to Withdraw</div>
-            <div class="amount-display">$1,240.50</div>
-            
+            <div class="amount-display">{{ wallet?.balance | currency:'USD' }}</div>
             <div class="card-actions">
-                <button class="btn-withdraw pulse-effect">
+                <button class="btn-withdraw pulse-effect" (click)="handleWithdraw()" [disabled]="wallet?.balance <= 0">
                     <i class="fa fa-paper-plane"></i> Withdraw Funds
                 </button>
             </div>
-            
-            <div class="wallet-info">
-                <i class="fa fa-check-circle"></i> Last withdrawal: $500 on Oct 28
-            </div>
+            <div class="wallet-info"><i class="fa fa-check-circle"></i> Funds ready for payout.</div>
         </div>
 
         <div class="card balance-card pending-wallet">
-            <div class="card-label">Work in Progress / Pending</div>
-            <div class="amount-display text-pending">$850.00</div>
-            
+            <div class="card-label">Total Pending in Escrow</div>
+            <div class="amount-display text-pending">{{ totalPending | currency:'USD' }}</div>
             <div class="card-actions">
                 <div class="status-badge">
-                    <i class="fa fa-clock"></i> 2 Contracts Active
+                    <i class="fa fa-clock"></i> {{ activeContractsCount }} Active Contracts
                 </div>
             </div>
-            
-            <div class="wallet-info">
-                <i class="fa fa-info-circle"></i> Funds clear 5 days after client approval.
-            </div>
+            <div class="wallet-info"><i class="fa fa-info-circle"></i> Released per milestone approval.</div>
         </div>
+      </div>
 
-    </div>
+      <div class="section-container" *ngIf="activeContractsCount > 0" style="margin-top: 30px;">
+          <h3>Active Contracts Progress</h3>
+          <div class="progress-grid">
+              <div class="card project-progress-card" *ngFor="let escrow of escrows">
+                  <ng-container *ngIf="escrow.status === 'LOCKED'">
+                      <div class="project-header">
+                          <strong>Contract #{{ escrow.contractId }}</strong>
+                          <span class="payout-ratio">${{ escrow.releasedAmount }} / ${{ escrow.totalAmount }}</span>
+                      </div>
+                      <div class="payout-progress-container">
+                          <div class="payout-progress-bar">
+                              <div class="payout-progress-fill" [style.width.%]="(escrow.releasedAmount / escrow.totalAmount) * 100"></div>
+                          </div>
+                          <small class="remaining-text">Remaining: {{ escrow.remainingAmount | currency:'USD' }}</small>
+                      </div>
+                  </ng-container>
+              </div>
+          </div>
+      </div>
 
-    <div class="section-container">
-        <div class="section-header-row">
-            <h3>Payout Methods</h3>
-            <button class="btn-text-add">+ Add Method</button>
-        </div>
-        
-        <div class="methods-grid">
-            <div class="card method-item active">
-                <div class="method-icon bank"><i class="fa fa-university"></i></div>
-                <div class="method-details">
-                    <h4>Bank Transfer (USD)</h4>
-                    <p>**** 4829 • Primary</p>
-                </div>
-                <span class="badge-status">Active</span>
-            </div>
-
-            <div class="card method-item">
-                <div class="method-icon paypal"><i class="fab fa-paypal"></i></div>
-                <div class="method-details">
-                    <h4>PayPal</h4>
-                    <p>kennethexample.com</p>
-                </div>
-                <button class="btn-icon-dots"><i class="fa fa-ellipsis-v"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <div class="section-container">
-        <h3>Transaction History</h3>
-        <div class="card table-card">
-            <table class="transaction-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th class="text-right">Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Nov 02, 2026</td>
-                        <td>Payment from <strong>Acme Corp</strong></td>
-                        <td>Fixed Price</td>
-                        <td class="text-right positive">+$600.00</td>
-                        <td><span class="badge pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>Oct 30, 2026</td>
-                        <td>Hourly Payment: <strong>TechStart LLC</strong></td>
-                        <td>Hourly</td>
-                        <td class="text-right positive">+$220.00</td>
-                        <td><span class="badge success">Cleared</span></td>
-                    </tr>
-                    <tr>
-                        <td>Oct 28, 2026</td>
-                        <td>Withdrawal to Bank Account ****4829</td>
-                        <td>Withdrawal</td>
-                        <td class="text-right negative">-$500.00</td>
-                        <td><span class="badge success">Processed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Oct 25, 2026</td>
-                        <td>Service Fee (CatchIQ)</td>
-                        <td>Fee</td>
-                        <td class="text-right fee">-$12.50</td>
-                        <td><span class="badge success">Paid</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-  </main>
+      <div class="section-container" style="margin-top: 30px;">
+          <h3>Recent Transaction History</h3>
+          <div class="card table-card">
+              <table class="transaction-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                      <tr>
+                          <th>Date</th>
+                          <th>Description</th>
+                          <th>Type</th>
+                          <th style="text-align: right;">Amount</th>
+                          <th>Status</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let tx of transactions">
+                          <td>{{ tx.createdAt | date:'mediumDate' }}</td>
+                          <td>{{ tx.description }}</td>
+                          <td><span class="type-tag">{{ tx.type }}</span></td>
+                          <td style="text-align: right;" [ngClass]="tx.toWalletId === wallet?.id ? 'positive' : 'negative'">
+                              {{ (tx.toWalletId === wallet?.id ? '+' : '-') }}{{ tx.amount | currency:'USD' }}
+                          </td>
+                          <td><span class="badge success">Completed</span></td>
+                      </tr>
+                      <tr *ngIf="transactions.length === 0">
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #999;">No transactions found.</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+    </div> </main>
 </div>

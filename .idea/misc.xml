@@ -11,6 +11,11 @@
         <option value="$PROJECT_DIR$/CatchOPP/apigetway/pom.xml" />
         <option value="$PROJECT_DIR$/CatchOPP/MS_CompetenceAndReview/pom.xml" />
         <option value="$PROJECT_DIR$/CatchOPP/MSCommunication/pom.xml" />
+        <option value="$PROJECT_DIR$/CatchOPP/SkillTestsMicroService/pom.xml" />
+        <option value="$PROJECT_DIR$/CatchOPP/SubscriptionMicroService/pom.xml" />
+        <option value="$PROJECT_DIR$/CatchOPP/ReferralMicroService/pom.xml" />
+        <option value="$PROJECT_DIR$/CatchOPP/CommunityMicroService/pom.xml" />
+        <option value="$PROJECT_DIR$/CatchOPP/paiementMS/pom.xml" />
       </list>
     </option>
   </component>

@@ -125,7 +125,7 @@
 /* Stats Row */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 columns for better balance */
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 50px;
 }

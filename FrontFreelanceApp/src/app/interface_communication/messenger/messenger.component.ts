@@ -199,8 +199,6 @@ export class MessengerComponent implements OnInit, OnDestroy, OnChanges {
     this.scrollToBottom();
   }
 
-
-  
   toggleMenu(msg: Message) {
     this.activeChat?.history.forEach(m => { if(m !== msg) m.showMenu = false; });
     msg.showMenu = !msg.showMenu;

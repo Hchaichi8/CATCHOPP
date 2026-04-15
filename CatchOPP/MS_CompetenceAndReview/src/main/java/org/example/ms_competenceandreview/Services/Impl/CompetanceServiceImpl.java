@@ -65,14 +65,12 @@ public class CompetanceServiceImpl implements CompetanceService {
             PDDocument document = PDDocument.load(file.getInputStream());
             PDFTextStripper pdfStripper = new PDFTextStripper();
 
-            // 1. Extraire le texte du CV en minuscules
             String cvText = pdfStripper.getText(document).toLowerCase();
             document.close();
 
-            // 2. 🟢 CORRECTION ICI : Remplacer "1" par "5" (ou enlever le filtre si tu veux TOUTES les compétences)
             List<Competance> allMasterSkills = competanceRepo.findAll()
                     .stream()
-                    .filter(c -> "5".equals(c.getUserId())) // <-- Remplacé par 5 pour correspondre à Angular
+                    .filter(c -> "5".equals(c.getUserId()))
                     .toList();
 
             // 3. Comparer avec le texte du CV

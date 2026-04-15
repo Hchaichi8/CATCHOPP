@@ -22,7 +22,7 @@
 .nav-icon-btn { background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
 .user-profile-menu img { width: 36px; height: 36px; border-radius: 50%; }
 
-.details-layout { max-width: 1200px; margin: 0 auto; padding: 20px 24px 60px; }
+.details-layout { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; }
 .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .detail-card { padding: 0; }

@@ -1,29 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { Contract } from '../../models/contract';
 import { ContractService } from '../../Services/contract.service';
-import { UserService } from '../../Services/user.service'; // 🟢 INJECTION
+import { UserService } from '../../Services/user.service';
 
 @Component({
   selector: 'app-client-contract',
   templateUrl: './client-contract.component.html',
-  styleUrls: ['./client-contract.component.css'] // 🟢 Attention: styleUrls avec un 's'
+  styleUrls: ['./client-contract.component.css']
 })
 export class ClientContractComponent implements OnInit {
   
   contracts: Contract[] = [];
   isLoading: boolean = true;
-  
-  // 🟢 VARIABLES UTILISATEUR
+  currentTab: string = 'active'; // active, pending, rejected
+
   currentUser: any = null;
-  clientId!: number; // Fini le "= 2" en dur !
+  clientId!: number;
 
   constructor(
     private contractService: ContractService,
-    private userService: UserService // 🟢 INJECTION
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    // 🟢 On commence par charger l'utilisateur
     this.loadUserData();
   }
 
@@ -41,7 +40,6 @@ export class ClientContractComponent implements OnInit {
             this.userService.getUserById(this.clientId).subscribe({
               next: (user) => {
                 this.currentUser = user;
-                // 🟢 Une fois le client connu, on charge SES contrats
                 this.loadContracts();
               },
               error: (err) => {
@@ -62,10 +60,11 @@ export class ClientContractComponent implements OnInit {
 
   loadContracts() {
     if (!this.clientId) return;
+    this.isLoading = true;
 
     this.contractService.getClientContracts(this.clientId).subscribe({
       next: (data) => {
-        this.contracts = data.reverse(); // Les plus récents en premier
+        this.contracts = data.reverse();
         this.isLoading = false;
       },
       error: (err) => {
@@ -75,18 +74,16 @@ export class ClientContractComponent implements OnInit {
     });
   }
 
-  // Count active contracts for the stats card
+  // Count helpers for the UI
   getActiveCount(): number {
-    return this.contracts.filter(c => c.status === 'SENT' || c.status === 'SIGNED' || c.status === 'ACTIVE').length;
+    return this.contracts.filter(c => c.status === 'ACTIVE' || c.status === 'SIGNED').length;
   }
 
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'SENT': return 'status-sent';
-      case 'SIGNED': return 'status-signed';
-      case 'ACTIVE': return 'status-signed';
-      case 'DRAFT': return 'status-draft';
-      default: return '';
-    }
+  getPendingCount(): number {
+    return this.contracts.filter(c => c.status === 'SENT').length;
+  }
+
+  getRejectedCount(): number {
+    return this.contracts.filter(c => c.status === 'REJECTED').length;
   }
 }

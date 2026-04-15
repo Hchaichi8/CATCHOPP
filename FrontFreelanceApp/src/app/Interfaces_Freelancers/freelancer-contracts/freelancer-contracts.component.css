@@ -9,7 +9,85 @@
    --danger: #ef4444;
    font-family: 'Inter', sans-serif;
 }
+/* ... Keep existing styles ... */
 
+/* New Badges */
+.badge.yellow { background: #fffbeb; color: #b45309; }
+.badge.red { background: #fef2f2; color: #ef4444; }
+
+/* Empty State */
+.empty-state {
+    text-align: center; 
+    padding: 50px 20px; 
+    border: 1px dashed #e5e7eb; 
+    border-radius: 12px; 
+    background: white;
+    color: var(--text-muted);
+}
+.empty-state i { font-size: 2.5rem; color: #d1d5db; margin-bottom: 15px; display: block; }
+
+/* Offer Card Specifics */
+.offer-card { border-color: #fcd34d; }
+.status-pending { background: #fffbeb; color: #b45309; }
+.footer-yellow { background: #fffbeb !important; }
+
+/* Rejected Card Specifics */
+.rejected-card { 
+    border-color: #fca5a5; 
+    background: #fafafa;
+}
+.status-rejected { background: #fef2f2; color: #ef4444; }
+
+.danger-outline {
+    background: white;
+    border: 1px solid #fca5a5;
+    color: #ef4444;
+}
+.danger-outline:hover {
+    background: #fef2f2;
+}
+
+/* Utils */
+.last-updated { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+
+/* New Badges */
+.badge.yellow { background: #fffbeb; color: #b45309; }
+.badge.red { background: #fef2f2; color: #ef4444; }
+
+/* Empty State */
+.empty-state {
+    text-align: center; 
+    padding: 50px 20px; 
+    border: 1px dashed #e5e7eb; 
+    border-radius: 12px; 
+    background: white;
+    color: var(--text-muted);
+}
+.empty-state i { font-size: 2.5rem; color: #d1d5db; margin-bottom: 15px; display: block; }
+
+/* Offer Card Specifics */
+.offer-card { border-color: #fcd34d; }
+.status-pending { background: #fffbeb; color: #b45309; }
+.footer-yellow { background: #fffbeb !important; }
+
+/* Rejected Card Specifics */
+.rejected-card { 
+    border-color: #fca5a5; 
+    background: #fafafa;
+}
+.status-rejected { background: #fef2f2; color: #ef4444; }
+
+.danger-outline {
+    background: white;
+    border: 1px solid #fca5a5;
+    color: #ef4444;
+}
+.danger-outline:hover {
+    background: #fef2f2;
+}
+
+/* Utils */
+.last-updated { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
 /* --- NAVBAR (Consistent) --- */
 .navbar { background: var(--surface); height: 64px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
 .nav-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 100%; }

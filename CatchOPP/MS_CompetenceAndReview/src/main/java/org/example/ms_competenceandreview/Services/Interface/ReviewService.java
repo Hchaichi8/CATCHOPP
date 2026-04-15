@@ -14,4 +14,6 @@ public interface ReviewService {
     List<Review> GetReviewsByFreelancer(String freelancerId);
     List<Review> GetReviewsByClient(String clientId);
 
+    String generateEnhancedText(String originalText, Integer rating);
+    List<Review> GetReviewsByProject(Long projectId); // 🟢 Add this
 }

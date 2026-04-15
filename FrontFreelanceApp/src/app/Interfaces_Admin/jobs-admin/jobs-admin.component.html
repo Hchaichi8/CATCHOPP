@@ -36,50 +36,28 @@
     <div class="stats-row">
         <div class="stat-pill">
             <span class="label">Total Jobs</span>
-            <span class="value">4,250</span>
+            <span class="value">{{ totalJobs }}</span>
         </div>
         <div class="stat-pill">
             <span class="label">Active Contracts</span>
-            <span class="value">850</span>
+            <span class="value">{{ activeContracts }}</span>
         </div>
         <div class="stat-pill success">
             <span class="label">Completed (Month)</span>
-            <span class="value">120</span>
+            <span class="value">{{ completedMonth }}</span>
         </div>
         <div class="stat-pill danger">
             <span class="label">Flagged / Disputes</span>
-            <span class="value">8</span>
-        </div>
-    </div>
-
-    <div class="card toolbar-card">
-        <div class="search-box">
-            <i class="fa fa-search"></i>
-            <input type="text" placeholder="Search by job title, client, or ID...">
-        </div>
-        
-        <div class="filters">
-            <select class="form-select">
-                <option value="all">All Categories</option>
-                <option value="dev">Development</option>
-                <option value="design">Design</option>
-                <option value="marketing">Marketing</option>
-            </select>
-            
-            <select class="form-select">
-                <option value="all">All Status</option>
-                <option value="open">Open</option>
-                <option value="active">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="dispute">Dispute</option>
-            </select>
-
-            <button class="btn-icon refresh"><i class="fa fa-filter"></i></button>
+            <span class="value">{{ disputes }}</span>
         </div>
     </div>
 
     <div class="card table-card">
-        <table class="data-table">
+        <div *ngIf="isLoading" style="text-align: center; padding: 40px;">
+            <i class="fa fa-spinner fa-spin fa-2x"></i>
+        </div>
+
+        <table class="data-table" *ngIf="!isLoading">
             <thead>
                 <tr>
                     <th style="width: 40px;"><input type="checkbox"></th>
@@ -93,125 +71,39 @@
                 </tr>
             </thead>
             <tbody>
-                
-                <tr>
+                <tr *ngFor="let contract of contracts" [class.row-alert]="contract.status === 'DISPUTE'">
                     <td><input type="checkbox"></td>
                     <td>
                         <div class="job-info">
-                            <strong>SaaS Dashboard Refactoring</strong>
-                            <small class="id-text">#JOB-9921</small>
+                            <strong>{{ contract.projectTitle || 'Contract #' + contract.id }}</strong>
+                            <small class="id-text">#JOB-{{ contract.id }}</small>
+                            <span *ngIf="contract.status === 'DISPUTE'" class="alert-tag">Escalated</span>
                         </div>
                     </td>
                     <td>
                         <div class="user-mini">
-                            <img src="https://placehold.co/30x30/198754/ffffff?text=A"> <span>Acme Corp</span>
+<img [src]="'https://placehold.co/30x30/3b82f6/ffffff?text=' + (contract.freelancerName ? contract.clientName.charAt(0) : 'F')">                            <span>{{ contract.clientName }}</span>
                         </div>
                     </td>
                     <td>
                         <div class="user-mini">
-                            <img src="https://i.pravatar.cc/150?u=10"> <span>Kenneth S.</span>
+<img [src]="'https://placehold.co/30x30/3b82f6/ffffff?text=' + (contract.freelancerName ? contract.freelancerName.charAt(0) : 'F')">                            <span>{{ contract.freelancerName || 'Unassigned' }}</span>
                         </div>
                     </td>
-                    <td><span class="budget hourly">$55/hr</span></td>
-                    <td><span class="status-badge active">In Progress</span></td>
-                    <td>2 days ago</td>
+                    <td><span class="budget fixed">{{ contract.rate | currency:'USD' }}</span></td>
+                    <td><span class="status-badge" [ngClass]="getStatusClass(contract.status)">{{ getStatusLabel(contract.status) }}</span></td>
+                    <td>{{ contract.startDate | date:'mediumDate' }}</td>
                     <td class="text-right">
-                        <button class="btn-action" title="View"   routerLink="/DetailJobs"   ><i class="fa fa-eye"></i></button>
+                        <button class="btn-action" title="View" [routerLink]="['/DetailJobs', contract.id]"><i class="fa fa-eye"></i></button>
                         <button class="btn-action" title="Settings"><i class="fa fa-cog"></i></button>
                     </td>
                 </tr>
-
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="job-info">
-                            <strong>Mobile App UI Design</strong>
-                            <small class="id-text">#JOB-9925</small>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-mini">
-                            <img src="https://placehold.co/30x30/3b82f6/ffffff?text=T"> <span>TechStart</span>
-                        </div>
-                    </td>
-                    <td><span class="text-muted italic">--</span></td>
-                    <td><span class="budget fixed">$1,200</span></td>
-                    <td><span class="status-badge open">Open</span></td>
-                    <td>5 hours ago</td>
-                    <td class="text-right">
-                        <button class="btn-action" title="View"><i class="fa fa-eye"></i></button>
-                        <button class="btn-action text-danger" title="Close Job"><i class="fa fa-times-circle"></i></button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="job-info">
-                            <strong>Python Data Scraping Script</strong>
-                            <small class="id-text">#JOB-8812</small>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-mini">
-                            <img src="https://placehold.co/30x30/f59e0b/ffffff?text=D"> <span>DataCo</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-mini">
-                            <img src="https://i.pravatar.cc/150?u=20"> <span>Sarah J.</span>
-                        </div>
-                    </td>
-                    <td><span class="budget fixed">$400</span></td>
-                    <td><span class="status-badge completed">Completed</span></td>
-                    <td>1 week ago</td>
-                    <td class="text-right">
-                        <button class="btn-action" title="View"><i class="fa fa-eye"></i></button>
-                    </td>
-                </tr>
-
-                <tr class="row-alert">
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <div class="job-info">
-                            <strong>Corporate Logo Design</strong>
-                            <small class="id-text">#JOB-9100</small>
-                            <span class="alert-tag">Escalated</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-mini">
-                            <img src="https://placehold.co/30x30/111827/ffffff?text=B"> <span>BrandInc</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="user-mini">
-                            <img src="https://i.pravatar.cc/150?u=33"> <span>John D.</span>
-                        </div>
-                    </td>
-                    <td><span class="budget fixed">$250</span></td>
-                    <td><span class="status-badge dispute">Dispute</span></td>
-                    <td>3 weeks ago</td>
-                    <td class="text-right">
-                        <button class="btn-action text-danger" title="Resolve"><i class="fa fa-gavel"></i></button>
-                    </td>
-                </tr>
-
             </tbody>
         </table>
 
-        <div class="table-footer">
-            <span class="showing-text">Showing <strong>1-4</strong> of <strong>4,250</strong> jobs</span>
-            <div class="pagination">
-                <button class="page-btn disabled"><i class="fa fa-chevron-left"></i></button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn">...</button>
-                <button class="page-btn"><i class="fa fa-chevron-right"></i></button>
-            </div>
+        <div class="table-footer" *ngIf="!isLoading">
+            <span class="showing-text">Showing <strong>{{ contracts.length }}</strong> jobs</span>
         </div>
     </div>
-
   </main>
 </div>

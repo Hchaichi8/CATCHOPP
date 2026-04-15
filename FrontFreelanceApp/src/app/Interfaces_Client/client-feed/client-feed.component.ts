@@ -267,24 +267,43 @@ export class ClientFeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  applyFilters() {
-    let temp = [...this.projectsList];
+ applyFilters() {
+  // 🟢 1. Start with the full list, but ONLY include 'OPEN' projects
+  let temp = this.projectsList.filter(p => p.status === 'OPEN');
 
-    if (this.searchText.trim() !== '') {
-      const search = this.searchText.toLowerCase();
-      temp = temp.filter(p => p.title.toLowerCase().includes(search) || p.description.toLowerCase().includes(search));
-    }
-
-    if (this.selectedExperience !== 'All') temp = temp.filter(p => p.ExperienceLevel === this.selectedExperience);
-    if (this.selectedCategory !== 'All') temp = temp.filter(p => p.category === this.selectedCategory);
-
-    if (this.selectedSort === 'Newest') temp.sort((a, b) => (b.id || 0) - (a.id || 0));
-    else if (this.selectedSort === 'Oldest') temp.sort((a, b) => (a.id || 0) - (b.id || 0));
-    else if (this.selectedSort === 'Highest Budget') temp.sort((a, b) => (b.budget || 0) - (a.budget || 0));
-    else if (this.selectedSort === 'Lowest Budget') temp.sort((a, b) => (a.budget || 0) - (b.budget || 0));
-
-    this.filteredProjects = temp;
+  // 2. Filter by search text
+  if (this.searchText.trim() !== '') {
+    const search = this.searchText.toLowerCase();
+    temp = temp.filter(p => 
+      p.title.toLowerCase().includes(search) || 
+      p.description.toLowerCase().includes(search)
+    );
   }
+
+  // 3. Filter by Experience Level
+  if (this.selectedExperience !== 'All') {
+    temp = temp.filter(p => p.ExperienceLevel === this.selectedExperience);
+  }
+
+  // 4. Filter by Category
+  if (this.selectedCategory !== 'All') {
+    temp = temp.filter(p => p.category === this.selectedCategory);
+  }
+
+  // 5. Apply Sorting
+  if (this.selectedSort === 'Newest') {
+    temp.sort((a, b) => (b.id || 0) - (a.id || 0));
+  } else if (this.selectedSort === 'Oldest') {
+    temp.sort((a, b) => (a.id || 0) - (b.id || 0));
+  } else if (this.selectedSort === 'Highest Budget') {
+    temp.sort((a, b) => (b.budget || 0) - (a.budget || 0));
+  } else if (this.selectedSort === 'Lowest Budget') {
+    temp.sort((a, b) => (a.budget || 0) - (b.budget || 0));
+  }
+
+  // 6. Update the filtered list displayed in HTML
+  this.filteredProjects = temp;
+}
 
   clearFilters() {
     this.searchText = '';

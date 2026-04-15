@@ -52,10 +52,7 @@ public class ProjectController {
     }
 
 
-   /* @PostMapping("/{projectId}/proposals")
-    public Proposal submitProposal(@PathVariable Long projectId, @RequestBody Proposal proposal) {
-        return service.createProposal(projectId, proposal);
-    }*/
+
 
     @GetMapping("/proposals/{proposalId}")
     public Proposal getProposal(@PathVariable Long proposalId) {
@@ -75,7 +72,6 @@ public class ProjectController {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    // 🟢 MODIFICATION DE LA MÉTHODE SUBMIT PROPOSAL
     @PostMapping("/{projectId}/proposals")
     public Proposal submitProposal(@PathVariable Long projectId, @RequestBody Proposal proposal) {
         Proposal savedProposal = service.createProposal(projectId, proposal);

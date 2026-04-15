@@ -153,10 +153,23 @@
                         <input type="radio" id="c-star1" name="rating" [value]="1" [(ngModel)]="newReview.rating" /><label for="c-star1"><i class="fa fa-star"></i></label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Feedback</label>
-                    <textarea placeholder="Describe your experience with this client..." rows="4" [(ngModel)]="newReview.description"></textarea>
-                </div>
+               <div class="form-group">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label>Feedback</label>
+        <button type="button" 
+                (click)="enhanceWithAI()" 
+                [disabled]="isGenerating || !newReview.description"
+                style="font-size: 0.8rem; border: none; background: #f0f7ff; color: #3b82f6; padding: 4px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <i class="fa" [ngClass]="isGenerating ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+            {{ isGenerating ? 'Enhancing...' : 'Enhance with AI' }}
+        </button>
+    </div>
+    
+    <textarea placeholder="Write a few words (e.g., 'good client, paid fast')..." 
+              rows="4" 
+              [(ngModel)]="newReview.description">
+    </textarea>
+</div>
                 <div class="form-actions">
                     <button class="btn-primary" (click)="submitReview()">Submit Review</button>
                 </div>

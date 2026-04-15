@@ -12,4 +12,5 @@ public interface ReviewRepo extends JpaRepository<Review, Long> {
     List<Review> findByFreelancerId(String freelancerId);
 
     List<Review> findByClientId(String clientId);
+    List<Review> findByProjectId(Long projectId);
 }

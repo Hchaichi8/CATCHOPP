@@ -34,16 +34,32 @@ public class Review {
     @Column(nullable = false)
     private Integer rating;
 
-    // --- NEW FIELDS ---
+    @Column(name = "project_id", nullable = true)
+    private Long projectId;
 
-    @Column(name = "client_id")
+    @Column(name = "client_id", nullable = true)
     private String clientId;
 
-    @Column(name = "freelancer_id")
+    @Column(name = "freelancer_id", nullable = true)
     private String freelancerId;
 
+    @Transient
+    private String reviewerName;
+
+    // Add Getter and Setter
+    public String getReviewerName() { return reviewerName; }
+    public void setReviewerName(String reviewerName) { this.reviewerName = reviewerName; }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
     @Column(name = "reviewer_role")
-    private String reviewerRole; // "CLIENT" or "FREELANCER" (Who wrote the review?)
+    private String reviewerRole;
 
     // ------------------
 

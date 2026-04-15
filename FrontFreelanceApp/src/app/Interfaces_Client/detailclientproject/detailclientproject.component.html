@@ -1,15 +1,9 @@
 <nav class="navbar">
   <div class="nav-container">
-     <div class="nav-brand" routerLink="/ClientFeed">
-      <img src="assets/logo.png" alt="CatchIQ Logo" class="logo-img">
-    </div>
-    <div class="nav-search">
-      <i class="fa fa-search"></i>
-      <input type="text" placeholder="Search freelancers or services...">
+    <div class="nav-brand" routerLink="/ClientFeed">
+      <img src="assets/logo.png" alt="CatchIQ" class="logo-img">
     </div>
     <div class="nav-actions">
-      <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
-      <div class="nav-divider"></div>
       <div class="user-profile-menu">
         <img src="https://placehold.co/40x40/198754/white?text=Me" alt="Profile">
       </div>
@@ -17,121 +11,122 @@
   </div>
 </nav>
 
-<div *ngIf="isLoading" style="text-align: center; padding: 100px;">
-  <i class="fa fa-spinner fa-spin" style="font-size: 40px; color: var(--primary);"></i>
-  <h2 style="margin-top: 20px;">Loading project details...</h2>
-</div>
-
 <div class="details-layout" *ngIf="project && !isLoading">
-  
   <div class="back-row">
-    <a routerLink="/ClientFeed" class="back-link"><i class="fa fa-arrow-left"></i> Back to My Jobs</a>
-    <div class="status-indicator open">
-      {{ project.status }}
-    </div>
+    <a routerLink="/ClientFeed" class="back-link"><i class="fa fa-arrow-left"></i> Back</a>
   </div>
 
   <div class="content-grid">
-    
     <main class="main-details">
       <div class="card detail-card">
         
         <div class="project-header">
-          <div class="header-top">
-            <span class="category-badge">Project #{{ project.id }}</span>
-            <span class="time-badge">Posted {{ project.postedAt }}</span>
-          </div>
-          <div class="title-row">
-             <h1>{{ project.title }}</h1>
-             <button class="btn-icon-edit" title="Edit Title"><i class="fa fa-pen"></i></button>
-          </div>
+          <h1>{{ project.title }}</h1>
           <div class="project-meta">
-            <span><i class="fa fa-globe-americas"></i> Worldwide</span>
-            <span class="separator">•</span>
-            <span><i class="fa fa-clock"></i> Fixed Price</span>
-            <span class="separator">•</span>
+            <span><i class="fa fa-clock"></i> {{ project.jobType }}</span>
             <span><i class="fa fa-layer-group"></i> {{ project.ExperienceLevel }}</span>
           </div>
         </div>
 
         <div class="tabs-row">
-          <button class="tab-btn" [class.active]="currentTab === 'details'" (click)="setTab('details')">View Job Post</button>
-          <button class="tab-btn" [class.active]="currentTab === 'proposals'" (click)="setTab('proposals')">Review Proposals <span class="badge">0</span></button>
-          <button class="tab-btn" [class.active]="currentTab === 'invite'" (click)="setTab('invite')">Invite Talent <span class="badge">0</span></button>
+          <button class="tab-btn" [class.active]="currentTab === 'details'" (click)="setTab('details')">Overview</button>
+          <button class="tab-btn" [class.active]="currentTab === 'reviews'" (click)="setTab('reviews')">Reviews ({{projectReviews.length}})</button>
+          <button *ngIf="isOwner" class="tab-btn" [class.active]="currentTab === 'proposals'" (click)="setTab('proposals')">Proposals</button>
         </div>
 
         <div class="divider"></div>
 
         <div *ngIf="currentTab === 'details'" class="tab-content fade-in">
-            <div class="section description-section">
-              <h3>Project Description</h3>
-              <p style="white-space: pre-wrap; line-height: 1.6;">{{ project.description }}</p>
-              
-              <div *ngIf="project.image" style="margin-top: 20px;">
-                <h4>Attached Image</h4>
-                <img [src]="project.image" style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 10px;">
-              </div>
-            </div>
+          <div class="section">
+            <h3>Description</h3>
+            <p style="white-space: pre-wrap;">{{ project.description }}</p>
             
-            <div class="divider"></div>
-            
-            <div class="section skills-section">
-              <h3>Required Skills</h3>
-              
-              <div class="tags-container">
-                <span class="skill-tag" *ngFor="let skill of projectSkills">
-                  {{ skill.nom }}
-                </span>
-                
-                <span *ngIf="projectSkills.length === 0" style="color: #9ca3af; font-size: 0.9rem; font-style: italic;">
-                  No specific skills required for this project.
-                </span>
-              </div>
-
+            <div *ngIf="project.image" class="project-image-container" style="margin-top: 25px;">
+              <h4 style="margin-bottom: 10px; color: #374151;">Project Visual</h4>
+              <img [src]="project.image" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #eee;">
             </div>
+          </div>
+          
+          <div class="section" style="margin-top: 30px;">
+            <h3>Skills Needed</h3>
+            <div class="tags-container">
+              <span class="skill-tag" *ngFor="let s of projectSkills">{{ s.nom }}</span>
+            </div>
+          </div>
         </div>
 
-        <div *ngIf="currentTab === 'proposals'" class="tab-content fade-in">
-           <div class="applicant-card" style="padding: 40px; text-align: center; color: #6b7280;">
-             <i class="fa fa-inbox" style="font-size: 40px; margin-bottom: 10px;"></i>
-             <h3>No proposals yet</h3>
-             <p>Wait for freelancers to apply, or invite them directly!</p>
-           </div>
-        </div>
-
-        <div *ngIf="currentTab === 'invite'" class="tab-content fade-in">
-           <p style="text-align: center; padding: 40px; color: #6b7280;">Talent recommendation engine coming soon...</p>
-        </div>
+        <div *ngIf="currentTab === 'reviews'" class="tab-content fade-in">
+  <h3>Community Feedback</h3>
   
+  <div class="review-list" style="margin-top: 20px;">
+   <div class="review-item" *ngFor="let r of projectReviews">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img [src]="'https://ui-avatars.com/api/?background=random&color=fff&name=' + (r.reviewerName || 'User')" 
+           style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #e5e7eb;">
+      
+      <div>
+        <strong style="display: block; color: #1f2937; font-size: 1.05rem;">
+          {{ r.reviewerName }}
+        </strong>
+        <small style="color: #6b7280;">{{ r.createdAt | date:'longDate' }}</small>
+      </div>
+    </div>
+
+    <div style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">
+      <i class="fa fa-star"></i> {{ r.rating }}/5
+    </div>
+  </div>
+
+  <p style="margin-top: 12px; color: #4b5563; padding-left: 52px; font-style: italic;">
+    "{{ r.description }}"
+  </p>
+</div>
+  </div>
+</div>
+
       </div>
     </main>
 
     <aside class="sidebar-details">
       <div class="card action-widget">
-        <h4>Manage Posting</h4>
+        <h4>Project Budget</h4>
         <div class="budget-display">
-          <small>Fixed Budget</small>
           <h2>${{ project.budget }}</h2>
         </div>
-        <div class="action-buttons">
-          <button class="btn-primary-full"><i class="fa fa-pen"></i> Edit Posting</button>
-          <button class="btn-outline-full" (click)="setTab('invite')"><i class="fa fa-user-plus"></i> Invite Freelancers</button>
-          <button class="btn-danger-outline"><i class="fa fa-ban"></i> Close Job</button>
-        </div>
-        <div class="visibility-row">
-            <i class="fa fa-eye"></i> Visibility: <strong>Public</strong>
-        </div>
-      </div>
+        
+        <button class="btn-outline-full" (click)="openReviewModal()" style="margin-bottom: 10px; border-color: #6366f1; color: #6366f1;">
+          <i class="fa fa-comment"></i> Review Project
+        </button>
 
-      <div class="card stats-widget">
-        <h4>Applicant Statistics</h4>
-        <ul class="stats-list">
-          <li><div class="stat-row"><span>Proposals</span><strong>0</strong></div></li>
-          <li><div class="stat-row"><span>Interviews</span><strong>0</strong></div></li>
-          <li><div class="stat-row"><span>Invites Sent</span><strong>0</strong></div></li>
-        </ul>
+        <button *ngIf="!isOwner" class="btn-primary-full">Submit Proposal</button>
+        
+        <div *ngIf="isOwner" class="owner-controls" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+          <p style="font-size: 12px; color: #666; margin-bottom: 10px;">You are the owner of this post</p>
+          <button class="btn-danger-outline" style="width: 100%;">Close Project</button>
+        </div>
       </div>
     </aside>
+  </div>
+</div>
 
+<div class="modal-overlay" *ngIf="showReviewModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999;">
+  <div class="modal-card" style="background:white; padding:30px; border-radius:12px; width:450px;">
+    <h3>Submit a Review</h3>
+    <div class="stars" style="font-size:30px; color:#fbbf24; margin:15px 0; cursor:pointer;">
+      <i *ngFor="let s of [1,2,3,4,5]" [class]="s <= rating ? 'fa fa-star' : 'far fa-star'" (click)="rating = s"></i>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <label>Your Feedback</label>
+      <button (click)="enhanceWithAI()" style="font-size:11px; border:none; background:#f0f7ff; color:#2563eb; padding:4px 8px; border-radius:4px; cursor:pointer;">
+        <i class="fa fa-magic"></i> {{ isEnhancing ? 'Improving...' : 'AI Enhance' }}
+      </button>
+    </div>
+    <textarea [(ngModel)]="reviewText" style="width:100%; height:100px; margin-top:10px; border:1px solid #ddd; border-radius:8px; padding:10px;"></textarea>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button (click)="closeReviewModal()" style="flex:1; padding:10px; border:1px solid #ddd; background:none; border-radius:6px;">Cancel</button>
+      <button (click)="submitReview()" style="flex:2; padding:10px; background:#198754; color:white; border:none; border-radius:6px;">Post Review</button>
+    </div>
   </div>
 </div>

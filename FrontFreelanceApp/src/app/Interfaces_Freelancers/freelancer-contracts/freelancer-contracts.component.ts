@@ -12,7 +12,7 @@ export class FreelancerContractsComponent implements OnInit {
 
   contracts: Contract[] = [];
   isLoading: boolean = true;
-  currentTab: string = 'active';
+  currentTab: string = 'active'; // active, offers, rejected
   
   currentUser: any = null; 
   freelancerId!: number; 
@@ -62,10 +62,10 @@ export class FreelancerContractsComponent implements OnInit {
     this.isLoading = true;
     this.contractService.getFreelancerContracts(this.freelancerId).subscribe({
       next: (data) => {
-        console.log('Contracts loaded:', data);
         this.contracts = data;
         this.isLoading = false;
         
+        // Auto-switch tab if no active jobs but offers exist
         if (this.getActiveCount() === 0 && this.getPendingCount() > 0) {
           this.currentTab = 'offers';
         }
@@ -86,7 +86,7 @@ export class FreelancerContractsComponent implements OnInit {
         if (index !== -1) {
           this.contracts[index].status = 'REJECTED';
         }
-        alert("Offer declined.");
+        this.currentTab = 'rejected'; // Move user to rejected tab to see the result
       },
       error: (err) => alert("Error declining offer.")
     });
@@ -98,5 +98,9 @@ export class FreelancerContractsComponent implements OnInit {
 
   getActiveCount(): number {
     return this.contracts.filter(c => c.status === 'ACTIVE').length;
+  }
+
+  getRejectedCount(): number {
+    return this.contracts.filter(c => c.status === 'REJECTED').length;
   }
 }

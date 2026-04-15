@@ -10,8 +10,8 @@ import { UserService } from '../../Services/user.service';
 })
 export class AllProjectsComponent implements OnInit {
 
-  selectedTab: string = 'OPEN'; 
-  projects: Project[] = []; 
+  selectedTab: string = 'OPEN';
+  projects: Project[] = [];
   activeMenuId: number | null = null;
   searchText: string = '';
 
@@ -19,19 +19,17 @@ export class AllProjectsComponent implements OnInit {
 
   isEditModalOpen: boolean = false;
   projectToEdit: Project = {} as Project;
-  
 
   isConfirmDeleteOpen: boolean = false;
   isConfirmCloseOpen: boolean = false;
   projectActionId: number | null = null;
 
- 
   showNvidiaToast: boolean = false;
   toastMessage: string = '';
 
   constructor(
     private projectService: ProjectServiceService,
-    private userService: UserService 
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -54,41 +52,54 @@ export class AllProjectsComponent implements OnInit {
                 this.currentUser = user;
                 this.loadMyProjects();
               },
-              error: (err) => console.error("Erreur Backend Profil :", err)
+              error: (err) => console.error('Erreur Backend Profil :', err)
             });
           }
         }
       } catch (e) {
-        console.error("Erreur de décodage du token :", e);
+        console.error('Erreur de décodage du token :', e);
       }
     }
   }
+
 
   loadMyProjects() {
     this.projectService.getAllProjects().subscribe({
       next: (data) => {
         if (this.currentUser && this.currentUser.id) {
-            const myId = this.currentUser.id;
-            this.projects = data.filter(p => p.clientId === myId).reverse();
+          const myId = this.currentUser.id;
+          // 1. Filter and reverse projects
+          this.projects = data.filter(p => p.clientId === myId).reverse();
+          
+          // 2. Fetch proposals for each project to fix the "0" issue
+          this.projects.forEach(project => {
+            if (project.id) {
+              this.projectService.getProposalsForProject(project.id).subscribe({
+                next: (proposals) => {
+                  project.proposals = proposals; // Assign the actual list to the project
+                },
+                error: (err) => console.error(`Error loading proposals for project ${project.id}`, err)
+              });
+            }
+          });
         } else {
-            this.projects = [];
+          this.projects = [];
         }
       },
-      error: (err) => console.error("Erreur de chargement", err)
+      error: (err) => console.error('Erreur de chargement', err)
     });
   }
 
   get filteredProjects() {
     return this.projects.filter(p => {
-      const currentStatus = p.status ? p.status : 'OPEN';
-      const matchesStatus = currentStatus === this.selectedTab;
+      const matchesStatus = p.status === this.selectedTab;
       const matchesSearch = p.title.toLowerCase().includes(this.searchText.toLowerCase());
       return matchesStatus && matchesSearch;
     });
   }
 
   getCount(status: string): number {
-    return this.projects.filter(p => (p.status ? p.status : 'OPEN') === status).length;
+    return this.projects.filter(p => p.status === status).length;
   }
 
   setTab(tab: string) {
@@ -97,7 +108,9 @@ export class AllProjectsComponent implements OnInit {
 
   formatEnumText(value: string | undefined): string {
     if (!value) return 'Uncategorized';
-    return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
+    return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) =>
+      txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+    );
   }
 
   toggleMenu(id: number | undefined, event: MouseEvent) {
@@ -111,16 +124,14 @@ export class AllProjectsComponent implements OnInit {
     this.activeMenuId = null;
   }
 
-
   editProject(id: number | undefined) {
     if (!id) return;
-    this.activeMenuId = null; 
-    
+    this.activeMenuId = null;
     const proj = this.projects.find(p => p.id === id);
     if (proj) {
-      this.projectToEdit = JSON.parse(JSON.stringify(proj)); 
+      this.projectToEdit = JSON.parse(JSON.stringify(proj));
       this.isEditModalOpen = true;
-      document.body.style.overflow = 'hidden'; 
+      document.body.style.overflow = 'hidden';
     }
   }
 
@@ -139,18 +150,17 @@ export class AllProjectsComponent implements OnInit {
           this.projects[index] = updatedProject;
         }
         this.closeEditModal();
-        this.triggerNvidiaToast("SYSTEM_UPDATE: Project modified successfully.");
+        this.triggerNvidiaToast('SYSTEM_UPDATE: Project modified successfully.');
       },
       error: (err) => {
         console.error(err);
-        alert("Error updating the project.");
+        alert('Error updating the project.');
       }
     });
   }
 
- 
   openCloseConfirm(id: number | undefined) {
-    if(!id) return;
+    if (!id) return;
     this.projectActionId = id;
     this.isConfirmCloseOpen = true;
     this.activeMenuId = null;
@@ -165,7 +175,7 @@ export class AllProjectsComponent implements OnInit {
 
   confirmCloseJob() {
     if (!this.projectActionId) return;
-    
+
     this.projectService.updateProjectStatus(this.projectActionId, 'CLOSED').subscribe({
       next: () => {
         const projectIndex = this.projects.findIndex(p => p.id === this.projectActionId);
@@ -173,18 +183,17 @@ export class AllProjectsComponent implements OnInit {
           this.projects[projectIndex].status = 'CLOSED';
         }
         this.cancelClose();
-        this.triggerNvidiaToast("STATUS_OVERRIDE: Project is now closed.");
+        this.triggerNvidiaToast('STATUS_OVERRIDE: Project is now closed.');
       },
       error: (err) => {
         console.error(err);
-        alert("Error closing the project.");
+        alert('Error closing the project.');
       }
     });
   }
 
-
   openDeleteConfirm(id: number | undefined) {
-    if(!id) return;
+    if (!id) return;
     this.projectActionId = id;
     this.isConfirmDeleteOpen = true;
     this.activeMenuId = null;
@@ -199,20 +208,19 @@ export class AllProjectsComponent implements OnInit {
 
   confirmDeleteProject() {
     if (!this.projectActionId) return;
-    
+
     this.projectService.deleteProject(this.projectActionId).subscribe({
       next: () => {
         this.projects = this.projects.filter(p => p.id !== this.projectActionId);
         this.cancelDelete();
-        this.triggerNvidiaToast("DATA_PURGED: Project deleted successfully.");
+        this.triggerNvidiaToast('DATA_PURGED: Project deleted successfully.');
       },
       error: (err) => {
         console.error(err);
-        alert("Error deleting the project.");
+        alert('Error deleting the project.');
       }
     });
   }
-
 
   triggerNvidiaToast(message: string) {
     this.toastMessage = message;

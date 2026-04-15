@@ -8,8 +8,21 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="MSCommunication" />
+        <module name="paiementMS" />
         <module name="eureka" />
+        <module name="SubscriptionMicroService" />
+        <module name="ReferralMicroService" />
+        <module name="SkillTestsMicroService" />
         <module name="apigetway" />
+      </profile>
+      <profile name="Annotation profile for CommunityMicroService" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="CommunityMicroService" />
       </profile>
       <profile name="Annotation profile for MS_CompetenceAndReview" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -28,12 +41,17 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="CatchOPP" options="-parameters" />
+      <module name="CommunityMicroService" options="-parameters" />
       <module name="MSCommunication" options="-parameters" />
       <module name="MS_CompetenceAndReview" options="-parameters" />
       <module name="ProjectMicroService" options="-parameters" />
+      <module name="ReferralMicroService" options="-parameters" />
+      <module name="SkillTestsMicroService" options="-parameters" />
+      <module name="SubscriptionMicroService" options="-parameters" />
       <module name="UserMicroService" options="-parameters" />
       <module name="apigetway" options="-parameters" />
       <module name="eureka" options="-parameters" />
+      <module name="paiementMS" options="-parameters" />
     </option>
   </component>
 </project>

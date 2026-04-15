@@ -8,7 +8,106 @@
   --border: #e5e7eb;
   font-family: 'Inter', sans-serif;
 }
+/* =============================================
+   ADD THESE RULES TO your existing CSS file
+   ============================================= */
 
+/* --- Status strip colors (matching your enum) --- */
+.status-strip.OPEN   { background: #198754; }  /* green */
+.status-strip.ACTIVE { background: #3b82f6; }  /* blue  */
+.status-strip.CLOSED { background: #1f2937; }  /* dark  */
+
+/* --- Tab dot indicators --- */
+.tab-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.open-dot   { background: #198754; }
+.active-dot { background: #3b82f6; }
+.closed-dot { background: #6b7280; }
+
+/* --- Tab active underline colors --- */
+.tab-btn[class*="active"] { color: var(--text-main); border-bottom-color: var(--text-muted); }
+.tab-btn.active           { border-bottom-color: var(--primary); color: var(--primary); }
+
+/* --- Badges per status --- */
+.badge-open   { background: #ecfdf5; color: #198754; }
+.badge-active { background: #eff6ff; color: #3b82f6; }
+.badge-closed { background: #e5e7eb; color: #6b7280; }
+
+/* --- Status pill inside project row --- */
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.pill-OPEN {
+  background: #ecfdf5;
+  color: #198754;
+}
+.pill-OPEN .pill-dot   { background: #198754; }
+
+.pill-ACTIVE {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.pill-ACTIVE .pill-dot { background: #3b82f6; }
+
+.pill-CLOSED {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.pill-CLOSED .pill-dot { background: #6b7280; }
+
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.status-banner i { font-size: 0.95rem; }
+
+.active-banner {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.closed-banner {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
 /* --- NAVBAR STYLES (Same as Dashboard) --- */
 .navbar {
   background: var(--surface);

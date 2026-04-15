@@ -40,6 +40,34 @@ export class ClientProfileComponent implements OnInit {
     private eRef: ElementRef
   ) {}
 
+
+
+  isGenerating: boolean = false;
+
+enhanceWithAI() {
+  if (!this.newReview.description || this.newReview.description.length < 5) {
+    alert("Please write a small draft first!");
+    return;
+  }
+
+  this.isGenerating = true;
+  
+  const payload = {
+    text: this.newReview.description,
+    rating: this.newReview.rating
+  };
+
+  this.http.post('http://localhost:8085/Review/enhance', payload).subscribe({
+    next: (res: any) => {
+      this.newReview.description = res.enhancedText;
+      this.isGenerating = false;
+    },
+    error: (err) => {
+      console.error("Backend error:", err);
+      this.isGenerating = false;
+    }
+  });
+}
   ngOnInit(): void {
     // 1. Qui regarde le profil ?
     const storedData = localStorage.getItem('currentUser');

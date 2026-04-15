@@ -20,7 +20,6 @@ public class ContractController {
     @Autowired
     private ContractImpl contractService;
 
-    // 🟢 1. INJECTION DU REPOSITORY DE NOTIFICATIONS
     @Autowired
     private NotificationRepository notificationRepository;
 
@@ -91,15 +90,19 @@ public class ContractController {
             @PathVariable Long contractId,
             @RequestBody Map<String, String> payload
     ) {
+        // Extract both values from the JSON body
         String signature = payload.get("signature");
-        Contract signedContract = contractService.freelancerSignContract(contractId, signature);
+        String freelancerName = payload.get("freelancerName");
 
-        // 🟢 NOTIFICATION AU CLIENT : Le Freelancer a signé !
+        // Pass freelancerName to the service
+        Contract signedContract = contractService.freelancerSignContract(contractId, signature, freelancerName);
+
+        // Notification Logic
         if (signedContract.getClientId() != null) {
             Notification notif = new Notification();
-            notif.setRecipientId(signedContract.getClientId()); // Le client
+            notif.setRecipientId(signedContract.getClientId());
             notif.setProjectId(signedContract.getProjectId());
-            notif.setMessage("✅ Great news! The freelancer has signed the contract. You can now start the project!");
+            notif.setMessage("✅ Great news! " + signedContract.getFreelancerName() + " has signed the contract. The project is now ACTIVE!");
             notificationRepository.save(notif);
         }
 
@@ -119,5 +122,11 @@ public class ContractController {
         }
 
         return ResponseEntity.ok(rejectedContract);
+    }
+
+    @PutMapping("/{contractId}/complete")
+    public ResponseEntity<?> completeContract(@PathVariable Long contractId) {
+        contractService.completeContractAndProject(contractId);
+        return ResponseEntity.ok().build();
     }
 }

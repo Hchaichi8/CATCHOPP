@@ -9,7 +9,43 @@
   --blue: #3b82f6;
   --locked: #f59e0b; /* Amber for locked funds */
   font-family: 'Inter', sans-serif;
+}.controls-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border); margin-bottom: 30px;
 }
+.tabs { display: flex; gap: 30px; }
+.tab-btn {
+  background: none; border: none; padding: 12px 0; font-size: 1rem; color: var(--text-muted);
+  font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 8px;
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.badge { background: #ecfdf5; color: var(--primary); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; }
+.badge.yellow { background: #fffbeb; color: #b45309; }
+.badge.red { background: #fef2f2; color: #ef4444; }
+
+/* Status Pills */
+.status-pill { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+.active-pill { background: #ecfdf5; color: var(--primary); }
+.pending-pill { background: #fffbeb; color: #b45309; }
+.rejected-pill { background: #fef2f2; color: #ef4444; }
+
+/* Contract Cards Modifiers */
+.contract-item { transition: 0.2s; border-left: 4px solid var(--primary); }
+.pending-border { border-left-color: #f59e0b; }
+.rejected-border { border-left-color: #ef4444; opacity: 0.8; }
+
+.empty-placeholder {
+    text-align: center; padding: 60px; background: white; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-muted);
+}
+.empty-placeholder i { font-size: 3rem; margin-bottom: 15px; display: block; opacity: 0.3; }
+
+.progress-box { margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6; }
+.progress-bar { height: 6px; background: #e5e7eb; border-radius: 3px; margin-bottom: 8px; overflow: hidden; }
+.fill.yellow { background: #f59e0b; }
+.rejected-note { font-size: 0.85rem; color: #6b7280; margin-top: 10px; font-style: italic; }
+
+.loading-state { text-align: center; padding: 100px; color: var(--primary); }
 
 /* --- NAVBAR (Standard) --- */
 .navbar { background: var(--surface); height: 64px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
@@ -100,3 +136,10 @@
   .milestone-actions { flex-direction: column; align-items: flex-start; gap: 15px; }
   .btn-release { width: 100%; }
 }
+.search-box { position: relative; }
+.search-box i { position: absolute; left: 12px; top: 11px; color: var(--text-muted); }
+.search-box input {
+  padding: 10px 10px 10px 35px; border-radius: 8px; border: 1px solid var(--border);
+  background: white; outline: none; width: 250px; transition: 0.2s;
+}
+.search-box input:focus { border-color: var(--primary); width: 280px; }

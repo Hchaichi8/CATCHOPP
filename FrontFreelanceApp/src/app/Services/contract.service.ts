@@ -42,10 +42,11 @@ export class ContractService {
     return this.http.get<Contract[]>(`${this.apiUrl}/freelancer/${freelancerId}`);
   }
 
-  // Signer
-  signContract(contractId: number, signature: string): Observable<Contract> {
-    return this.http.put<Contract>(`${this.apiUrl}/${contractId}/sign`, { signature });
-  }
+
+// Update the second parameter to accept 'any' or a specific object
+signContract(contractId: number, data: any): Observable<Contract> {
+  return this.http.put<Contract>(`${this.apiUrl}/${contractId}/sign`, data);
+}
 
   // Rejeter
   rejectContract(contractId: number): Observable<Contract> {

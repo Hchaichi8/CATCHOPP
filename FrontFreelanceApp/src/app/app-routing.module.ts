@@ -42,6 +42,37 @@ import { authGuard } from './Interfaces_Authentification/Guards/auth.guard';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { OnboardingComponent } from './Interfaces_Freelancers/onboarding/onboarding.component';
 import { MessagesComponent } from './interface_communication/messages/messages.component';
+import { SubscriptionPlansComponent } from './Interfaces_Subscription/subscription-plans/subscription-plans.component';
+import { SubscriptionDetailComponent } from './Interfaces_Subscription/subscription-detail/subscription-detail.component';
+import { SubscriptionCheckoutComponent } from './Interfaces_Subscription/subscription-checkout/subscription-checkout.component';
+import { SubscriptionDashboardComponent } from './Interfaces_Subscription/subscription-dashboard/subscription-dashboard.component';
+import { AdminSubscriptionsComponent } from './Interfaces_Admin/admin-subscriptions/admin-subscriptions.component';
+import { AdminCertificationsComponent } from './Interfaces_Admin/admin-certifications/admin-certifications.component';
+import { AdminStatisticsComponent } from './Interfaces_Admin/admin-statistics/admin-statistics.component';
+import { AdminPromoCodesComponent } from './Interfaces_Admin/admin-promo-codes/admin-promo-codes.component';
+import { PlanComparatorComponent } from './Interfaces_Subscription/plan-comparator/plan-comparator.component';
+import { SkillTestsListComponent } from './Interfaces_SkillTests/skill-tests-list/skill-tests-list.component';
+import { SkillTestTakeComponent } from './Interfaces_SkillTests/skill-test-take/skill-test-take.component';
+import { SkillTestResultComponent } from './Interfaces_SkillTests/skill-test-result/skill-test-result.component';
+import { MyCertificationsComponent } from './Interfaces_SkillTests/my-certifications/my-certifications.component';
+import { ReferralDashboardComponent } from './Interfaces_Referral/referral-dashboard/referral-dashboard.component';
+import { MyAvailabilityComponent } from './Interfaces_Availability/my-availability/my-availability.component';
+import { WorldClockViewComponent } from './Interfaces_Availability/world-clock-view/world-clock-view.component';
+import { AdminPlansComponent } from './Interfaces_Admin/admin-plans/admin-plans.component';
+import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/admin-skill-tests.component';
+import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
+import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
+import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
+
+import { GroupListComponent } from './interfaces_events/group-list/group-list.component';
+import { GroupPageComponent } from './interfaces_events/group-page/group-page.component';
+import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
+import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
+import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
+import { ClubComponent } from './interfaces_events/club/club.component';
+import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
+import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
 
 const routes: Routes = [
 
@@ -100,15 +131,60 @@ const routes: Routes = [
 {path:'AdminDashboard',component:DashboardAdminComponent, },
 {path:'AdminUsers',component:UserAdminComponent, },
 {path:'AdminJobs',component:JobsAdminComponent, },
-{path:'DetailJobs',component:DetailJobsAdminComponent, },
+{path:'DetailJobs/:id',component:DetailJobsAdminComponent, },
 {path:'AdminDisputes',component:DisputesAdminComponent, },
-{path:'AdminFinance',component:FinanceAdminComponent, },
+{path:'AdminFinancee',component:FinanceAdminComponent, },
 {path:'AdminSkills',component:CompetenceAdminComponent, },
+{path:'AdminFinance',component:AdminFinanceComponent, },
 
 
+//Subscription routes (Module 3 - Freelancer)
+{path:'SubscriptionPlans',component:SubscriptionPlansComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'SubscriptionDetail/:id',component:SubscriptionDetailComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'SubscriptionCheckout/:id',component:SubscriptionCheckoutComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'SubscriptionDashboard',component:SubscriptionDashboardComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'PlanComparator',component:PlanComparatorComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+
+// Admin back-office (Protected by AdminGuard)
+{path:'AdminSubscriptions',component:AdminSubscriptionsComponent, },
+{path:'AdminCertifications',component:AdminCertificationsComponent, },
+{path:'AdminSkillTests',component:AdminSkillTestsComponent,  },
+{path:'AdminStatistics',component:AdminStatisticsComponent,  },
+{path:'AdminPromoCodes',component:AdminPromoCodesComponent,  },
+{path:'AdminPlans',component:AdminPlansComponent,  },
+
+// Skill Tests & Certifications
+{path:'SkillTests',component:SkillTestsListComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'SkillTestTake/:id',component:SkillTestTakeComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'SkillTestResult/:id',component:SkillTestResultComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'MyCertifications',component:MyCertificationsComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+
+// Referral & Affiliate Program
+{path:'ReferralDashboard',component:ReferralDashboardComponent,canActivate: [authGuard], data: { role: 'FREELANCER' } },
+
+// Time Zone & Availability (Freelancer + Client)
+{path:'MyAvailability',component:MyAvailabilityComponent, canActivate: [authGuard], data: { role: 'FREELANCER' } },
+{path:'WorldClock',component:WorldClockViewComponent, canActivate: [authGuard], data: { role: 'CLIENT' }},
+{path:'worldclock',redirectTo:'WorldClock', pathMatch:'full' },
+
+// AI CV Generator (Premium/Enterprise only)
+{path:'AICVGenerator',component:AiCvGeneratorComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+
+// Rewards & Promo Codes
+{path:'rewards',component:RewardsDashboardComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
+{path:'rewards/spin-wheel',component:SpinWheelComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 
 
+// Events & Communities routes
 
+{ path: 'groups', component: GroupListComponent },
+{ path: 'groups/:id', component: GroupPageComponent },
+{ path: 'events', component: EventsListComponent },
+{ path: 'events/:id', component: EventDetailsComponent },
+{ path: 'clubs', component: ClubsListComponent },
+{ path: 'clubs/:id', component: ClubComponent },
+{ path: 'ClubDashboard', component: ClubDashboardComponent },
+{ path: 'admin/dashboard', component: AdminDashboardComponent }
 
 
 

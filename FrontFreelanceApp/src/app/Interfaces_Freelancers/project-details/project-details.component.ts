@@ -5,6 +5,7 @@ import { ProjectServiceService } from '../../Services/project-service.service';
 import { Proposal } from '../../models/proposal';
 import { UserService } from '../../Services/user.service'; 
 import { CompetanceService } from '../../Services/competance.service'; // 🟢 Ajout du service des compétences
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-project-details',
@@ -12,223 +13,156 @@ import { CompetanceService } from '../../Services/competance.service'; // 🟢 A
   styleUrls: ['./project-details.component.css']
 })
 export class ProjectDetailsComponent implements OnInit {
-  project: Project | null = null;
-  proposals: Proposal[] = []; 
-  isLoading: boolean = true;
   
-  activeTab: 'job' | 'proposals' = 'job'; 
-  isSaved: boolean = false; 
-  currentUrl: string = '';
+  // State
+  activeTab: string = 'job';
+  isLoading: boolean = true;
+  project!: Project;
+  projectSkills: any[] = [];
+  allSkills: any[] = [];
+  proposals: any[] = [];
+  
+  // Review Logic
+  projectReviews: any[] = [];
+  showReviewModal: boolean = false;
+  reviewText: string = '';
+  rating: number = 5;
+  isEnhancing: boolean = false;
 
-  lowestBid: number = 0;
-  highestBid: number = 0;
-  averageBid: number = 0;
-
+  // User Context
   currentUser: any = null;
   currentFreelancerId: number | null = null;
+  hasAlreadyApplied: boolean = false;
+  isSaved: boolean = false;
+  currentUrl: string = window.location.href;
 
-  // 🟢 NOUVELLES VARIABLES POUR AFFICHER LES COMPÉTENCES
-  allSkills: any[] = []; 
-  projectSkills: any[] = []; 
-
-  get hasAlreadyApplied(): boolean {
-    if (!this.currentFreelancerId) return false;
-    return this.proposals.some(p => p.freelancerId === this.currentFreelancerId);
-  }
-
-  isProposalModalOpen: boolean = false;
-  
-  newProposal: Proposal = {
-    bidAmount: 0,
-    estimationEndDate: '',
-    status: 'PENDING',
-    freelancerId: 0 
-  };
+  // Stats
+  lowestBid: number = 0;
+  averageBid: number = 0;
+  highestBid: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectServiceService,
-    private userService: UserService,
-    private competenceService: CompetanceService // 🟢 Injection du service
-  ) { }
+    private competenceService: CompetanceService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
-    this.currentUrl = window.location.href;
-    this.loadUserData();
-
+    this.loadCurrentUser();
     const idParam = this.route.snapshot.paramMap.get('id');
+    
     if (idParam) {
       const projectId = Number(idParam);
       
-      // 🟢 1. On charge le catalogue de compétences
-      this.competenceService.getAllCompetances().subscribe({
-        next: (skills) => {
-          this.allSkills = skills;
-          this.resolveProjectSkills(); // On essaie de faire le lien
-        },
-        error: (err) => console.error("Erreur chargement catalogue", err)
+      // Load Skills Reference
+      this.competenceService.getAllCompetances().subscribe(skills => {
+        this.allSkills = skills;
+        this.resolveProjectSkills();
       });
 
-      // 🟢 2. On charge le projet et les propositions
-      this.loadProjectDetails(projectId);
-      this.loadProposals(projectId); 
-    } else {
-      this.isLoading = false;
+      // Load Project Details
+      this.projectService.getProjectById(projectId).subscribe({
+        next: (data) => {
+          this.project = data;
+          this.resolveProjectSkills();
+          this.fetchProjectReviews(); // Load Reviews
+          this.loadProposals(projectId);
+          this.isLoading = false;
+        },
+        error: () => this.isLoading = false
+      });
     }
   }
 
-  // 🟢 LA LOGIQUE POUR AFFICHER LES NOMS DES COMPÉTENCES AU LIEU DES IDs
-  resolveProjectSkills() {
-    if (this.project && this.allSkills.length > 0) {
-      if (this.project.requiredCompetenceIds && this.project.requiredCompetenceIds.length > 0) {
-        // On filtre le catalogue avec les IDs exigés par le projet
-        this.projectSkills = this.allSkills.filter(skill => 
-          this.project!.requiredCompetenceIds!.includes(skill.id)
-        );
-      } else {
-        this.projectSkills = [];
-      }
-    }
-  }
-
-  loadUserData() {
+  loadCurrentUser() {
     const storedData = localStorage.getItem('currentUser');
     if (storedData) {
       try {
-        let token = storedData.includes('token') ? JSON.parse(storedData).token : storedData;
-        if (token) {
-          const payload = token.split('.')[1];
-          const decodedPayload = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
-          this.currentFreelancerId = decodedPayload.id;
-
-          if (this.currentFreelancerId) {
-            this.userService.getUserById(this.currentFreelancerId).subscribe({
-              next: (user) => {
-                this.currentUser = user;
-                this.checkIfSaved();
-              },
-              error: (err) => console.error("Erreur Backend Profil :", err)
-            });
-          }
-        }
-      } catch (e) {
-        console.error("Erreur de décodage du token :", e);
-      }
+        const parsed = JSON.parse(storedData);
+        this.currentUser = parsed;
+        const token = parsed.token || storedData;
+        const payload = JSON.parse(window.atob(token.split('.')[1]));
+        this.currentFreelancerId = payload.id;
+      } catch (e) { console.error('Auth Error', e); }
     }
   }
 
-  loadProjectDetails(id: number) {
-    this.projectService.getProjectById(id).subscribe({
-      next: (data) => { 
-        this.project = data; 
-        this.isLoading = false; 
-        this.checkIfSaved(); 
-        this.resolveProjectSkills(); // 🟢 On relance le calcul quand le projet est là
-      },
-      error: (err) => { console.error(err); this.isLoading = false; }
-    });
+  fetchProjectReviews() {
+    this.http.get<any[]>(`http://localhost:8085/Review/GetReviewsByProject/${this.project.id}`)
+      .subscribe(res => this.projectReviews = res);
   }
 
   loadProposals(projectId: number) {
-    this.projectService.getProposalsForProject(projectId).subscribe({
-      next: (data) => { 
-        this.proposals = data.reverse(); 
-        this.calculateBidStats(); 
-      }, 
-      error: (err) => console.error("Error loading proposals", err)
+    // Replace with your real proposals endpoint
+    this.http.get<any[]>(`http://localhost:8082/proposals/project/${projectId}`)
+      .subscribe(res => {
+        this.proposals = res;
+        this.calculateStats();
+        this.hasAlreadyApplied = this.proposals.some(p => p.freelancerId === this.currentFreelancerId);
+      });
+  }
+
+  calculateStats() {
+    if (this.proposals.length > 0) {
+      const bids = this.proposals.map(p => p.bidAmount);
+      this.lowestBid = Math.min(...bids);
+      this.highestBid = Math.max(...bids);
+      this.averageBid = Math.round(bids.reduce((a, b) => a + b, 0) / bids.length);
+    }
+  }
+
+  resolveProjectSkills() {
+    if (this.project?.requiredCompetenceIds && this.allSkills.length > 0) {
+      this.projectSkills = this.allSkills.filter(s => this.project.requiredCompetenceIds!.includes(s.id));
+    }
+  }
+
+  setTab(tab: string) { this.activeTab = tab; }
+
+  // --- Review Actions ---
+  openReviewModal() { this.showReviewModal = true; }
+  closeReviewModal() { this.showReviewModal = false; this.reviewText = ''; this.rating = 5; }
+
+  enhanceWithAI() {
+    if (!this.reviewText) return;
+    this.isEnhancing = true;
+    this.http.post<any>('http://localhost:8085/Review/enhance', { text: this.reviewText, rating: this.rating })
+      .subscribe({
+        next: (res) => { 
+          this.reviewText = res.enhancedText; 
+          this.isEnhancing = false; 
+        },
+        error: () => this.isEnhancing = false
+      });
+  }
+
+  submitReview() {
+    const reviewData = {
+      description: this.reviewText,
+      rating: this.rating,
+      projectId: this.project.id,
+      freelancerId: this.currentFreelancerId?.toString(),
+      reviewerRole: 'FREELANCER',
+      createdAt: new Date().toISOString()
+    };
+
+    this.http.post('http://localhost:8085/Review/AjouterReview', reviewData).subscribe(() => {
+      alert('Review posted successfully!');
+      this.fetchProjectReviews(); 
+      this.closeReviewModal();
     });
   }
 
-  calculateBidStats() {
-    if (!this.proposals || this.proposals.length === 0) {
-      this.lowestBid = 0;
-      this.highestBid = 0;
-      this.averageBid = 0;
-      return;
-    }
-
-    const bids = this.proposals.map(p => p.bidAmount);
-    
-    this.lowestBid = Math.min(...bids);
-    this.highestBid = Math.max(...bids);
-    
-    const sum = bids.reduce((a, b) => a + b, 0);
-    this.averageBid = Math.round(sum / bids.length);
+  // UI Helpers
+  formatEnumText(text: any): string {
+    if (!text) return '';
+    return text.toString().replace(/_/g, ' ');
   }
 
-  openModal() { 
-    if (!this.currentFreelancerId) {
-      alert("You must be logged in to submit a proposal.");
-      return;
-    }
-    
-    this.newProposal.freelancerId = this.currentFreelancerId;
-    this.isProposalModalOpen = true; 
-    document.body.style.overflow = 'hidden';
+  toggleSave() { this.isSaved = !this.isSaved; }
+  copyLink() {
+    navigator.clipboard.writeText(this.currentUrl);
+    alert('Link copied!');
   }
-  
-  closeModal() { 
-    this.isProposalModalOpen = false; 
-    document.body.style.overflow = 'auto';
-    this.newProposal = { bidAmount: 0, estimationEndDate: '', status: 'PENDING', freelancerId: this.currentFreelancerId || 0 }; 
-  }
-
-  submitProposal() {
-    if (!this.project?.id) return;
-    if (!this.newProposal.bidAmount || !this.newProposal.estimationEndDate) {
-      alert("Please fill all fields!");
-      return;
-    }
-
-    this.projectService.submitProposal(this.project.id, this.newProposal).subscribe({
-      next: (res) => {
-        alert("Proposal submitted successfully! 🚀");
-        this.closeModal();
-        this.loadProposals(this.project!.id!); 
-        this.activeTab = 'proposals'; 
-      },
-      error: (err) => alert("Error submitting proposal.")
-    });
-  }
-
-  checkIfSaved() {
-    if (this.currentUser && this.project && this.project.id) {
-      const savedStr = localStorage.getItem(`saved_jobs_${this.currentUser.id}`);
-      if (savedStr) {
-        const savedArr: Project[] = JSON.parse(savedStr);
-        this.isSaved = savedArr.some(p => p.id === this.project!.id);
-      }
-    }
-  }
-
-  toggleSave() { 
-    if (!this.currentUser || !this.project) return;
-
-    this.isSaved = !this.isSaved; 
-    
-    let savedArr: Project[] = [];
-    const savedStr = localStorage.getItem(`saved_jobs_${this.currentUser.id}`);
-    if (savedStr) savedArr = JSON.parse(savedStr);
-
-    if (this.isSaved) {
-      // Ajouter s'il n'y est pas déjà
-      if (!savedArr.some(p => p.id === this.project!.id)) {
-        savedArr.push(this.project);
-      }
-    } else {
-      // Retirer
-      savedArr = savedArr.filter(p => p.id !== this.project!.id);
-    }
-
-    localStorage.setItem(`saved_jobs_${this.currentUser.id}`, JSON.stringify(savedArr));
-  }
-
-  setTab(tab: 'job' | 'proposals') { this.activeTab = tab; }
-
-  formatEnumText(value: string | undefined): string {
-    if (!value) return 'General';
-    return value.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
-  }
-
-  copyLink() { navigator.clipboard.writeText(this.currentUrl).then(() => alert('Link copied! 📋')); }
 }

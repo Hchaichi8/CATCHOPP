@@ -11,13 +11,13 @@
       <button class="nav-icon-btn"><i class="fa fa-bell"></i></button>
       <div class="nav-divider"></div>
       <div class="user-profile-menu" routerLink="/FreelancerProfilManager" style="cursor: pointer;">
-        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/150x150/3b82f6/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'F')" alt="Profile">
+        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/150/3b82f6/ffffff?text=' + (currentUser?.firstName?.charAt(0) || 'F')" alt="Profile">
       </div>
     </div>
   </div>
 </nav>
 
-<div *ngIf="isLoading" style="text-align: center; padding: 100px; color: var(--primary);">
+<div *ngIf="isLoading" style="text-align: center; padding: 100px; color: #198754;">
   <i class="fa fa-circle-notch fa-spin fa-3x"></i>
   <p style="margin-top: 15px; font-weight: 500;">Loading project details...</p>
 </div>
@@ -29,115 +29,92 @@
   </div>
 
   <div class="content-grid">
-    
     <main class="main-details">
       <div class="card detail-card">
         
         <div class="project-header">
           <div class="header-top">
             <span class="category-badge">{{ formatEnumText(project.category) }}</span>
-            <span class="time-badge">Posted {{ project.postedAt }}</span>
+            <span class="time-badge">Posted recently</span>
           </div>
           <h1>{{ project.title }}</h1>
           <div class="project-meta">
-            <span><i class="fa fa-globe-americas"></i> Worldwide</span>
-            <span class="separator">•</span>
-            <span><i class="fa fa-clock"></i> {{ project.jobType === 'HOURLY' ? 'Hourly Project' : 'Fixed Price Project' }}</span>
+            <span><i class="fa fa-clock"></i> {{ project.jobType }}</span>
             <span class="separator">•</span>
             <span><i class="fa fa-layer-group"></i> {{ project.ExperienceLevel }} Level</span>
           </div>
         </div>
 
         <div class="tabs-row">
-          <button class="tab-btn" [class.active]="activeTab === 'job'" (click)="setTab('job')">View Job</button>
+          <button class="tab-btn" [class.active]="activeTab === 'job'" (click)="setTab('job')">Overview</button>
           <button class="tab-btn" [class.active]="activeTab === 'proposals'" (click)="setTab('proposals')">
             Proposals <span class="badge">{{ proposals.length }}</span>
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'reviews'" (click)="setTab('reviews')">
+            Reviews <span class="badge">{{ projectReviews.length }}</span>
           </button>
         </div>
         
         <div class="divider"></div>
 
-        <div *ngIf="activeTab === 'job'">
-          <div class="section description-section">
+        <div *ngIf="activeTab === 'job'" class="fade-in">
+          <div class="section">
             <h3>Project Description</h3>
-            <p style="white-space: pre-wrap;">{{ project.description }}</p>
+            <p style="white-space: pre-wrap; color: #4b5563; line-height: 1.6;">{{ project.description }}</p>
             
-            <div *ngIf="project.image" style="margin-top: 20px;">
-              <img [src]="project.image" alt="Project Attachment" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border);">
+            <div *ngIf="project.image" style="margin-top: 25px;">
+              <img [src]="project.image" style="max-width: 100%; border-radius: 12px; border: 1px solid #eee;">
             </div>
           </div>
           
-          <div class="divider"></div>
-          
-          <div class="section skills-section">
-            <h3>Skills & Expertise Required</h3>
+          <div class="section" style="margin-top: 30px;">
+            <h3>Skills & Expertise</h3>
             <div class="tags-container">
-              
-              <span class="skill-tag" *ngFor="let skill of projectSkills">
-                {{ skill.nom }}
-              </span>
-              
-              <span *ngIf="projectSkills.length === 0" style="color: #9ca3af; font-size: 0.9rem; font-style: italic;">
-                No specific skills required for this project.
-              </span>
-              
+              <span class="skill-tag" *ngFor="let skill of projectSkills">{{ skill.nom }}</span>
+              <span *ngIf="projectSkills.length === 0" class="empty-text">No specific skills listed.</span>
             </div>
           </div>
         </div>
 
-        <div *ngIf="activeTab === 'proposals'" class="section proposals-section">
-          <h3>Freelancer Bids ({{ proposals.length }})</h3>
-          
-          <div *ngIf="proposals.length === 0" class="empty-proposals">
-            <i class="fa fa-file-signature"></i>
-            <p>No proposals yet. Be the first to apply!</p>
+        <div *ngIf="activeTab === 'proposals'" class="section fade-in">
+          <h3>Freelancer Activity</h3>
+          <div class="analytics-dashboard" *ngIf="proposals.length > 0">
+            <div class="stat-card">
+              <small>Average Bid</small>
+              <strong>${{ averageBid }}</strong>
+            </div>
           </div>
 
-          <div class="analytics-dashboard" *ngIf="proposals.length > 0">
-            <div class="stat-card lowest">
-              <i class="fa fa-arrow-down"></i>
-              <div>
-                <small>Lowest Bid</small>
-                <strong>${{ lowestBid }}</strong>
-              </div>
-            </div>
-            
-            <div class="stat-card average">
-              <i class="fa fa-equals"></i>
-              <div>
-                <small>Average Bid</small>
-                <strong>${{ averageBid }}</strong>
-              </div>
-            </div>
-            
-            <div class="stat-card highest">
-              <i class="fa fa-arrow-up"></i>
-              <div>
-                <small>Highest Bid</small>
-                <strong>${{ highestBid }}</strong>
-              </div>
-            </div>
-          </div>
-          
           <div class="proposal-card" *ngFor="let prop of proposals">
             <div class="prop-freelancer">
-              <img src="https://placehold.co/40x40/1f2937/white?text=F" alt="Freelancer">
+              <img src="https://ui-avatars.com/api/?name=User" alt="Freelancer">
               <div>
-                <strong>Freelancer #{{ prop.freelancerId }} <span *ngIf="prop.freelancerId === currentFreelancerId" style="color:var(--primary); font-size: 0.8em;">(You)</span></strong>
-                <small>Submitted an offer</small>
+                <strong>Freelancer #{{ prop.freelancerId }} <span *ngIf="prop.freelancerId == currentFreelancerId">(You)</span></strong>
+                <small>Est. {{ prop.estimationEndDate }}</small>
               </div>
             </div>
-            
-            <div class="prop-details">
-              <div class="prop-stat">
-                <small>Bid Amount</small>
-                <strong>${{ prop.bidAmount }}</strong>
+            <div class="prop-price">${{ prop.bidAmount }}</div>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'reviews'" class="section fade-in">
+          <h3>Community Feedback</h3>
+          <div class="review-list" style="margin-top: 20px;">
+            <div class="review-item" *ngFor="let r of projectReviews">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img [src]="'https://ui-avatars.com/api/?background=random&name=' + r.reviewerName" style="width: 35px; height: 35px; border-radius: 50%;">
+                  <strong>{{ r.reviewerName }}</strong>
+                </div>
+                <div style="background: #fef3c7; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: #92400e;">
+                  <i class="fa fa-star"></i> {{ r.rating }}
+                </div>
               </div>
-              <div class="prop-stat">
-                <small>Est. Delivery</small>
-                <strong>{{ prop.estimationEndDate }}</strong>
-              </div>
-              <span class="status-badge" [ngClass]="prop.status?.toLowerCase()">{{ prop.status || 'PENDING' }}</span>
+              <p style="margin-top: 10px; color: #4b5563; font-style: italic;">"{{ r.description }}"</p>
+            </div>
+            <div *ngIf="projectReviews.length === 0" style="text-align: center; padding: 40px; color: #9ca3af;">
+              <i class="fa fa-comments fa-2x"></i>
+              <p>No reviews yet for this project.</p>
             </div>
           </div>
         </div>
@@ -146,107 +123,62 @@
     </main>
 
     <aside class="sidebar-details">
-      
       <div class="card action-widget">
         <div class="budget-display">
-          <small>{{ project.jobType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Budget' }}</small>
+          <small>Project Budget</small>
           <h2>${{ project.budget }}</h2>
         </div>
+        
         <div class="action-buttons">
-          
-          <button class="btn-primary-full" *ngIf="!hasAlreadyApplied" (click)="openModal()">
-            Submit a Proposal
-          </button>
-          
+          <button class="btn-primary-full" *ngIf="!hasAlreadyApplied">Submit Proposal</button>
           <button class="btn-primary-full btn-applied" *ngIf="hasAlreadyApplied" disabled>
-            <i class="fa fa-check-circle"></i> Already Applied
+            <i class="fa fa-check-circle"></i> Applied
           </button>
           
-          <button class="btn-outline-full" [class.saved]="isSaved" (click)="toggleSave()">
-            <i class="fa-heart" [ngClass]="isSaved ? 'fas' : 'far'"></i> 
-            {{ isSaved ? 'Saved' : 'Save Job' }}
+          <button class="btn-outline-full" (click)="openReviewModal()" style="margin-top: 10px; border-color: #10b981; color: #10b981;">
+            <i class="fa fa-pencil-alt"></i> Rate Project
           </button>
-        </div>
-        <div class="flag-row">
-          <i class="fa fa-flag"></i> Flag as inappropriate
+
+          <button class="btn-outline-full" [class.saved]="isSaved" (click)="toggleSave()" style="margin-top: 10px;">
+            <i class="fa-heart" [ngClass]="isSaved ? 'fas' : 'far'"></i> Save Job
+          </button>
         </div>
       </div>
 
       <div class="card client-widget">
         <h4>About the Client</h4>
         <div class="client-rating">
-          <div class="stars">
-            <i class="fa fa-star filled"></i>
-            <i class="fa fa-star filled"></i>
-            <i class="fa fa-star filled"></i>
-            <i class="fa fa-star filled"></i>
-            <i class="fa fa-star filled"></i>
-          </div>
-          <span>5.0 of 12 reviews</span>
+          <i class="fa fa-star filled" *ngFor="let i of [1,2,3,4,5]"></i>
+          <span> (12 reviews)</span>
         </div>
-        
-        <ul class="client-stats-list">
-          <li>
-            <i class="fa fa-building"></i>
-            <div>
-              <strong>Client ID: {{ project.clientId }}</strong>
-              <small>From Eureka/Feign later</small>
-            </div>
-          </li>
-          <li>
-            <i class="fa fa-check-circle verified-color"></i>
-            <div>
-              <strong>Payment Verified</strong>
-              <small>Member since 2021</small>
-            </div>
-          </li>
-        </ul>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+          <i class="fa fa-user"></i> Client ID: {{ project.clientId }}
+        </p>
       </div>
-
-      <div class="card share-widget">
-        <h4>Job Link</h4>
-        <div class="copy-box">
-          <input type="text" [value]="currentUrl" readonly>
-          <button (click)="copyLink()">Copy</button>
-        </div>
-      </div>
-
     </aside>
-
   </div>
 </div>
 
-<div *ngIf="!isLoading && !project" style="text-align: center; padding: 100px;">
-  <h2>Project not found</h2>
-  <a routerLink="/FreelancerFeed" style="color: var(--primary);">Return to feed</a>
-</div>
-
-<div class="modal-overlay" *ngIf="isProposalModalOpen">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h2>Submit Your Proposal</h2>
-      <button class="close-btn" (click)="closeModal()">&times;</button>
-    </div>
+<div class="modal-overlay" *ngIf="showReviewModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999;">
+  <div class="modal-card" style="background:white; padding:30px; border-radius:15px; width:450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 20px;">Share your experience</h3>
     
-    <div class="modal-body">
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
-        You are bidding on: <strong>{{ project?.title }}</strong>
-      </p>
-
-      <div class="form-group">
-        <label>Bid Amount ($)</label>
-        <input type="number" class="form-control" [(ngModel)]="newProposal.bidAmount" placeholder="Enter your price">
-      </div>
-
-      <div class="form-group">
-        <label>Estimated Delivery Date</label>
-        <input type="date" class="form-control" [(ngModel)]="newProposal.estimationEndDate">
-      </div>
+    <div class="stars" style="font-size:30px; color:#fbbf24; margin-bottom: 25px; text-align: center;">
+      <i *ngFor="let s of [1,2,3,4,5]" [class]="s <= rating ? 'fa fa-star' : 'far fa-star'" (click)="rating = s" style="cursor: pointer; margin: 0 5px;"></i>
     </div>
-    
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
-      <button class="btn-publish" (click)="submitProposal()">Send Proposal <i class="fa fa-paper-plane"></i></button>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+      <label style="font-weight: 600;">Your Comment</label>
+      <button (click)="enhanceWithAI()" [disabled]="isEnhancing" style="font-size:12px; border:none; background:#f0f9ff; color:#0369a1; padding:5px 12px; border-radius:20px; cursor:pointer; font-weight: 500;">
+        <i class="fa fa-magic"></i> {{ isEnhancing ? 'Improving...' : 'AI Enhance' }}
+      </button>
+    </div>
+
+    <textarea [(ngModel)]="reviewText" placeholder="How was the project communication and requirements?" style="width:100%; height:120px; border:1px solid #e5e7eb; border-radius:10px; padding:15px; font-family: inherit;"></textarea>
+
+    <div style="display:flex; gap:12px; margin-top:25px;">
+      <button (click)="closeReviewModal()" style="flex:1; padding:12px; border:1px solid #d1d5db; background:white; border-radius:8px; font-weight: 500;">Cancel</button>
+      <button (click)="submitReview()" [disabled]="!reviewText" style="flex:2; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; font-weight: 600;">Post Review</button>
     </div>
   </div>
 </div>

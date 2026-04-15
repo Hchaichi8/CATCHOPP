@@ -51,7 +51,6 @@ public class CompetanceController {
         this.competanceService = competanceService;
     }
 
-    // --- LOGS POUR AJOUTER ---
     @PostMapping("/AjouterCompetance")
     public ResponseEntity<?> AjouterCompetance(@RequestBody Competance a) {
         System.out.println("\n=========================================");
@@ -73,7 +72,6 @@ public class CompetanceController {
         }
     }
 
-    // --- LOGS POUR GET ALL ---
     @GetMapping("/GetAllCompetance")
     public ResponseEntity<?> GetAllCompetance() {
         System.out.println("\n=========================================");
@@ -98,13 +96,11 @@ public class CompetanceController {
         return competanceService.ModifierCompetance(a);
     }
 
-    // FIXED: Use @PathVariable instead of @RequestBody
     @DeleteMapping("/SupprimerCompetance/{id}")
     public void SupprimerCompetance(@PathVariable Long id) {
         competanceService.SupprimerCompetance(id);
     }
 
-    // FIXED: Use @PathVariable instead of @RequestBody
     @GetMapping("/GetCompetance/{id}")
     public Competance GetCompetance(@PathVariable Long id) {
         return competanceService.GetCompetance(id);
