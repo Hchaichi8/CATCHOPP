@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 @FeignClient(
         name = "UserMicroService",
         url = "http://localhost:8083",
-        configuration = FeignConfig.class // 🟢 This uses the JacksonDecoder you set up
+        configuration = FeignConfig.class
 )
 public interface UserClient {
     @GetMapping("/users/{id}")

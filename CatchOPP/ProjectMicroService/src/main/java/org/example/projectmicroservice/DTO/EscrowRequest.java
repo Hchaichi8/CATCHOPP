@@ -15,6 +15,13 @@ public class EscrowRequest {
     private Long freelancerId;
     private BigDecimal amount;
 
+    public EscrowRequest(Long contractId, Long clientId, Long freelancerId, BigDecimal amount) {
+        this.contractId = contractId;
+        this.clientId = clientId;
+        this.freelancerId = freelancerId;
+        this.amount = amount;
+    }
+
     // Getters & Setters
     public Long getContractId() { return contractId; }
     public void setContractId(Long contractId) { this.contractId = contractId; }

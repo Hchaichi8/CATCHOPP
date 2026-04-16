@@ -69,6 +69,126 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Proposal> proposals;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getExperienceLevel() {
+        return ExperienceLevel;
+    }
+
+    public void setExperienceLevel(String experienceLevel) {
+        ExperienceLevel = experienceLevel;
+    }
+
+    public Double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Double budget) {
+        this.budget = budget;
+    }
+
+    public LocalDate getPostedAt() {
+        return postedAt;
+    }
+
+    public void setPostedAt(LocalDate postedAt) {
+        this.postedAt = postedAt;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public ProjectCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProjectCategory category) {
+        this.category = category;
+    }
+
+    public JobType getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(JobType jobType) {
+        this.jobType = jobType;
+    }
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    public void setLoves(Integer loves) {
+        this.loves = loves;
+    }
+
+    public void setHahas(Integer hahas) {
+        this.hahas = hahas;
+    }
+
+    public void setSupports(Integer supports) {
+        this.supports = supports;
+    }
+
+    public List<Long> getRequiredCompetenceIds() {
+        return requiredCompetenceIds;
+    }
+
+    public void setRequiredCompetenceIds(List<Long> requiredCompetenceIds) {
+        this.requiredCompetenceIds = requiredCompetenceIds;
+    }
+
+    public List<Proposal> getProposals() {
+        return proposals;
+    }
+
+    public void setProposals(List<Proposal> proposals) {
+        this.proposals = proposals;
+    }
+
     /**
      * Helper methods to ensure we never return null to the frontend
      * even if the database has NULL values.

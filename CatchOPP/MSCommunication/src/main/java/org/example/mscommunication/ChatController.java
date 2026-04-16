@@ -15,7 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/chat")
 @CrossOrigin(origins = "http://localhost:4200")
-public class ChatController {
+public class ChatController{
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -96,6 +96,25 @@ public class ChatController {
         }
         return ResponseEntity.notFound().build();
     }
+    // =======================================================
+    // 😊 UPDATE MESSAGE REACTIONS
+    // =======================================================
+    @PutMapping("/messages/{id}/reactions")
+    public ResponseEntity<?> updateReactions(@PathVariable Long id, @RequestBody String reactions) {
+        Optional<Message> optionalMsg = messageRepository.findById(id);
+        if(optionalMsg.isPresent()){
+            Message msg = optionalMsg.get();
+            msg.setReactions(reactions);
+            Message updatedMsg = messageRepository.save(msg);
+
+            // Notifier les deux utilisateurs de la mise à jour des réactions
+            messagingTemplate.convertAndSendToUser(String.valueOf(msg.getRecipientId()), "/queue/updates", updatedMsg);
+            messagingTemplate.convertAndSendToUser(String.valueOf(msg.getSenderId()), "/queue/updates", updatedMsg);
+
+            return ResponseEntity.ok(updatedMsg);
+        }
+        return ResponseEntity.notFound().build();
+    }
 
     // =======================================================
     // 📥 PARTIE CLASSIQUE (API REST pour l'historique)
@@ -116,5 +135,78 @@ public class ChatController {
         Conversation conv = conversationRepository.findByParticipants(user1, user2)
                 .orElseGet(() -> conversationRepository.save(new Conversation(user1, user2)));
         return ResponseEntity.ok(conv);
+    }
+
+    // =======================================================
+    // 📎 FILE UPLOAD (Images & PDFs)
+    // =======================================================
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam("conversationId") Long conversationId,
+            @RequestParam("senderId") Long senderId,
+            @RequestParam("recipientId") Long recipientId,
+            @RequestParam("content") String content) {
+        
+        try {
+            // Save file to server using absolute path
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            String uploadDir = System.getProperty("user.dir") + "/uploads/";
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+            
+            System.out.println("Upload directory: " + uploadDir);
+            
+            if (!java.nio.file.Files.exists(uploadPath)) {
+                java.nio.file.Files.createDirectories(uploadPath);
+                System.out.println("Created uploads directory");
+            }
+            
+            java.nio.file.Path filePath = uploadPath.resolve(fileName);
+            java.nio.file.Files.copy(file.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            // Create message with file URL
+            Message chatMessage = new Message();
+            chatMessage.setConversationId(conversationId);
+            chatMessage.setSenderId(senderId);
+            chatMessage.setRecipientId(recipientId);
+            chatMessage.setContent(content);
+            chatMessage.setTimestamp(LocalDateTime.now());
+            
+            // Store file URL in message (you can add a separate field for this)
+            String fileUrl = "http://localhost:8086/uploads/" + fileName;
+            chatMessage.setContent(content + " [FILE:" + fileUrl + "]");
+            
+            Message savedMsg = messageRepository.save(chatMessage);
+            
+            // Update conversation
+            conversationRepository.findById(conversationId).ifPresent(conv -> {
+                conv.setLastMessageTime(LocalDateTime.now());
+                conversationRepository.save(conv);
+            });
+            
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(recipientId),
+                    "/queue/messages",
+                    savedMsg
+            );
+            
+            // Send to sender
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(senderId),
+                    "/queue/messages",
+                    savedMsg
+            );
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "File uploaded successfully",
+                "fileUrl", fileUrl,
+                "messageId", savedMsg.getId()
+            ));
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "File upload failed: " + e.getMessage()));
+        }
     }
 }

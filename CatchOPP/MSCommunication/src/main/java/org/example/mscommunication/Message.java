@@ -35,4 +35,10 @@ public class Message {
     public void setContent(String content) { this.content = content; }
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    @Column(columnDefinition = "TEXT")
+    private String reactions; // JSON string: {"👍": 2, "❤️": 1}
+
+    public String getReactions() { return reactions; }
+    public void setReactions(String reactions) { this.reactions = reactions; }
 }

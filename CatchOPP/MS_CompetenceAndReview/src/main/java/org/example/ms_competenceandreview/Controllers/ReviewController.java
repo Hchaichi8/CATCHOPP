@@ -5,6 +5,7 @@ import org.example.ms_competenceandreview.Entities.Review;
 
 import org.example.ms_competenceandreview.Services.Interface.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -32,14 +33,30 @@ public class ReviewController {
         String enhanced = reviewService.generateEnhancedText(text, rating);
         return Collections.singletonMap("enhancedText", enhanced);
     }
+
     @GetMapping("/GetReviewsByProject/{id}")
     public List<Review> GetReviewsByProject(@PathVariable Long id) {
         return reviewService.GetReviewsByProject(id);
     }
+
     @PostMapping("/AjouterReview")
-    public Review AjouterReview(@RequestBody Review a) {
-        if(a.getCreatedAt() == null) a.setCreatedAt(java.time.LocalDateTime.now());
-        return reviewService.AjouterReview(a);
+    public ResponseEntity<?> AjouterReview(@RequestBody Review a) {
+        try {
+            if (a.getCreatedAt() == null) a.setCreatedAt(java.time.LocalDateTime.now());
+            Review saved = reviewService.AjouterReview(a);
+            return ResponseEntity.ok(saved);
+
+        } catch (IllegalArgumentException e) {
+            // 🚫 Rejected by AI moderation — tell the frontend why
+            String reason = e.getMessage().replace("REJECTED: ", "");
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Your review was rejected by our moderation system.", "reason", reason)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    Map.of("error", "An unexpected error occurred.")
+            );
+        }
     }
 
     @PutMapping("/ModifierReview")
