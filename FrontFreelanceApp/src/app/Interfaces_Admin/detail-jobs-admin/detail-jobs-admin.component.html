@@ -50,7 +50,39 @@
             <div class="description-text">
                 <p>{{ contract?.terms }}</p>
             </div>
+            
+            <!-- AI Insights Section -->
+            <div class="ai-insights-container" *ngIf="contract?.terms">
+                <div class="ai-header">
+                    <i class="fa fa-magic ai-icon"></i>
+                    <h4>AI Contract Analysis</h4>
+                </div>
+                
+                <div *ngIf="isAnalyzingAi" class="ai-loading">
+                    <i class="fa fa-spinner fa-spin"></i> Extracting key terms...
+                </div>
+                
+                <div *ngIf="!isAnalyzingAi && aiInsights.length > 0" class="ai-results">
+                    <ul class="insight-list">
+                        <li *ngFor="let insight of aiInsights" class="insight-item" [ngClass]="insight.type">
+                            <div class="insight-icon">
+                                <i class="fa" 
+                                   [ngClass]="{
+                                     'fa-money-bill-wave': insight.type === 'payment',
+                                     'fa-clock': insight.type === 'deadline',
+                                     'fa-list-check': insight.type === 'requirement',
+                                     'fa-info-circle': insight.type === 'general'
+                                   }"></i>
+                            </div>
+                            <div class="insight-content">
+                                <strong>{{ insight.type | titlecase }}</strong>
+                                <span>{{ insight.text }}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
+        </div>
 
         <div class="card content-card">
             <h3><i class="fa fa-shield-alt"></i> Financial & Escrow Status</h3>

@@ -3,6 +3,7 @@ import { Contract } from '../../models/contract';
 import { ActivatedRoute } from '@angular/router';
 import { ContractService } from '../../Services/contract.service';
 import { UserService } from '../../Services/user.service'; // 🟢 INJECTION
+import { DisputeService } from '../../Services/dispute.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -26,7 +27,8 @@ export class FreelancerContractDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private contractService: ContractService,
-    private userService: UserService // 🟢 INJECTION
+    private userService: UserService, // 🟢 INJECTION
+    private disputeService: DisputeService
   ) {}
 
   ngOnInit(): void {
@@ -114,4 +116,36 @@ export class FreelancerContractDetailsComponent implements OnInit {
       if(btn) btn.innerHTML = '<i class="fa fa-file-download"></i> Download Signed PDF';
     });
   }
-}
+
+  // --- DISPUTE LOGIC ---
+  showDisputeModal = false;
+  disputeReason = '';
+  isDisputing = false;
+
+  openDisputeModal() {
+    this.showDisputeModal = true;
+  }
+
+  closeDisputeModal() {
+    this.showDisputeModal = false;
+    this.disputeReason = '';
+  }
+
+  submitDispute() {
+    if (!this.disputeReason.trim() || !this.contract || !this.currentFreelancerId) return;
+    
+    this.isDisputing = true;
+    this.disputeService.raiseDispute(this.contract.id!, this.currentFreelancerId, this.disputeReason).subscribe({
+      next: (res) => {
+        this.isDisputing = false;
+        this.closeDisputeModal();
+        alert('Dispute raised successfully. Our Admin team will review it shortly.');
+      },
+      error: (err) => {
+        console.error('Error raising dispute', err);
+        this.isDisputing = false;
+        alert('Failed to raise dispute. Make sure the escrow is locked and not already closed.');
+      }
+    });
+  }
+}

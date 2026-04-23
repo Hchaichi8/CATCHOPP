@@ -255,8 +255,17 @@ public class payementService {
         transactionRepository.save(tx);
         walletRepository.save(escrowWallet);
         walletRepository.save(freelancerWallet);
+        escrowRepository.save(escrow);
 
-        return escrowRepository.save(escrow);
+        // Notify Contract microservice to close the contract
+        try {
+            contractClient.markAsCompleted(escrow.getContractId());
+            System.out.println("[LOG] Contract #" + escrow.getContractId() + " closed after dispute release to freelancer.");
+        } catch (Exception e) {
+            System.err.println("[ERROR] Could not notify contract service: " + e.getMessage());
+        }
+
+        return escrow;
     }
 
     @Transactional
@@ -333,20 +342,31 @@ public class payementService {
         escrowWallet.debit(refundAmount);
         clientWallet.credit(refundAmount);
 
-        escrow.setStatus(EscrowStatus.REFUNDED); // Matches your Enum
+        escrow.setStatus(EscrowStatus.REFUNDED);
+        escrow.setReleasedAt(LocalDateTime.now());
 
         Transaction tx = Transaction.builder()
                 .fromWallet(escrowWallet)
                 .toWallet(clientWallet)
                 .amount(refundAmount)
-                .type(TransactionType.REFUND) // Matches your Enum
+                .type(TransactionType.REFUND)
                 .description("Admin Refund - Dispute Resolution #" + escrow.getContractId())
                 .build();
 
         transactionRepository.save(tx);
         walletRepository.save(escrowWallet);
         walletRepository.save(clientWallet);
-        return escrowRepository.save(escrow);
+        escrowRepository.save(escrow);
+
+        // Notify Contract microservice to mark contract as CANCELLED/COMPLETED
+        try {
+            contractClient.markAsCompleted(escrow.getContractId());
+            System.out.println("[LOG] Contract #" + escrow.getContractId() + " closed after dispute refund.");
+        } catch (Exception e) {
+            System.err.println("[ERROR] Could not notify contract service: " + e.getMessage());
+        }
+
+        return escrow;
     }
     public List<EscrowDetailDTO> getAllEscrowsWithDetails() {
         List<Escrow> escrows = escrowRepository.findAll();

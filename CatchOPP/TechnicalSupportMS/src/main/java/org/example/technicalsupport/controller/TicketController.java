@@ -142,7 +142,7 @@ public class TicketController {
         String title = body.getOrDefault("title", "");
         String description = body.getOrDefault("description", "");
         if (description.isBlank()) return ResponseEntity.badRequest().body(Map.of("error", "description required"));
-        String enhanced = ticketService.enhanceText(title, description);
+        String enhanced = enhancementService.enhance(title, description);
         return ResponseEntity.ok(Map.of("enhanced", enhanced));
     }
 

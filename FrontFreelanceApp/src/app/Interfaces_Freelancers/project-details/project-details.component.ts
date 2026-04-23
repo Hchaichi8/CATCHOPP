@@ -140,19 +140,108 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   submitProposal() {
-    if (!this.project?.id || !this.newProposal.bidAmount) {
-      alert("Veuillez remplir tous les champs.");
+    if (!this.project?.id || !this.newProposal.bidAmount || !this.newProposal.estimationEndDate) {
+      this.showToast("Please fill all fields, including the delivery date.", "error");
       return;
     }
     this.projectService.submitProposal(this.project.id, this.newProposal).subscribe({
       next: () => {
-        alert("Offre soumise avec succès ! 🚀");
+        this.showToast("Proposal submitted successfully! 🚀", "success");
         this.closeModal();
         this.loadProposals(this.project!.id!);
         this.activeTab = 'proposals';
       },
-      error: () => alert("Erreur lors de la soumission.")
+      error: () => this.showToast("Error submitting your proposal. Please try again.", "error")
     });
+  }
+
+  // --- CUSTOM TOAST NOTIFICATIONS ---
+  toastMessage: string = '';
+  toastType: 'success' | 'error' | '' = '';
+  
+  showToast(msg: string, type: 'success' | 'error') {
+    this.toastMessage = msg;
+    this.toastType = type;
+    setTimeout(() => {
+      if (this.toastMessage === msg) {
+        this.toastMessage = '';
+      }
+    }, 4000);
+  }
+
+  // --- CUSTOM DATE PICKER LOGIC ---
+  showDatePicker = false;
+  currentDate = new Date();
+  selectedDate: Date | null = null;
+  calendarWeeks: any[][] = [];
+  months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+  toggleDatePicker() {
+    this.showDatePicker = !this.showDatePicker;
+    if (this.showDatePicker) {
+      if (this.selectedDate) {
+        this.currentDate = new Date(this.selectedDate);
+      } else {
+        this.currentDate = new Date();
+      }
+      this.generateCalendar();
+    }
+  }
+
+  generateCalendar() {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    let date = 1;
+    this.calendarWeeks = [];
+    for (let i = 0; i < 6; i++) {
+      let week = [];
+      let hasDays = false;
+      for (let j = 0; j < 7; j++) {
+        if (i === 0 && j < firstDay) {
+          week.push(null);
+        } else if (date > daysInMonth) {
+          week.push(null);
+        } else {
+          week.push(new Date(year, month, date));
+          date++;
+          hasDays = true;
+        }
+      }
+      if (hasDays) {
+        this.calendarWeeks.push(week);
+      }
+    }
+  }
+
+  prevMonth(event: Event) {
+    event.stopPropagation();
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
+    this.generateCalendar();
+  }
+
+  nextMonth(event: Event) {
+    event.stopPropagation();
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
+    this.generateCalendar();
+  }
+
+  selectDate(d: Date, event: Event) {
+    event.stopPropagation();
+    this.selectedDate = d;
+    const pad = (n: number) => n < 10 ? '0' + n : n;
+    this.newProposal.estimationEndDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    this.showDatePicker = false;
+  }
+
+  isSameDate(d1: Date, d2: Date | null): boolean {
+    if (!d1 || !d2) return false;
+    return d1.getFullYear() === d2.getFullYear() && 
+           d1.getMonth() === d2.getMonth() && 
+           d1.getDate() === d2.getDate();
   }
 
   // --- LOGIQUE DES REVIEWS & IA GEMINI ---
@@ -176,7 +265,7 @@ export class ProjectDetailsComponent implements OnInit {
           this.isEnhancing = false;
         },
         error: () => {
-          alert("Erreur avec l'IA. Réessayez.");
+          this.showToast("Erreur avec l'IA. Réessayez.", "error");
           this.isEnhancing = false;
         }
       });
@@ -231,7 +320,7 @@ export class ProjectDetailsComponent implements OnInit {
 
   // --- GESTION DES MODALS ET BOUTONS ---
   openModal() {
-    if (!this.currentFreelancerId) return alert("Vous devez être connecté.");
+    if (!this.currentFreelancerId) return this.showToast("Vous devez être connecté.", "error");
     this.newProposal.freelancerId = this.currentFreelancerId;
     this.isProposalModalOpen = true;
     document.body.style.overflow = 'hidden';
@@ -288,6 +377,6 @@ export class ProjectDetailsComponent implements OnInit {
 
   copyLink() {
     navigator.clipboard.writeText(this.currentUrl);
-    alert('Lien copié ! 📋');
+    this.showToast("Lien copié ! 📋", "success");
   }
 }

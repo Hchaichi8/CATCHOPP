@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ContractService } from '../../Services/contract.service';
 import { PaymentService } from '../../Services/payment.service';
 import { Contract } from '../../models/contract';
+import { AiExtractorService, AiInsight } from '../../Services/ai-extractor.service';
 
 @Component({
   selector: 'app-detail-jobs-admin',
@@ -15,10 +16,15 @@ export class DetailJobsAdminComponent implements OnInit {
   escrow: any = null;
   isLoading: boolean = true;
 
+  // AI Analysis states
+  aiInsights: AiInsight[] = [];
+  isAnalyzingAi: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private contractService: ContractService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private aiExtractor: AiExtractorService
   ) {}
 
   ngOnInit(): void {
@@ -37,6 +43,11 @@ export class DetailJobsAdminComponent implements OnInit {
       next: (data) => {
         this.contract = data;
         this.loadEscrowDetails(); // Fetch financial data once we have the contract
+        
+        // Start AI Analysis on the contract terms
+        if (this.contract && this.contract.terms) {
+          this.analyzeContractTerms(this.contract.terms);
+        }
       },
       error: (err) => {
         console.error("Error loading contract", err);
@@ -55,6 +66,20 @@ export class DetailJobsAdminComponent implements OnInit {
       error: (err) => {
         console.warn("No escrow found for this contract", err);
         this.isLoading = false;
+      }
+    });
+  }
+
+  analyzeContractTerms(terms: string) {
+    this.isAnalyzingAi = true;
+    this.aiExtractor.extractKeyPoints(terms).subscribe({
+      next: (insights) => {
+        this.aiInsights = insights;
+        this.isAnalyzingAi = false;
+      },
+      error: (err) => {
+        console.error("Error analyzing terms with AI", err);
+        this.isAnalyzingAi = false;
       }
     });
   }

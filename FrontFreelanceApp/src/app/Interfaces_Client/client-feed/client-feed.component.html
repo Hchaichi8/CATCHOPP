@@ -10,6 +10,13 @@
     </div>
 
     <div class="nav-actions">
+      <!-- Technical Support Icon -->
+      <div class="icon-btn-wrapper">
+        <button class="nav-icon-btn" routerLink="/TechnicalSupport" title="Technical Support">
+          <i class="fa fa-headset"></i>
+        </button>
+      </div>
+
       <div class="icon-btn-wrapper">
         <button class="nav-icon-btn" (click)="toggleMessages(); $event.stopPropagation()" [class.active]="isMessagesOpen">
           <i class="fa fa-comment-dots"></i>
@@ -97,134 +104,144 @@
   </aside>
 
   <main class="feed-center">
-    <div class="card create-trigger">
-      <div class="trigger-row">
-        <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/white?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" class="sm-avatar">
-        <button class="trigger-btn" (click)="openProjectModal()">
-          <span>Post a new project opportunity...</span>
+    
+    <!-- Compact Professional Dashboard Header -->
+    <div class="dashboard-top-bar">
+      <div class="dash-greeting">
+        <h2>Welcome back, <span class="text-primary">{{ currentUser?.firstName || 'Company' }}</span></h2>
+        <p>Manage your projects and discover top talent.</p>
+      </div>
+      
+      
+      <button class="btn-primary-solid" (click)="openProjectModal()">
+        <i class="fa fa-plus"></i> Create Project
+      </button>
+    </div>
+
+    <!-- Filter Dashboard -->
+    <div class="filter-dashboard">
+      <div class="filter-header">
+        <h3>Your Project Requisitions</h3>
+        <div class="sort-dropdown">
+          <i class="fa fa-sort-amount-down text-muted"></i>
+          <select [(ngModel)]="selectedSort" (change)="applyFilters()">
+            <option value="Newest">Newest First</option>
+            <option value="Highest Budget">Highest Budget</option>
+            <option value="Oldest">Oldest First</option>
+            <option value="Lowest Budget">Lowest Budget</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-chips">
+        <div class="chip-group">
+          <span class="chip-label">Category:</span>
+          <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="chip-select">
+            <option value="All">All Categories</option>
+            <option value="WEB_DEVELOPMENT">Web Development</option>
+            <option value="MOBILE_DEVELOPMENT">Mobile Dev</option>
+            <option value="UI_UX_DESIGN">UI/UX Design</option>
+            <option value="DIGITAL_MARKETING">Marketing</option>
+            <option value="DATA_SCIENCE_AI">Data & AI</option>
+          </select>
+        </div>
+        
+        <div class="chip-group">
+          <span class="chip-label">Level:</span>
+          <select [(ngModel)]="selectedExperience" (change)="applyFilters()" class="chip-select">
+            <option value="All">Any Level</option>
+            <option value="Entry Level">Entry Level</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Expert">Expert</option>
+          </select>
+        </div>
+        
+        <button class="btn-clear-filters" (click)="clearFilters()" *ngIf="searchText || selectedExperience !== 'All' || selectedSort !== 'Newest' || selectedCategory !== 'All'">
+          <i class="fa fa-times"></i> Clear Filters
         </button>
       </div>
-      <div class="trigger-actions">
-        <button (click)="openProjectModal()"><i class="fa fa-laptop-code"></i> IT & Dev</button>
-        <button (click)="openProjectModal()"><i class="fa fa-pen-nib"></i> Design</button>
-        <button (click)="openProjectModal()"><i class="fa fa-bullhorn"></i> Marketing</button>
-      </div>
     </div>
 
-     <div class="card filter-bar">
-      <div class="filter-group">
-        <label>Category:</label>
-        <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
-          <option value="All">All Categories</option>
-          <option value="WEB_DEVELOPMENT">Web Development</option>
-          <option value="MOBILE_DEVELOPMENT">Mobile Dev</option>
-          <option value="UI_UX_DESIGN">UI/UX Design</option>
-          <option value="DIGITAL_MARKETING">Marketing</option>
-          <option value="DATA_SCIENCE_AI">Data & AI</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Level:</label>
-        <select [(ngModel)]="selectedExperience" (change)="applyFilters()">
-          <option value="All">All Levels</option>
-          <option value="Entry Level">Entry Level</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Expert">Expert</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Sort:</label>
-        <select [(ngModel)]="selectedSort" (change)="applyFilters()">
-          <option value="Newest">Newest</option>
-          <option value="Highest Budget">Highest Budget</option>
-        </select>
-      </div>
-    </div>
-
-  <div class="feed-stream">
-  
-  <div class="empty-state card" *ngIf="filteredProjects.length === 0">
-    <i class="fa fa-search"></i>
-    <h3>No projects found</h3>
-    <p>Try adjusting your search or filters.</p>
-    <button class="btn-primary-outline" style="margin-top: 15px;" (click)="clearFilters()" *ngIf="searchText || selectedExperience !== 'All' || selectedSort !== 'Newest'">Clear Filters</button>
-  </div>
-
-  <article class="card project-post premium-card" *ngFor="let p of filteredProjects">
+    <div class="feed-stream">
     
-    <div class="post-header">
-      <div class="client-info">
-        <img [src]="clientDetailsMap[p.clientId!]?.profilePictureUrl || 'https://placehold.co/48x48/198754/white?text=' + (clientDetailsMap[p.clientId!]?.firstName ? clientDetailsMap[p.clientId!].firstName.charAt(0).toUpperCase() : 'C')" class="client-avatar" alt="Client Avatar">
-        <div class="client-meta">
-          <h4>{{ clientDetailsMap[p.clientId!]?.firstName || 'Utilisateur inconnu' }}  <i class="fa fa-check-circle verified-icon" title="Payment Verified"></i></h4>
-          <span class="post-time"><i class="far fa-clock"></i> Posted {{ p.postedAt }}</span> 
-        </div>
+      <div class="empty-state-premium" *ngIf="filteredProjects.length === 0">
+        <div class="empty-icon"><i class="fa fa-search"></i></div>
+        <h3>No projects found</h3>
+        <p>Try adjusting your search or filters to see your projects.</p>
+        <button class="btn-glow-outline" (click)="clearFilters()" *ngIf="searchText || selectedExperience !== 'All' || selectedSort !== 'Newest'">Clear Filters</button>
       </div>
-    <div class="post-actions">
+
+      <article class="requisition-card" *ngFor="let p of filteredProjects">
+        <div class="req-sidebar">
+          <div class="req-status-dot" [ngClass]="p.status?.toLowerCase() || 'open'"></div>
+          <div class="req-date">
+            <span class="day">{{ p.postedAt | date:'dd' }}</span>
+            <span class="month">{{ p.postedAt | date:'MMM' }}</span>
+          </div>
+        </div>
         
-      <div class="reaction-wrapper" [class.force-hide]="p.justReacted">
-          
-          <div class="reaction-popup">
-            <button class="react-emoji" (click)="react(p, 'LIKE')" title="J'aime">👍</button>
-            <button class="react-emoji" (click)="react(p, 'LOVE')" title="J'adore">❤️</button>
-            <button class="react-emoji" (click)="react(p, 'HAHA')" title="Haha">😂</button>
-            <button class="react-emoji" (click)="react(p, 'SUPPORT')" title="Soutien">🤝</button>
+        <div class="req-content">
+          <div class="req-header">
+            <div class="req-title-wrapper">
+              <h2 class="req-title" [routerLink]="['/ClientDetailProject', p.id]">{{ p.title }}</h2>
+              <div class="req-badges">
+                <span class="req-badge category">{{ formatEnumText(p.category) }}</span>
+                <span class="req-badge level"><i class="fa fa-layer-group"></i> {{ p.ExperienceLevel }}</span>
+                <span class="req-badge type"><i class="fa fa-clock"></i> {{ p.jobType === 'HOURLY' ? 'Hourly' : 'Fixed Price' }}</span>
+              </div>
+            </div>
+            
+            <div class="req-budget">
+              <span class="budget-label">Est. Budget</span>
+              <span class="budget-value">${{ p.budget }}</span>
+            </div>
           </div>
           
-          <button class="icon-btn like-btn" 
-                  [ngClass]="p.myReaction ? 'active-' + p.myReaction.toLowerCase() : ''" 
-                  (click)="react(p, 'LIKE')">
+          <p class="req-desc">{{ p.description }}</p>
+          
+          <div *ngIf="p.image" class="req-image">
+            <img [src]="p.image" alt="Project Attachment">
+          </div>
+          
+          <div class="req-footer">
+            <div class="req-stats">
+              <div class="stat-pill">
+                <div class="avatars-mini">
+                  <img src="https://i.pravatar.cc/150?u=1" alt="Freelancer">
+                  <img src="https://i.pravatar.cc/150?u=2" alt="Freelancer">
+                </div>
+                <strong>0</strong> Proposals
+              </div>
+              
+              <div class="reaction-wrapper" [class.force-hide]="p.justReacted">
+                <div class="reaction-popup">
+                  <button class="react-emoji" (click)="react(p, 'LIKE')" title="J'aime">👍</button>
+                  <button class="react-emoji" (click)="react(p, 'LOVE')" title="J'adore">❤️</button>
+                  <button class="react-emoji" (click)="react(p, 'HAHA')" title="Haha">😂</button>
+                  <button class="react-emoji" (click)="react(p, 'SUPPORT')" title="Soutien">🤝</button>
+                </div>
+                <button class="stat-pill reaction-btn" [ngClass]="p.myReaction ? 'active-' + p.myReaction.toLowerCase() : ''" (click)="react(p, 'LIKE')">
+                  <span *ngIf="p.myReaction === 'LOVE'">❤️</span>
+                  <span *ngIf="p.myReaction === 'HAHA'">😂</span>
+                  <span *ngIf="p.myReaction === 'SUPPORT'">🤝</span>
+                  <span *ngIf="p.myReaction === 'LIKE' || !p.myReaction"><i class="fa fa-thumbs-up"></i></span>
+                  <span class="like-count" *ngIf="getTotalReactions(p) > 0">{{ getTotalReactions(p) }}</span>
+                  <span *ngIf="getTotalReactions(p) === 0">React</span>
+                </button>
+              </div>
+            </div>
             
-            <span *ngIf="p.myReaction === 'LOVE'">❤️</span>
-            <span *ngIf="p.myReaction === 'HAHA'">😂</span>
-            <span *ngIf="p.myReaction === 'SUPPORT'">🤝</span>
-            <span *ngIf="p.myReaction === 'LIKE' || !p.myReaction"><i class="fa fa-thumbs-up"></i></span>
-            
-            <span class="like-count" *ngIf="getTotalReactions(p) > 0">{{ getTotalReactions(p) }}</span>
-          </button>
+            <div class="req-actions">
+              <button class="btn-req-outline"><i class="fa fa-ellipsis-h"></i></button>
+              <button class="btn-req-primary" [routerLink]="['/ClientDetailProject', p.id]">
+                Manage Project <i class="fa fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
         </div>
+      </article>
 
-        <button class="icon-btn" title="Save Project"><i class="far fa-heart"></i></button>
-        <button class="icon-btn"><i class="fa fa-ellipsis-h"></i></button>
-      </div>
     </div>
-    
-    <div class="post-body">
-      <div class="title-row">
-        <h2 class="post-title">{{ p.title }}</h2>
-        <div class="budget-badge">
-          <span class="amount">${{ p.budget }}</span>
-          <span class="type">{{ p.jobType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Price' }}</span>
-        </div>
-      </div>
-      
-      <p class="post-desc">{{ p.description }}</p>
-
-      <div *ngIf="p.image" class="project-image-container">
-        <img [src]="p.image" alt="Project Attachment">
-      </div>
-
-      <div class="post-badges">
-        <span class="badge-item"><i class="fa fa-layer-group"></i> {{ p.ExperienceLevel }}</span>
-        <span class="badge-item status-badge" *ngIf="p.status"><i class="fa fa-bolt"></i> {{ p.status }}</span>
-      </div>
-    </div>
-    
-    <div class="post-footer">
-      <div class="proposal-stats">
-        <div class="avatars">
-          <img src="https://i.pravatar.cc/150?u=1" alt="Freelancer">
-          <img src="https://i.pravatar.cc/150?u=2" alt="Freelancer">
-          <div class="avatar-more">+3</div>
-        </div>
-        <span class="stat-text"><strong>0</strong> Proposals received</span>
-      </div>
-      
-      <button class="btn-primary" [routerLink]="['/ClientDetailProject', p.id]">View Details</button>
-    </div>
-  </article>
-
-</div>
   </main>
 
   <aside class="sidebar-right">
@@ -261,94 +278,144 @@
 </div>
 
 <div class="modal-overlay" *ngIf="isProjectModalOpen">
-  <div class="modal-card">
+  <div class="modal-card premium-modal">
     <div class="modal-header">
-      <h2>Post a New Project</h2>
-      <button class="close-btn" (click)="closeProjectModal()">&times;</button>
+      <div class="header-content">
+        <div class="header-icon"><i class="fa fa-rocket"></i></div>
+        <div>
+          <h2>Post a New Project</h2>
+          <p>Find the perfect talent for your next big idea.</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeProjectModal()"><i class="fa fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label>Title</label>
-        <input type="text" class="form-control" [(ngModel)]="project.title" placeholder="Project name">
-      </div>
-      <div class="form-row">
+      
+      <div class="form-section">
         <div class="form-group">
-          <label>Category</label>
-          <select class="form-control" [(ngModel)]="project.category">
-            <option value="WEB_DEVELOPMENT">Web Development</option>
-            <option value="MOBILE_DEVELOPMENT">Mobile App</option>
-            <option value="UI_UX_DESIGN">UI/UX Design</option>
-            <option value="DIGITAL_MARKETING">Digital Marketing</option>
-          </select>
+          <label><i class="fa fa-heading text-muted"></i> Project Title <span class="required">*</span></label>
+          <input type="text" class="form-control premium-input" [(ngModel)]="project.title" placeholder="e.g. Build a Responsive E-commerce App">
         </div>
-        <div class="form-group">
-          <label>Experience</label>
-          <select class="form-control" [(ngModel)]="project.ExperienceLevel">
-            <option value="Entry Level">Entry Level</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Expert">Expert</option>
-          </select>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa fa-tags text-muted"></i> Category <span class="required">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-control premium-input" [(ngModel)]="project.category">
+                <option value="WEB_DEVELOPMENT">Web Development</option>
+                <option value="MOBILE_DEVELOPMENT">Mobile App</option>
+                <option value="UI_UX_DESIGN">UI/UX Design</option>
+                <option value="DIGITAL_MARKETING">Digital Marketing</option>
+              </select>
+              <i class="fa fa-chevron-down select-icon"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-layer-group text-muted"></i> Experience Level <span class="required">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-control premium-input" [(ngModel)]="project.ExperienceLevel">
+                <option value="Entry Level">Entry Level</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Expert">Expert</option>
+              </select>
+              <i class="fa fa-chevron-down select-icon"></i>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span>Required Skills <small style="color: #6b7280; font-weight: normal;">(For matching)</small></span>
-          <span class="badge" style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">
-            {{ selectedSkills.size }} selected
-          </span>
-        </label>
-        
-        <input type="text" 
-               class="form-control" 
-               style="margin-bottom: 10px; padding: 8px; font-size: 0.9rem;" 
-               [(ngModel)]="skillSearchText" 
-               placeholder="Search skills (e.g. Angular, Figma)...">
-        
-        <div class="skills-selector-box" style="max-height: 140px; overflow-y: auto; border: 1px solid #e5e7eb; padding: 10px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; background: #f9fafb;">
+      <div class="form-section">
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span><i class="fa fa-magic text-muted"></i> Required Skills <span class="required">*</span></span>
+            <span class="skill-count-badge">
+              {{ selectedSkills.size }} selected
+            </span>
+          </label>
           
-          <div class="skill-chip" 
-               *ngFor="let skill of filteredSkillsArray"
-               (click)="toggleSkill(skill.id)"
-               style="padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #d1d5db; transition: 0.2s; user-select: none;"
-               [ngStyle]="{'background': isSkillSelected(skill.id) ? '#3b82f6' : 'white', 'color': isSkillSelected(skill.id) ? 'white' : '#374151', 'border-color': isSkillSelected(skill.id) ? '#3b82f6' : '#d1d5db'}">
-            {{ skill.nom }}
-            <i class="fa fa-check" *ngIf="isSkillSelected(skill.id)" style="margin-left: 5px; font-size: 0.75rem;"></i>
+          <div class="skill-search-wrapper">
+            <i class="fa fa-search search-icon"></i>
+            <input type="text" 
+                   class="form-control premium-input with-icon" 
+                   [(ngModel)]="skillSearchText" 
+                   placeholder="Search skills (e.g. Angular, Figma)...">
           </div>
+          
+          <div class="skills-selector-box premium-scroll">
+            <div class="skill-chip premium-chip" 
+                 *ngFor="let skill of filteredSkillsArray"
+                 (click)="toggleSkill(skill.id)"
+                 [class.selected]="isSkillSelected(skill.id)">
+              {{ skill.nom }}
+              <i class="fa" [ngClass]="isSkillSelected(skill.id) ? 'fa-check' : 'fa-plus'"></i>
+            </div>
 
-          <div *ngIf="filteredSkillsArray.length === 0" style="width: 100%; text-align: center; color: #9ca3af; font-size: 0.85rem; padding: 10px;">
-            Aucune compétence trouvée.
+            <div *ngIf="filteredSkillsArray.length === 0" class="empty-skills">
+              <i class="fa fa-folder-open text-muted"></i> No skills found matching your search.
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea class="form-control text-area" [(ngModel)]="project.description"></textarea>
-      </div>
-      <div class="form-row">
+      <div class="form-section">
         <div class="form-group">
-          <label>Contract Type</label>
-          <div class="radio-group" style="display: flex; gap: 15px; margin-top: 10px;">
-            <label><input type="radio" value="FIXED_PRICE" [(ngModel)]="project.jobType"> Fixed Price</label>
-            <label><input type="radio" value="HOURLY" [(ngModel)]="project.jobType"> Hourly</label>
+          <label><i class="fa fa-align-left text-muted"></i> Description <span class="required">*</span></label>
+          <textarea class="form-control premium-input text-area" [(ngModel)]="project.description" placeholder="Describe the project scope, timeline, and deliverables..."></textarea>
+        </div>
+
+        <label class="section-label"><i class="fa fa-file-contract text-muted"></i> Contract Details <span class="required">*</span></label>
+        <div class="contract-type-cards">
+          <label class="contract-card" [class.active]="project.jobType === 'FIXED_PRICE'">
+            <input type="radio" value="FIXED_PRICE" [(ngModel)]="project.jobType" style="display:none">
+            <div class="card-content">
+              <i class="fa fa-money-check-alt"></i>
+              <span>Fixed Price</span>
+            </div>
+          </label>
+          <label class="contract-card" [class.active]="project.jobType === 'HOURLY'">
+            <input type="radio" value="HOURLY" [(ngModel)]="project.jobType" style="display:none">
+            <div class="card-content">
+              <i class="fa fa-stopwatch"></i>
+              <span>Hourly Rate</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label><i class="fa fa-dollar-sign text-muted"></i> Budget Estimate</label>
+          <div class="budget-input-wrapper">
+            <span class="currency-prefix">$</span>
+            <input type="number" class="form-control premium-input with-prefix" [(ngModel)]="project.budget" placeholder="0.00">
           </div>
         </div>
-        <div class="form-group">
-          <label>Budget ($)</label>
-          <input type="number" class="form-control" [(ngModel)]="project.budget">
+      </div>
+
+      <div class="form-section last-section">
+        <label><i class="fa fa-paperclip text-muted"></i> Attachments</label>
+        <div class="upload-area premium-upload" (click)="fileInput.click()">
+          <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none">
+          <div *ngIf="!project.image" class="upload-placeholder">
+            <div class="upload-icon"><i class="fa fa-cloud-upload-alt"></i></div>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <span class="text-muted">PNG, JPG, GIF up to 5MB</span>
+          </div>
+          <div *ngIf="project.image" class="image-preview-wrapper">
+            <img [src]="project.image">
+            <div class="change-image-overlay">
+              <i class="fa fa-camera"></i> Change Image
+            </div>
+          </div>
         </div>
       </div>
-      <div class="upload-area" (click)="fileInput.click()">
-        <input type="file" #fileInput (change)="onFileSelected($event)" style="display:none">
-        <p *ngIf="!project.image">Click to upload image</p>
-        <img *ngIf="project.image" [src]="project.image" style="max-height: 100px;">
-      </div>
+
     </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeProjectModal()">Cancel</button>
-      <button class="btn-publish" (click)="publishProject()">Publish Now</button>
+    <div class="modal-footer premium-footer">
+      <button class="btn-cancel premium-btn-outline" (click)="closeProjectModal()" [disabled]="isSubmitting">Cancel</button>
+      <button class="btn-publish premium-btn-primary" (click)="publishProject()" [disabled]="isSubmitting">
+        <i class="fa fa-paper-plane" *ngIf="!isSubmitting"></i> 
+        <i class="fa fa-spinner fa-spin" *ngIf="isSubmitting"></i> 
+        {{ isSubmitting ? 'Publishing...' : 'Publish Project' }}
+      </button>
     </div>
   </div>
 </div>
-<app-technical-support></app-technical-support>

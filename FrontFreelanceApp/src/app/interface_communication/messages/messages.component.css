@@ -1,3 +1,4 @@
+/* --- GENERAL STYLES --- */
 .chat-container {
   display: flex;
   height: calc(100vh - 70px); /* Hauteur de l'écran moins la navbar */
@@ -192,3 +193,44 @@
   justify-content: center;
 }
 .btn-send:hover { background: #2563eb; }
+
+/* --- REACTION SECTION --- */
+.reaction-panel {
+  position: relative;
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  z-index: 100;
+}
+
+.reactions {
+  margin-top: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.reactions span {
+  font-size: 1.5rem;
+}
+
+/* --- EMOJI BUTTON --- */
+.reaction-panel button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.reaction-panel button:hover {
+  opacity: 0.8;
+}

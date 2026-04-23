@@ -207,30 +207,77 @@
 
 <!-- ======================== PROPOSAL MODAL ======================== -->
 <div class="modal-overlay" *ngIf="isProposalModalOpen">
-  <div class="modal-card">
+  <div class="modal-card premium-modal">
     <div class="modal-header">
-      <h2>Submit Your Proposal</h2>
-      <button class="close-btn" (click)="closeModal()">&times;</button>
+      <div class="header-content">
+        <div class="header-icon proposal-icon"><i class="fa fa-file-signature"></i></div>
+        <div>
+          <h2>Submit Your Proposal</h2>
+          <p class="subtitle">Offer your services for: <strong style="color: #1e293b;">{{ project?.title }}</strong></p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeModal()"><i class="fa fa-times"></i></button>
     </div>
 
-    <div class="modal-body">
-      <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">
-        You are bidding on: <strong>{{ project?.title }}</strong>
-      </p>
-      <div class="form-group">
-        <label>Bid Amount ($)</label>
-        <input type="number" class="form-control" [(ngModel)]="newProposal.bidAmount" placeholder="Enter your price">
+    <div class="modal-body premium-body">
+      
+      <div class="form-section">
+        <div class="form-group">
+          <label><i class="fa fa-dollar-sign text-muted"></i> Your Bid Amount <span class="required">*</span></label>
+          <div class="input-wrapper-prefix">
+            <span class="prefix">$</span>
+            <input type="number" class="form-control premium-input with-prefix" [(ngModel)]="newProposal.bidAmount" placeholder="e.g. 500">
+          </div>
+          <small class="helper-text"><i class="fa fa-info-circle"></i> Client's budget is ${{ project?.budget }}</small>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Estimated Delivery Date</label>
-        <input type="date" class="form-control" [(ngModel)]="newProposal.estimationEndDate">
+
+      <div class="form-section important-section">
+        <div class="important-header">
+          <div class="warning-icon-wrapper">
+            <i class="fa fa-calendar-check warning-icon"></i>
+          </div>
+          <div>
+            <h4>Estimated Delivery Date <span class="required">*</span></h4>
+            <p>This date is crucial. It will serve as the <strong>official end date of your contract</strong>.</p>
+          </div>
+        </div>
+        
+        <div class="form-group custom-datepicker-container" style="margin-top: 15px; margin-bottom: 0;">
+          <div class="datepicker-input-wrapper" (click)="toggleDatePicker()">
+            <input type="text" readonly class="form-control premium-input date-input-highlight" 
+                   [value]="newProposal.estimationEndDate ? newProposal.estimationEndDate : 'Select a delivery date'"
+                   style="cursor: pointer; background: white;">
+            <i class="fa fa-calendar-alt calendar-icon"></i>
+          </div>
+          
+          <div class="custom-calendar-popup" *ngIf="showDatePicker" (click)="$event.stopPropagation()">
+            <div class="calendar-header">
+              <button type="button" class="nav-btn" (click)="prevMonth($event)"><i class="fa fa-chevron-left"></i></button>
+              <strong>{{ months[currentDate.getMonth()] }} {{ currentDate.getFullYear() }}</strong>
+              <button type="button" class="nav-btn" (click)="nextMonth($event)"><i class="fa fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid">
+              <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+              <ng-container *ngFor="let week of calendarWeeks">
+                <div class="day-cell" *ngFor="let day of week" 
+                     [class.empty]="!day" 
+                     [class.selected]="isSameDate(day, selectedDate)"
+                     (click)="day ? selectDate(day, $event) : null">
+                  {{ day ? day.getDate() : '' }}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
 
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
-      <button class="btn-publish" (click)="submitProposal()">
-        Send Proposal <i class="fa fa-paper-plane"></i>
+    <div class="modal-footer premium-footer">
+      <button class="btn-cancel premium-btn-outline" (click)="closeModal()">Cancel</button>
+      <button class="btn-publish premium-btn-primary" (click)="submitProposal()">
+        <i class="fa fa-paper-plane"></i> Send Proposal
       </button>
     </div>
   </div>
@@ -317,4 +364,13 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- ======================== CUSTOM TOAST NOTIFICATION ======================== -->
+<div class="custom-toast" [class.show]="toastMessage" [ngClass]="toastType">
+  <div class="toast-icon">
+    <i class="fa fa-check-circle" *ngIf="toastType === 'success'"></i>
+    <i class="fa fa-exclamation-circle" *ngIf="toastType === 'error'"></i>
+  </div>
+  <div class="toast-content">{{ toastMessage }}</div>
 </div>

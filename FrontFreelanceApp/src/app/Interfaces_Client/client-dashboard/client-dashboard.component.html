@@ -6,7 +6,7 @@
 
     <div class="nav-menu">
       <a routerLink="/ClientFeed" routerLinkActive="active"><i class="fa fa-stream"></i> Feed</a>
-      <a routerLink="/ClientDashboard" routerLinkActive="active"><i class="fa fa-th-large"></i> Dashboard</a>
+      <a routerLink="/ClientDashboard" class="menu-item active"><i class="fa fa-th-large"></i> Dashboard</a>
       <a routerLink="/ClientProfileManager" routerLinkActive="active"><i class="fa fa-user-circle"></i> Profile</a>
       <a routerLink="/AllProjects" routerLinkActive="active"><i class="fa fa-folder-open"></i> Projects</a>
       <a routerLink="/ClientContracts" ><i class="fa fa-file-contract"></i> Contracts</a>
@@ -15,9 +15,9 @@
     </div>
 
     <div class="nav-actions">
-        <button class="btn-create-nav"><i class="fa fa-plus"></i> Post Job</button>
+        <button class="btn-create-nav" routerLink="/ClientFeed"><i class="fa fa-plus"></i> Post Job</button>
         <div class="user-profile">
-            <img src="https://placehold.co/40x40/198754/ffffff?text=AC" alt="Acme Corp">
+            <img [src]="currentUser?.profilePictureUrl || 'https://placehold.co/40x40/198754/ffffff?text=' + (currentUser?.firstName ? currentUser.firstName.charAt(0) : 'C')" alt="User Profile">
         </div>
     </div>
   </div>
@@ -28,83 +28,126 @@
   <header class="page-header">
     <div class="welcome-text">
       <h1>Dashboard Overview</h1>
-      <p>Welcome back, Acme Corp. You have 3 active projects running.</p>
+      <p>Welcome back, {{ currentUser?.firstName || 'Company' }}. Here is a summary of your operations.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export"><i class="fa fa-download"></i> Export Report</button>
     </div>
   </header>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="icon-box green"><i class="fa fa-briefcase"></i></div>
-      <div><h3>12</h3><p>Total Posted</p></div>
+  <!-- Metrics Row -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon green"><i class="fa fa-folder-open"></i></div>
+      <div class="metric-info">
+        <p>Total Projects</p>
+        <h3>{{ totalProjects }}</h3>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="icon-box orange"><i class="fa fa-clock"></i></div>
-      <div><h3>3</h3><p>Active Now</p></div>
-    </div>
-    <div class="stat-card">
-      <div class="icon-box blue"><i class="fa fa-file-contract"></i></div>
-      <div><h3>5</h3><p>Hired</p></div>
-    </div>
-    <div class="stat-card">
-        <div class="icon-box purple"><i class="fa fa-coins"></i></div>
-        <div><h3>$45k</h3><p>Total Spent</p></div>
-    </div>
-  </div>
-
-  <h3 class="section-title">Active Projects</h3>
-  
-  <div class="projects-grid">
     
-    <div class="project-card">
-      <div class="card-status active">Active</div>
-      <div class="card-body">
-        <h3>Senior Angular Developer</h3>
-        <p class="budget">Hourly: $45 - $60</p>
-        <div class="meta-info">
-          <span><i class="fa fa-clock"></i> Posted 2d ago</span>
-          <span><i class="fa fa-paper-plane"></i> 8 Proposals</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <button class="btn-manage" routerLink="/ProjectProposals/1">
-          Manage Proposals <i class="fa fa-arrow-right"></i>
-        </button>
+    <div class="metric-card">
+      <div class="metric-icon blue"><i class="fa fa-clipboard-list"></i></div>
+      <div class="metric-info">
+        <p>Open Requisitions</p>
+        <h3>{{ openRequisitions }}</h3>
       </div>
     </div>
-
-    <div class="project-card">
-      <div class="card-status review">In Review</div>
-      <div class="card-body">
-        <h3>UI/UX Design for Mobile App</h3>
-        <p class="budget">Fixed: $1,200</p>
-        <div class="meta-info">
-          <span><i class="fa fa-clock"></i> Posted 5d ago</span>
-          <span><i class="fa fa-paper-plane"></i> 15 Proposals</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <button class="btn-manage" routerLink="/ProjectProposals/2">
-          Manage Proposals <i class="fa fa-arrow-right"></i>
-        </button>
+    
+    <div class="metric-card">
+      <div class="metric-icon orange"><i class="fa fa-file-signature"></i></div>
+      <div class="metric-info">
+        <p>Active Contracts</p>
+        <h3>{{ activeContracts }}</h3>
       </div>
     </div>
-
-    <div class="project-card">
-      <div class="card-status active">Active</div>
-      <div class="card-body">
-        <h3>Marketing Campaign Specialist</h3>
-        <p class="budget">Hourly: $30 - $40</p>
-        <div class="meta-info">
-          <span><i class="fa fa-clock"></i> Posted 1w ago</span>
-          <span><i class="fa fa-paper-plane"></i> 4 Proposals</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <button class="btn-manage" routerLink="/ProjectProposals/3">
-          Manage Proposals <i class="fa fa-arrow-right"></i>
-        </button>
+    
+    <div class="metric-card">
+      <div class="metric-icon purple"><i class="fa fa-dollar-sign"></i></div>
+      <div class="metric-info">
+        <p>Total Spent (Closed)</p>
+        <h3>${{ totalSpentClosed | number:'1.0-0' }}</h3>
       </div>
     </div>
-
   </div>
+
+  <!-- Chart Section -->
+  <div class="chart-section card">
+    <div class="card-header">
+      <h3>Project Activity (Last 6 Months)</h3>
+    </div>
+    <div class="chart-container">
+      <canvas baseChart 
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="'line'">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Data Table Section -->
+  <div class="table-section card">
+    <div class="card-header">
+      <h3>All Projects & Contracts</h3>
+      <div class="table-actions">
+        <div class="search-box">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Search projects...">
+        </div>
+        <button class="btn-filter"><i class="fa fa-filter"></i> Filter</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Project Title</th>
+            <th>Category</th>
+            <th>Budget</th>
+            <th>Status</th>
+            <th>Date Posted</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="paginatedProjects.length === 0">
+            <td colspan="6" class="text-center empty-cell">You haven't posted any projects yet.</td>
+          </tr>
+          <tr *ngFor="let p of paginatedProjects">
+            <td>
+              <div class="cell-title">
+                <strong>{{ p.title }}</strong>
+                <span>{{ p.jobType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Price' }}</span>
+              </div>
+            </td>
+            <td>{{ formatEnumText(p.category) }}</td>
+            <td class="cell-budget">${{ p.budget }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="p.status?.toLowerCase() || 'open'">
+                {{ p.status || 'OPEN' }}
+              </span>
+            </td>
+            <td class="cell-date">{{ p.postedAt | date:'mediumDate' }}</td>
+            <td>
+              <button class="btn-action-sm" [routerLink]="['/ClientDetailProject', p.id]">
+                Manage <i class="fa fa-chevron-right"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button class="btn-page" [disabled]="currentPage === 1" (click)="prevPage()">
+        <i class="fa fa-chevron-left"></i> Previous
+      </button>
+      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button class="btn-page" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        Next <i class="fa fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
 </div>

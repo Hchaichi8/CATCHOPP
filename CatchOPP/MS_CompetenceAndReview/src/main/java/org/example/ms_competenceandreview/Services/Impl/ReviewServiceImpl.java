@@ -29,7 +29,6 @@ public class ReviewServiceImpl implements ReviewService {
     public Review AjouterReview(Review review) {
         if (review.getDescription() != null && !review.getDescription().isBlank()) {
 
-            // 🛡️ LAYER 1: Local keyword pre-filter (instant, no API call needed)
             if (containsBadWords(review.getDescription())) {
                 throw new IllegalArgumentException("REJECTED: Your review contains inappropriate language.");
             }
@@ -44,13 +43,43 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     private boolean containsBadWords(String text) {
-        List<String> badWords = List.of(
-                "spam", "scam", "fuck", "shit", "idiot", "stupid", "kill",
-                "hate", "worthless", "garbage", "ass", "bastard", "crap"
-                // Add more as needed
-        );
-        String lower = text.toLowerCase();
-        return badWords.stream().anyMatch(lower::contains);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey;
+
+            String prompt = "You are a content moderation assistant. Analyze the following text and determine if it contains inappropriate language, profanity, hate speech, or spam. Respond with EXACTLY ONE WORD: 'true' if it contains bad words, or 'false' if it is clean.\n\nText: \"" + text + "\"";
+
+            Map<String, Object> textPart = new HashMap<>();
+            textPart.put("text", prompt);
+
+            Map<String, Object> parts = new HashMap<>();
+            parts.put("parts", Collections.singletonList(textPart));
+
+            Map<String, Object> contents = new HashMap<>();
+            contents.put("contents", Collections.singletonList(parts));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(contents, headers);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+
+            List<?> candidates = (List<?>) response.getBody().get("candidates");
+            if (candidates != null && !candidates.isEmpty()) {
+                Map<?, ?> firstCandidate = (Map<?, ?>) candidates.get(0);
+                Map<?, ?> content = (Map<?, ?>) firstCandidate.get("content");
+                List<?> partsList = (List<?>) content.get("parts");
+                Map<?, ?> firstPart = (Map<?, ?>) partsList.get(0);
+
+                String result = (String) firstPart.get("text");
+                if (result != null) {
+                    return result.trim().toLowerCase().contains("true");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Content Moderation API Error: " + e.getMessage(), e);
+        }
+        return false;
     }
 
 

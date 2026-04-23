@@ -340,12 +340,19 @@ export class ClientFeedComponent implements OnInit, OnDestroy {
     this.resetForm();
   }
 
+  isSubmitting = false;
+
   publishProject() {
     if (!this.project.title || !this.project.description || !this.project.budget) {
       alert("Please fill all required fields");
       return;
     }
 
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.isSubmitting = true;
     this.project.requiredCompetenceIds = Array.from(this.selectedSkills);
     this.project.postedAt = new Date().toISOString().split('T')[0];
 
@@ -354,10 +361,12 @@ export class ClientFeedComponent implements OnInit, OnDestroy {
         alert("Project created successfully 🚀");
         this.closeProjectModal();
         this.loadProjects(); 
+        this.isSubmitting = false;
       },
       error: (err) => {
         console.error(err);
-        alert("Server error ❌");
+        alert(err.error?.message || "Erreur: Ce projet existe déjà ou le serveur a rencontré un problème ❌");
+        this.isSubmitting = false;
       }
     });
   }

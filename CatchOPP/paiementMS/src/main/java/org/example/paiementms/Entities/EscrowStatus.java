@@ -7,5 +7,6 @@ public enum EscrowStatus {
     PARTIAL_PAID,   // some tasks paid, remaining still locked
     RELEASED,       // all tasks paid, escrow fully released
     REFUNDED,       // dispute resolved, money back to client
+    DISPUTED,       // in dispute
     CANCELLED       // contract cancelled before locking
 }

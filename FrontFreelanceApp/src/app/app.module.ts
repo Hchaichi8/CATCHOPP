@@ -88,6 +88,7 @@ import { ClubPageComponent } from './interfaces_events/club-page/club-page.compo
 import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
 import { ClubService } from './interfaces_events';
 import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
+import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-support.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +105,7 @@ import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-fi
     ClientDashboardComponent,
     ProjectProposalsComponent,
     AllProjectsComponent,
+    
   
     ClientProfileComponent,
         VirtualContractComponent,
@@ -118,7 +120,7 @@ import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-fi
         DashboardFreelancerComponent,
         FreelancerWalletComponent,
         MessengerComponent,
-        TechnicalSupportComponent,
+      
         DashboardAdminComponent,
         UserAdminComponent,
         JobsAdminComponent,
@@ -135,6 +137,8 @@ import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-fi
         WorkspaceComponent,
         OnboardingComponent,
         MessagesComponent,
+        TechnicalSupportComponent,
+        AdminSupportComponent,
 
          SubscriptionPlansComponent,
          SubscriptionDashboardComponent,

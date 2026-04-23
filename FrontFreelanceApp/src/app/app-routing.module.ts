@@ -73,6 +73,7 @@ import { ClubComponent } from './interfaces_events/club/club.component';
 import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
 import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
 import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
+import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-support.component';
 
 const routes: Routes = [
 
@@ -136,7 +137,7 @@ const routes: Routes = [
 {path:'AdminFinancee',component:FinanceAdminComponent, },
 {path:'AdminSkills',component:CompetenceAdminComponent, },
 {path:'AdminFinance',component:AdminFinanceComponent, },
-
+{path:'AdminSupport',component:AdminSupportComponent, },
 
 //Subscription routes (Module 3 - Freelancer)
 {path:'SubscriptionPlans',component:SubscriptionPlansComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},

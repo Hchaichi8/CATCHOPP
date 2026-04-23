@@ -112,6 +112,15 @@ public class TicketService {
         return summary;
     }
 
+    public String regenerateEnhancement(Long id) {
+        Ticket ticket = ticketRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ticket not found: " + id));
+        String enhanced = enhancementService.enhance(ticket.getTitle(), ticket.getDescription());
+        ticket.setEnhancedDescription(enhanced);
+        ticketRepo.save(ticket);
+        return enhanced;
+    }
+
     public Ticket escalateTicket(Long id) {
         Ticket ticket = ticketRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Ticket not found: " + id));

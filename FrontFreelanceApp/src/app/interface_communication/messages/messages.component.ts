@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, forwardRef, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ChatService } from '../../Services/chat.service';
 import { Router } from '@angular/router';
+
 
 
 @Component({
@@ -15,7 +16,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
   messages: any[] = [];
   newMessageText: string = '';
 
-  constructor(private chatService: ChatService, private router: Router) {}
+constructor(
+    @Inject(forwardRef(() => ChatService)) private chatService: ChatService, // 2. Use Inject + forwardRef
+    private router: Router
+  ) {}  
 
   ngOnInit(): void {
     // 1. Récupérer l'ID de l'utilisateur connecté

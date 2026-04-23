@@ -14,6 +14,7 @@
         <module name="ReferralMicroService" />
         <module name="SkillTestsMicroService" />
         <module name="apigetway" />
+        <module name="TechnicalSupportMS" />
       </profile>
       <profile name="Annotation profile for CommunityMicroService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -24,7 +25,7 @@
         </processorPath>
         <module name="CommunityMicroService" />
       </profile>
-      <profile name="Annotation profile for ProjectMicroService" enabled="true">
+      <profile name="Annotation profile for CatchOPP" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -48,6 +49,7 @@
       <module name="ReferralMicroService" options="-parameters" />
       <module name="SkillTestsMicroService" options="-parameters" />
       <module name="SubscriptionMicroService" options="-parameters" />
+      <module name="TechnicalSupportMS" options="-parameters" />
       <module name="UserMicroService" options="-parameters" />
       <module name="apigetway" options="-parameters" />
       <module name="eureka" options="-parameters" />

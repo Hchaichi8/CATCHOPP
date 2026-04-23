@@ -19,6 +19,9 @@ public class ProjectService {
 
     // --- Project Methods ---
     public Project createProject(Project project) {
+        if (projectRepo.existsByTitleAndClientIdAndStatus(project.getTitle(), project.getClientId(), Status.OPEN)) {
+            throw new RuntimeException("Un projet avec ce titre est déjà ouvert. Vous ne pouvez pas créer de doublons.");
+        }
         return projectRepo.save(project);
     }
 

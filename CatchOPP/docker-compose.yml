@@ -1,0 +1,210 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────
+#  CatchOPP – Microservices Stack
+#  Services covered:
+#    • mysql-db          (shared MySQL 8)
+#    • eureka            (Service Registry  – 8761)
+#    • apigateway        (API Gateway       – 8085)
+#    • user-ms           (UserMicroService  – 8083)
+#    • project-ms        (ProjectMS         – 8082)
+#    • competence-ms     (MS_CompetenceAndReview – 8084)
+#    • paiement-ms       (paiementMS        – 8088)
+#    • communication-ms  (MSCommunication   – 8086)
+#    • support-ms        (TechnicalSupportMS– 8087)
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── MySQL (shared instance, one DB per service) ──────────────
+  mysql-db:
+    image: mysql:8.0
+    container_name: catchopp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-catchopp}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-catchopp}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - catchopp-net
+
+  # ── Eureka Service Registry ──────────────────────────────────
+  eureka:
+    build:
+      context: ./eureka
+    container_name: catchopp-eureka
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - catchopp-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+  # ── API Gateway ──────────────────────────────────────────────
+  apigateway:
+    build:
+      context: ./apigetway
+    container_name: catchopp-apigateway
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── User MicroService ────────────────────────────────────────
+  user-ms:
+    build:
+      context: ./UserMicroService
+    container_name: catchopp-user-ms
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_users?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── Project MicroService ─────────────────────────────────────
+  project-ms:
+    build:
+      context: ./ProjectMicroService
+    container_name: catchopp-project-ms
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_projects?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── Competence & Review MicroService ────────────────────────
+  competence-ms:
+    build:
+      context: ./MS_CompetenceAndReview
+    container_name: catchopp-competence-ms
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_competence?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── Paiement MicroService ────────────────────────────────────
+  paiement-ms:
+    build:
+      context: ./paiementMS
+    container_name: catchopp-paiement-ms
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_paiement?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── Communication MicroService (HTTP + WebSocket) ────────────
+  communication-ms:
+    build:
+      context: ./MSCommunication
+    container_name: catchopp-communication-ms
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_communication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+  # ── Technical Support MicroService ──────────────────────────
+  support-ms:
+    build:
+      context: ./TechnicalSupportMS
+    container_name: catchopp-support-ms
+    restart: unless-stopped
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchopp_support?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - catchopp-net
+
+volumes:
+  mysql_data:
+
+networks:
+  catchopp-net:
+    driver: bridge
