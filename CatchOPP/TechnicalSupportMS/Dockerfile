@@ -1,20 +1,20 @@
 # ─────────────────────────────────────────────
 #  Stage 1 – Build
+#  Uses maven:3.9 image (no mvnw needed)
 # ─────────────────────────────────────────────
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 
 WORKDIR /app
 
-# Copy Maven wrapper & pom first (layer-cache friendly)
-COPY mvnw mvnw.cmd pom.xml ./
-COPY .mvn .mvn
+# Copy pom first (layer-cache friendly)
+COPY pom.xml .
 
-# Download dependencies without compiling sources
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+# Download dependencies
+RUN mvn dependency:go-offline -B
 
 # Copy source code and build
 COPY src src
-RUN ./mvnw package -DskipTests -B
+RUN mvn package -DskipTests -B
 
 # ─────────────────────────────────────────────
 #  Stage 2 – Runtime
@@ -23,13 +23,11 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Non-root user for security
 RUN addgroup -S catchopp && adduser -S catchopp -G catchopp
 USER catchopp
 
 COPY --from=builder /app/target/TechnicalSupportMS-0.0.1-SNAPSHOT.jar app.jar
 
-# HTTP + WebSocket port
 EXPOSE 8087
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
