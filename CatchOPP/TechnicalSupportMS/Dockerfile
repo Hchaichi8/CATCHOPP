@@ -10,11 +10,11 @@ WORKDIR /app
 COPY pom.xml .
 
 # Download dependencies
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B -Dmaven.test.skip=true
 
 # Copy source code and build
 COPY src src
-RUN mvn package -DskipTests -B
+RUN mvn package -Dmaven.test.skip=true -B
 
 # ─────────────────────────────────────────────
 #  Stage 2 – Runtime
