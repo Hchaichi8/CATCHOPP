@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Project } from '../../models/project.model';
@@ -103,7 +103,7 @@ export class DetailclientprojectComponent implements OnInit {
 
   // --- REVIEWS ---
   fetchProjectReviews() {
-    this.http.get<any[]>(`http://localhost:8085/Review/GetReviewsByProject/${this.project.id}`)
+    this.http.get<any[]>(`http://192.168.110.134:8085/Review/GetReviewsByProject/${this.project.id}`)
       .subscribe(res => this.projectReviews = res);
   }
 
@@ -131,7 +131,7 @@ export class DetailclientprojectComponent implements OnInit {
     this.reviewRejectionMsg = '';
     this.reviewWasRejected = false;
 
-    this.http.post<any>('http://localhost:8085/Review/enhance', {
+    this.http.post<any>('http://192.168.110.134:8085/Review/enhance', {
       text: this.reviewText,
       rating: this.rating
     }).subscribe({
@@ -166,7 +166,7 @@ export class DetailclientprojectComponent implements OnInit {
       createdAt: new Date().toISOString()
     };
 
-    this.http.post('http://localhost:8085/Review/AjouterReview', reviewData).subscribe({
+    this.http.post('http://192.168.110.134:8085/Review/AjouterReview', reviewData).subscribe({
       next: () => {
         this.isSubmittingReview = false;
         this.reviewRejectionMsg = '';

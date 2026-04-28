@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -55,7 +55,7 @@ export interface WalletStats {
   providedIn: 'root'
 })
 export class DonationService {
-  private baseUrl = 'http://localhost:8088/api';
+  private baseUrl = 'http://192.168.110.134:8088/api';
 
   constructor(private http: HttpClient) {}
 
@@ -139,3 +139,4 @@ export class DonationService {
     return this.http.post(`${this.baseUrl}/donations/${donationId}/refund`, null);
   }
 }
+

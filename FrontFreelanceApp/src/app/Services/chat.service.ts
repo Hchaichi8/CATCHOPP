@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Client, Message } from '@stomp/stompjs';
@@ -8,7 +8,7 @@ import SockJS from 'sockjs-client';
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:8086/chat'; // Backend URL
+  private apiUrl = 'http://192.168.110.134:8086/chat'; // Backend URL
   private stompClient: Client | null = null;
   
   public messageSubject: Subject<any> = new Subject<any>();
@@ -68,7 +68,7 @@ export class ChatService {
     }
 
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8086/ws'),
+      webSocketFactory: () => new SockJS('http://192.168.110.134:8086/ws'),
       debug: (str) => { console.log(str); },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,

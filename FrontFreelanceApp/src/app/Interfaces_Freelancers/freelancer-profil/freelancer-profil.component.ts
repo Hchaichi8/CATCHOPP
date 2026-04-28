@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+﻿import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { UserService } from '../../Services/user.service';
 import { CompetanceService } from '../../Services/competance.service';
 import { ReviewService } from '../../Services/review.service'; 
@@ -105,7 +105,7 @@ export class FreelancerProfilComponent implements OnInit {
 
   openConversation(event: Event) {
     event.stopPropagation();
-    const chatApiUrl = `http://localhost:8086/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.freelancerId}`;
+    const chatApiUrl = `http://192.168.110.134:8086/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.freelancerId}`;
     this.http.post(chatApiUrl, null).subscribe({
       next: (res: any) => {
         this.selectedConversationUserId = this.freelancerId;

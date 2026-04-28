@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+﻿import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Project } from '../models/project.model';
@@ -9,7 +9,7 @@ import { Project } from '../models/project.model';
 export class ProjectServiceService {
 
     constructor(private http:HttpClient) { }  
-  private url ='http://localhost:8085/Project'
+  private url ='http://192.168.110.134:8085/Project'
  
 
   addProject(project: Project): Observable<Project> {
@@ -51,3 +51,4 @@ export class ProjectServiceService {
   return this.http.put<any>(`${this.url}/proposals/${proposalId}/status`, {}, { params });
 }
 }
+

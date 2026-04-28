@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   NotificationService,
@@ -130,7 +130,7 @@ export class GroupListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.saveError = 'Impossible de charger les groupes. Vérifiez que le backend tourne sur http://localhost:8089.';
+        this.saveError = 'Impossible de charger les groupes. Vérifiez que le backend tourne sur http://192.168.110.134:8089.';
       }
     });
   }
@@ -457,3 +457,4 @@ export class GroupListComponent implements OnInit {
     return interests.split(',').map(i => i.trim()).filter(i => i.length > 0);
   }
 }
+

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * API Configuration for Events & Communities Module
  */
 
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:8090',
+  BASE_URL: 'http://192.168.110.134:8090',
   ENDPOINTS: {
     GROUPS: '/api/groups',
     EVENTS: '/api/events',
@@ -19,3 +19,4 @@ export const API_CONFIG = {
 export function getApiUrl(endpoint: string): string {
   return `${API_CONFIG.BASE_URL}${endpoint}`;
 }
+

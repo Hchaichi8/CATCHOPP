@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+﻿import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TicketService, Ticket, PagedTickets, TicketStats } from './ticket.service';
 
 describe('TicketService', () => {
   let service: TicketService;
   let httpMock: HttpTestingController;
-  const API = 'http://localhost:8087/api/tickets';
+  const API = 'http://192.168.110.134:8087/api/tickets';
 
   const mockTicket: Ticket = {
     id: 1, userId: 10, title: 'Test', description: 'Desc',
@@ -134,3 +134,4 @@ describe('TicketService', () => {
     req.flush({ ...response, id: 1 });
   });
 });
+

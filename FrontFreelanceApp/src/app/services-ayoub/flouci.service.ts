@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -37,7 +37,7 @@ export class FlouciService {
   private readonly APP_SECRET = 'YOUR_FLOUCI_APP_SECRET'; 
   
   // Backend proxy endpoint (recommended for security)
-  private readonly BACKEND_URL = 'http://localhost:8087/Subscription/flouci';
+  private readonly BACKEND_URL = 'http://192.168.110.134:8087/Subscription/flouci';
   private useTestMode = true; 
 
   constructor(private http: HttpClient) {
@@ -159,3 +159,4 @@ export class FlouciService {
     return usdAmount * exchangeRate;
   }
 }
+

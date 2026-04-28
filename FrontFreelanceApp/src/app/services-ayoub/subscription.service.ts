@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-const API = 'http://localhost:8087/Subscription';
+const API = 'http://192.168.110.134:8087/Subscription';
 
 export interface SubscriptionPlan {
   id?: number;
@@ -134,3 +134,4 @@ export class SubscriptionService {
     );
   }
 }
+

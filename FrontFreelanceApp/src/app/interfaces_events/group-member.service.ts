@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -14,7 +14,7 @@ export interface GroupMember {
   providedIn: 'root'
 })
 export class GroupMemberService {
-  private apiUrl = 'http://localhost:8090/api/group-members';
+  private apiUrl = 'http://192.168.110.134:8090/api/group-members';
 
   constructor(private http: HttpClient) {}
 
@@ -58,3 +58,4 @@ export class GroupMemberService {
     return this.http.get<number>(`${this.apiUrl}/group/${groupId}/count`);
   }
 }
+

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { User } from '../models/user';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UserService {
 
 
-  private apiUrl = 'http://localhost:8085/users'; 
+  private apiUrl = 'http://192.168.110.134:8085/users'; 
 
   constructor(private http: HttpClient) { }
 
@@ -42,4 +42,5 @@ export class UserService {
     return this.http.put<any>(`${this.apiUrl}/update/${id}`, user);
   }
 }
+
 

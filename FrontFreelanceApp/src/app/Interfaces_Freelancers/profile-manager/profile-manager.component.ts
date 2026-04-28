@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Competance } from '../../models/Competance';
 import { CompetanceService } from '../../Services/competance.service';
 import { UserService } from '../../Services/user.service';
@@ -142,7 +142,7 @@ export class ProfileManagerComponent implements OnInit {
 
   downloadCv() {
     if (!this.uploadedCvName) return;
-    const backendUrl = `http://localhost:8085/users/download-cv/${this.uploadedCvName}`;
+    const backendUrl = `http://192.168.110.134:8085/users/download-cv/${this.uploadedCvName}`;
     window.open(backendUrl, '_blank');
   }
 

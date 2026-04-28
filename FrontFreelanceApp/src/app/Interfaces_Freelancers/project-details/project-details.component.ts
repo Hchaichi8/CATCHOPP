@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectServiceService } from '../../Services/project-service.service';
@@ -246,7 +246,7 @@ export class ProjectDetailsComponent implements OnInit {
 
   // --- LOGIQUE DES REVIEWS & IA GEMINI ---
   fetchProjectReviews(projectId: number) {
-    this.http.get<any[]>(`http://localhost:8085/Review/GetReviewsByProject/${projectId}`)
+    this.http.get<any[]>(`http://192.168.110.134:8085/Review/GetReviewsByProject/${projectId}`)
       .subscribe(res => this.projectReviews = res);
   }
 
@@ -258,7 +258,7 @@ export class ProjectDetailsComponent implements OnInit {
     this.reviewRejectionMsg = '';
     this.reviewWasRejected = false;
 
-    this.http.post<any>('http://localhost:8085/Review/enhance', { text: this.reviewText, rating: this.rating })
+    this.http.post<any>('http://192.168.110.134:8085/Review/enhance', { text: this.reviewText, rating: this.rating })
       .subscribe({
         next: (res) => {
           this.reviewText = res.enhancedText;
@@ -290,7 +290,7 @@ export class ProjectDetailsComponent implements OnInit {
       createdAt: new Date().toISOString()
     };
 
-    this.http.post('http://localhost:8085/Review/AjouterReview', reviewData).subscribe({
+    this.http.post('http://192.168.110.134:8085/Review/AjouterReview', reviewData).subscribe({
       next: () => {
         this.isSubmittingReview = false;
         this.reviewRejectionMsg = '';

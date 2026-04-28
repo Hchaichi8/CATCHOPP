@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Contract } from '../models/contract';
 import { Observable } from 'rxjs';
@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ContractService {
 
-  private apiUrl = 'http://localhost:8085/Contract'; 
-  private proposalUrl = 'http://localhost:8085/Project';
+  private apiUrl = 'http://192.168.110.134:8085/Contract'; 
+  private proposalUrl = 'http://192.168.110.134:8085/Project';
 
   constructor(private http: HttpClient) {}
 
@@ -53,4 +53,5 @@ signContract(contractId: number, data: any): Observable<Contract> {
     return this.http.put<Contract>(`${this.apiUrl}/${contractId}/reject`, {});
   }
 }
+
 

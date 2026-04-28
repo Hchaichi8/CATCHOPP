@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+﻿import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { UserService } from '../../Services/user.service';
 import { ActivatedRoute, Router } from '@angular/router'; 
 import { HttpClient } from '@angular/common/http'; // 🟢 Ajout pour le chat
@@ -57,7 +57,7 @@ enhanceWithAI() {
     rating: this.newReview.rating
   };
 
-  this.http.post('http://localhost:8085/Review/enhance', payload).subscribe({
+  this.http.post('http://192.168.110.134:8085/Review/enhance', payload).subscribe({
     next: (res: any) => {
       this.newReview.description = res.enhancedText;
       this.isGenerating = false;
@@ -141,7 +141,7 @@ enhanceWithAI() {
     event.stopPropagation();
     
     // Création de la conversation en base de données
-    const chatApiUrl = `http://localhost:8086/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.clientId}`;
+    const chatApiUrl = `http://192.168.110.134:8086/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.clientId}`;
 
     this.http.post(chatApiUrl, null).subscribe({
       next: (res: any) => {

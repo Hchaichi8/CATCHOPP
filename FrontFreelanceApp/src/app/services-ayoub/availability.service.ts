@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-const API = 'http://localhost:8088/Referral/availability';
+const API = 'http://192.168.110.134:8088/Referral/availability';
 
 export type AvailabilityStatus = 'ONLINE' | 'AVAILABLE' | 'AVAILABLE_TOMORROW' | 'OFFLINE' | 'DO_NOT_DISTURB' | 'CUSTOM';
 
@@ -149,3 +149,4 @@ export class AvailabilityService {
     return new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
   }
 }
+
