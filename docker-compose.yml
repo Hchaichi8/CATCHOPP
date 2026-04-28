@@ -102,7 +102,7 @@ services:
       - catchopp-network
 
   competence-ms:
-    image: ghassenhchaichi/catchopp-competenceandreview-ms:latest
+    image: ghassenhchaichi/catchopp-competence-ms:latest
     container_name: catchopp-competence-ms
     ports:
       - "8084:8084"
