@@ -1,4 +1,4 @@
-package org.example.referralmicroservice.Controllers;
+﻿package org.example.referralmicroservice.Controllers;
 
 import org.example.referralmicroservice.Entities.RewardTransaction;
 import org.example.referralmicroservice.Entities.UserWallet;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wallet")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class WalletController {
 
     @Autowired
@@ -102,3 +102,4 @@ public class WalletController {
         return ResponseEntity.ok(stats);
     }
 }
+

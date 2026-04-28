@@ -1,4 +1,4 @@
-package org.example.subscriptionmicroservice.Controllers;
+﻿package org.example.subscriptionmicroservice.Controllers;
 
 import org.example.subscriptionmicroservice.Entities.SpinWheelAttempt;
 import org.example.subscriptionmicroservice.Entities.UserReward;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rewards")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class RewardController {
 
     @Autowired
@@ -161,3 +161,4 @@ public class RewardController {
         return ResponseEntity.ok(response);
     }
 }
+

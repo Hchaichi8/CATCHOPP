@@ -1,4 +1,4 @@
-package org.example.ms_competenceandreview.Controllers;
+﻿package org.example.ms_competenceandreview.Controllers;
 
 import org.example.ms_competenceandreview.Entities.Competance;
 import org.example.ms_competenceandreview.Services.Interface.CompetanceService;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/Competance")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class CompetanceController {
 
     @GetMapping("/download/{filename:.+}")
@@ -106,4 +106,5 @@ public class CompetanceController {
         return competanceService.GetCompetance(id);
     }
 }
+
 

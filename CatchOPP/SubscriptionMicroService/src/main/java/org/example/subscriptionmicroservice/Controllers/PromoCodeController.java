@@ -1,4 +1,4 @@
-package org.example.subscriptionmicroservice.Controllers;
+﻿package org.example.subscriptionmicroservice.Controllers;
 
 import org.example.subscriptionmicroservice.Entities.PromoCode;
 import org.example.subscriptionmicroservice.Services.PromoCodeService;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/promo-codes")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class PromoCodeController {
 
     @Autowired
@@ -188,3 +188,4 @@ public class PromoCodeController {
     }
 
 }
+

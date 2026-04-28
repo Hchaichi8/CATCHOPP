@@ -1,4 +1,4 @@
-package org.example.subscriptionmicroservice.Config;
+﻿package org.example.subscriptionmicroservice.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         
         // Allow origin
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        config.setAllowedOrigins(Arrays.asList("http://192.168.110.134"));
         
         // Allow all headers
         config.addAllowedHeader("*");
@@ -34,3 +34,4 @@ public class CorsConfig {
         return new CorsFilter(source);
     }
 }
+

@@ -1,4 +1,4 @@
-package org.example.mscommunication;
+﻿package org.example.mscommunication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/chat/admin")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class AdminChatController {
 
     @Autowired
@@ -164,3 +164,4 @@ public class AdminChatController {
         return ResponseEntity.ok(activity);
     }
 }
+

@@ -1,4 +1,4 @@
-package org.example.referralmicroservice.Controllers;
+﻿package org.example.referralmicroservice.Controllers;
 
 import org.example.referralmicroservice.Entities.Referral;
 import org.example.referralmicroservice.Entities.ReferralCode;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/Referral")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class ReferralController {
 
     @Autowired
@@ -113,3 +113,4 @@ public class ReferralController {
         service.deleteReferralReward(id);
     }
 }
+

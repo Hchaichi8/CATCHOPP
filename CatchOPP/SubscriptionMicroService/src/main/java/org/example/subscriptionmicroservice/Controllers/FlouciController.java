@@ -1,4 +1,4 @@
-package org.example.subscriptionmicroservice.Controllers;
+﻿package org.example.subscriptionmicroservice.Controllers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Subscription/flouci")
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "http://192.168.110.134", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class FlouciController {
 
     @Value("${flouci.app.token:YOUR_FLOUCI_APP_TOKEN}")
@@ -179,7 +179,7 @@ public class FlouciController {
         // Create mock payment link that redirects back to checkout with success
         String baseUrl = request.get("successUrl") != null ? 
             request.get("successUrl").toString().split("\\?")[0] : 
-            "http://localhost:4200/SubscriptionCheckout/" + planId;
+            "http://192.168.110.134/SubscriptionCheckout/" + planId;
             
         result.put("link", baseUrl + "?payment_id=" + testPaymentId + "&status=success");
         result.put("payment_id", testPaymentId);
@@ -215,3 +215,4 @@ public class FlouciController {
         return ResponseEntity.ok(response);
     }
 }
+

@@ -1,4 +1,4 @@
-package org.example.referralmicroservice.availability;
+﻿package org.example.referralmicroservice.availability;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/Referral/availability")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class AvailabilityController {
 
     @Autowired
@@ -125,3 +125,4 @@ public class AvailabilityController {
         return availabilityService.findCompatibleSlots(userIds);
     }
 }
+

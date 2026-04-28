@@ -1,4 +1,4 @@
-package org.example.technicalsupport.controller;
+﻿package org.example.technicalsupport.controller;
 
 import org.example.technicalsupport.dto.AddResponseRequest;
 import org.example.technicalsupport.dto.CreateTicketRequest;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class TicketController {
 
     @Autowired private TicketService ticketService;
@@ -181,3 +181,4 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getStatistics());
     }
 }
+

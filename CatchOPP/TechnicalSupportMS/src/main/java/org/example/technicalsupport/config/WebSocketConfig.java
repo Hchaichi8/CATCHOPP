@@ -1,4 +1,4 @@
-package org.example.technicalsupport.config;
+﻿package org.example.technicalsupport.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,7 +18,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-support")
-                .setAllowedOrigins("http://localhost:4200")
+                .setAllowedOrigins("http://192.168.110.134")
                 .withSockJS();
     }
 }
+

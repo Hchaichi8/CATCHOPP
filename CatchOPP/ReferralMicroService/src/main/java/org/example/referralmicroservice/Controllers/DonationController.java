@@ -1,4 +1,4 @@
-package org.example.referralmicroservice.Controllers;
+﻿package org.example.referralmicroservice.Controllers;
 
 import org.example.referralmicroservice.Entities.Donation;
 import org.example.referralmicroservice.Services.DonationService;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/donations")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://192.168.110.134")
 public class DonationController {
 
     @Autowired
@@ -121,3 +121,4 @@ public class DonationController {
         }
     }
 }
+

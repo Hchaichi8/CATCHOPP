@@ -1,4 +1,4 @@
-package org.example.subscriptionmicroservice.Services;
+﻿package org.example.subscriptionmicroservice.Services;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -178,7 +178,7 @@ public class EmailService {
                         </ul>
                         
                         <center>
-                            <a href="http://localhost:4200/SubscriptionDashboard" class="button">View Dashboard</a>
+                            <a href="http://192.168.110.134/SubscriptionDashboard" class="button">View Dashboard</a>
                         </center>
                         
                         <p style="margin-top: 30px;">If you have any questions, feel free to contact us at <a href="mailto:%s">%s</a></p>
@@ -244,7 +244,7 @@ public class EmailService {
                         <p>To continue enjoying all the benefits, make sure your payment method is up to date.</p>
                         
                         <center>
-                            <a href="http://localhost:4200/SubscriptionDashboard" class="button">Manage Subscription</a>
+                            <a href="http://192.168.110.134/SubscriptionDashboard" class="button">Manage Subscription</a>
                         </center>
                         
                         <p style="margin-top: 30px;">Questions? Contact us at <a href="mailto:%s">%s</a></p>
@@ -305,7 +305,7 @@ public class EmailService {
                         <p>Use this code on your next subscription renewal to save money!</p>
                         
                         <center>
-                            <a href="http://localhost:4200/rewards" class="button">View My Rewards</a>
+                            <a href="http://192.168.110.134/rewards" class="button">View My Rewards</a>
                         </center>
                         
                         <p style="margin-top: 30px; font-size: 14px; color: #6b7280;">
@@ -344,3 +344,4 @@ public class EmailService {
         return html.toString();
     }
 }
+
