@@ -1,0 +1,187 @@
+version: '3.8'
+
+networks:
+  catchopp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+
+services:
+
+  # ─────────────────────────────────────────────
+  #  DATABASE
+  # ─────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: catchopp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: catchopp_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - catchopp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ─────────────────────────────────────────────
+  #  EUREKA SERVER
+  # ─────────────────────────────────────────────
+  eureka:
+    image: ghassenhchaichi/catchopp-eureka:latest
+    container_name: catchopp-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - catchopp-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  # ─────────────────────────────────────────────
+  #  API GATEWAY
+  # ─────────────────────────────────────────────
+  gateway:
+    image: ghassenhchaichi/catchopp-gateway:latest
+    container_name: catchopp-gateway
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ─────────────────────────────────────────────
+  #  MICROSERVICES
+  # ─────────────────────────────────────────────
+  user-ms:
+    image: ghassenhchaichi/catchopp-user-ms:latest
+    container_name: catchopp-user-ms
+    ports:
+      - "8088:8088"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_user_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  project-ms:
+    image: ghassenhchaichi/catchopp-project-ms:latest
+    container_name: catchopp-project-ms
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_project_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  competence-ms:
+    image: ghassenhchaichi/catchopp-competence-ms:latest
+    container_name: catchopp-competence-ms
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_competence_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  paiement-ms:
+    image: ghassenhchaichi/catchopp-paiement-ms:latest
+    container_name: catchopp-paiement-ms
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_paiement_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  communication-ms:
+    image: ghassenhchaichi/catchopp-communication-ms:latest
+    container_name: catchopp-communication-ms
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_chat_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  support-ms:
+    image: ghassenhchaichi/catchopp-support-ms:latest
+    container_name: catchopp-support-ms
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/catchopp_support_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ─────────────────────────────────────────────
+  #  FRONTEND
+  # ─────────────────────────────────────────────
+  frontend:
+    image: ghassenhchaichi/catchopp-frontend:latest
+    container_name: catchopp-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+    networks:
+      - catchopp-network
