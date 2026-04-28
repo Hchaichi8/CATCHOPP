@@ -102,8 +102,8 @@ services:
       - catchopp-network
 
   competence-ms:
-    image: ghassenhchaichi/catchopp-competence-ms:latest
-    container_name: catchopp-competence-ms
+    image: ghassenhchaichi/catchopp-competanceandreview-ms:latest
+    container_name: /catchopp-competanceandreview-ms
     ports:
       - "8084:8084"
     environment:
