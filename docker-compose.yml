@@ -34,7 +34,7 @@ services:
   #  EUREKA SERVER
   # ─────────────────────────────────────────────
   eureka:
-    image: ghassenhchaichi/catchopp-eureka:latest
+    image: ghassenhchaichi/catchopp-eureka-ms:latest
     container_name: catchopp-eureka
     ports:
       - "8761:8761"
@@ -50,7 +50,7 @@ services:
   #  API GATEWAY
   # ─────────────────────────────────────────────
   gateway:
-    image: ghassenhchaichi/catchopp-gateway:latest
+    image: ghassenhchaichi/catchopp-gateway-ms:latest
     container_name: catchopp-gateway
     ports:
       - "8085:8085"
@@ -102,7 +102,7 @@ services:
       - catchopp-network
 
   competence-ms:
-    image: ghassenhchaichi/catchopp-competence-ms:latest
+    image: ghassenhchaichi/catchopp-competenceandreview-ms:latest
     container_name: catchopp-competence-ms
     ports:
       - "8084:8084"
@@ -177,7 +177,7 @@ services:
   #  FRONTEND
   # ─────────────────────────────────────────────
   frontend:
-    image: ghassenhchaichi/catchopp-frontend:latest
+    image: ghassenhchaichi/catchopp-frontend-ms:latest
     container_name: catchopp-frontend
     ports:
       - "80:80"
