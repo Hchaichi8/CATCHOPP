@@ -12,7 +12,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/disputes")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 public class DisputeController {
 
     private final DisputeService disputeService;

@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Client } from '@stomp/stompjs';
@@ -60,7 +60,7 @@ export interface TicketStats {
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
-  private apiUrl = 'http://192.168.110.134:8087/api/tickets';
+  private apiUrl = 'http://192.168.110.134:8085/api/tickets';
   private stompClient: Client | null = null;
 
   public notificationSubject = new Subject<any>();
@@ -141,7 +141,7 @@ export class TicketService {
   connectWebSocket(userId: string) {
     if (this.stompClient?.active) return;
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://192.168.110.134:8087/ws-support'),
+      webSocketFactory: () => new SockJS('http://192.168.110.134:8085/ws-support'),
       reconnectDelay: 5000,
     });
     this.stompClient.onConnect = () => {

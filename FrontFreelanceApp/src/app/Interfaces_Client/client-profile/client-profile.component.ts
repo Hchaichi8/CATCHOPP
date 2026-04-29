@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { UserService } from '../../Services/user.service';
 import { ActivatedRoute, Router } from '@angular/router'; 
 import { HttpClient } from '@angular/common/http'; // 🟢 Ajout pour le chat
@@ -141,7 +141,7 @@ enhanceWithAI() {
     event.stopPropagation();
     
     // Création de la conversation en base de données
-    const chatApiUrl = `http://192.168.110.134:8086/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.clientId}`;
+    const chatApiUrl = `http://192.168.110.134:8085/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.clientId}`;
 
     this.http.post(chatApiUrl, null).subscribe({
       next: (res: any) => {

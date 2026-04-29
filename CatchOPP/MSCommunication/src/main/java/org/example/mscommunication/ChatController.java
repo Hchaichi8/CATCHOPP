@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/chat")
-@CrossOrigin(origins = "http://192.168.110.134")
 public class ChatController{
 
     @Autowired

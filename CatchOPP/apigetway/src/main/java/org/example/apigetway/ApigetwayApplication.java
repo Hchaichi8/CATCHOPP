@@ -30,6 +30,16 @@ public class ApigetwayApplication {
 
                 .route("idroute2CompetanceETreview", r -> r.path("/Review/**")
                         .uri("lb://MSCOMPETENCEANDREVIEW"))
+
+                .route("idroutepayment", r -> r.path("/api/payments/**", "/api/disputes/**")
+                        .uri("lb://PAIEMENTMS"))
+
+                .route("idroutesupport", r -> r.path("/api/tickets/**", "/ws-support/**")
+                        .uri("http://catchopp-support-ms:8087"))
+
+                .route("idroutechat", r -> r.path("/chat/**", "/ws/**")
+                        .uri("http://catchopp-communication-ms:8086"))
+
                 .build();
     }
 

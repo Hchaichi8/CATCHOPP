@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -19,7 +19,7 @@ export interface Dispute {
   providedIn: 'root'
 })
 export class DisputeService {
-  private apiUrl = 'http://192.168.110.134:8088/api/disputes'; // assuming paiementMS runs on 8088
+  private apiUrl = 'http://192.168.110.134:8085/api/disputes'; // Gateway URL
 
   constructor(private http: HttpClient) {}
 

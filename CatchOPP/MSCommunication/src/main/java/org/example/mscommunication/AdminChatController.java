@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/chat/admin")
-@CrossOrigin(origins = "http://192.168.110.134")
 public class AdminChatController {
 
     @Autowired
