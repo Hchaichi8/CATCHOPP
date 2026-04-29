@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/Competance")
-@CrossOrigin(origins = "http://192.168.110.134")
 public class CompetanceController {
 
     @GetMapping("/download/{filename:.+}")
