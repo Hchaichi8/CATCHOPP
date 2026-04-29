@@ -1,4 +1,4 @@
-﻿import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Competance } from '../models/Competance';
 import { Observable } from 'rxjs';
@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class CompetanceService {
 
-   constructor(private http:HttpClient) { }  
-    private url ='http://192.168.110.134:8084/Competance'
+    constructor(private http:HttpClient) { }  
+    private url ='http://192.168.110.134:8085/Competance'
 
 parseCv(file: File): Observable<Competance[]> {
   const formData: FormData = new FormData();
