@@ -1,4 +1,4 @@
-﻿package org.example.subscriptionmicroservice.Controllers;
+package org.example.subscriptionmicroservice.Controllers;
 
 import org.example.subscriptionmicroservice.Entities.SpinWheelAttempt;
 import org.example.subscriptionmicroservice.Entities.UserReward;

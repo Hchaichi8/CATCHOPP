@@ -1,4 +1,4 @@
-﻿package org.example.technicalsupport.config;
+package org.example.technicalsupport.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

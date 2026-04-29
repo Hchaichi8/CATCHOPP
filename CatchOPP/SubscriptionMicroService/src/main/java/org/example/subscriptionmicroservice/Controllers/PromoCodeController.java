@@ -1,4 +1,4 @@
-﻿package org.example.subscriptionmicroservice.Controllers;
+package org.example.subscriptionmicroservice.Controllers;
 
 import org.example.subscriptionmicroservice.Entities.PromoCode;
 import org.example.subscriptionmicroservice.Services.PromoCodeService;

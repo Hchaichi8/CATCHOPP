@@ -1,4 +1,4 @@
-﻿package org.example.subscriptionmicroservice.Config;
+package org.example.subscriptionmicroservice.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

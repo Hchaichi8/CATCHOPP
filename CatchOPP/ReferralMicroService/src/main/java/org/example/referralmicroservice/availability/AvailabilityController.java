@@ -1,4 +1,4 @@
-﻿package org.example.referralmicroservice.availability;
+package org.example.referralmicroservice.availability;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

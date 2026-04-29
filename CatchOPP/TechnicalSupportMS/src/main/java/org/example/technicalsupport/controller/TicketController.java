@@ -1,4 +1,4 @@
-﻿package org.example.technicalsupport.controller;
+package org.example.technicalsupport.controller;
 
 import org.example.technicalsupport.dto.AddResponseRequest;
 import org.example.technicalsupport.dto.CreateTicketRequest;

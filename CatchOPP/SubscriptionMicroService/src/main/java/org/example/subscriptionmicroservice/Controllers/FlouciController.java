@@ -1,4 +1,4 @@
-﻿package org.example.subscriptionmicroservice.Controllers;
+package org.example.subscriptionmicroservice.Controllers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;

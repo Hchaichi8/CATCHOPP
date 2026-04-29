@@ -1,4 +1,4 @@
-﻿package org.example.referralmicroservice.Controllers;
+package org.example.referralmicroservice.Controllers;
 
 import org.example.referralmicroservice.Entities.Referral;
 import org.example.referralmicroservice.Entities.ReferralCode;

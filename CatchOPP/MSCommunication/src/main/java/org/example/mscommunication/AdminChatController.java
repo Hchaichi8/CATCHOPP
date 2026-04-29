@@ -1,4 +1,4 @@
-﻿package org.example.mscommunication;
+package org.example.mscommunication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

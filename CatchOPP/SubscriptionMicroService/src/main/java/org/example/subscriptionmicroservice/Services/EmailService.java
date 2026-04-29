@@ -1,4 +1,4 @@
-﻿package org.example.subscriptionmicroservice.Services;
+package org.example.subscriptionmicroservice.Services;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

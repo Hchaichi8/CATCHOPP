@@ -1,4 +1,4 @@
-﻿package org.example.ms_competenceandreview.Controllers;
+package org.example.ms_competenceandreview.Controllers;
 
 import org.example.ms_competenceandreview.Entities.Competance;
 import org.example.ms_competenceandreview.Services.Interface.CompetanceService;
