@@ -1,4 +1,4 @@
-﻿package org.example.mscommunication;
+package org.example.mscommunication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -173,7 +173,7 @@ public class ChatController{
             chatMessage.setTimestamp(LocalDateTime.now());
             
             // Store file URL in message (you can add a separate field for this)
-            String fileUrl = "http://localhost:8086/uploads/" + fileName;
+            String fileUrl = "http://192.168.110.134:8086/uploads/" + fileName;
             chatMessage.setContent(content + " [FILE:" + fileUrl + "]");
             
             Message savedMsg = messageRepository.save(chatMessage);

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 @FeignClient(
         name = "UserMicroService",
-        url = "http://localhost:8083",
+        url = "http://catchopp-user-ms:8088",
         configuration = FeignConfig.class
 )
 public interface UserClient {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "paiement-ms", url = "http://localhost:8088", configuration = FeignConfig.class)
+@FeignClient(name = "paiement-ms", url = "http://catchopp-paiement-ms:8083", configuration = FeignConfig.class)
 public interface PaymentClient {
 
     @PostMapping(value = "/api/payments/escrow/lock", consumes = MediaType.APPLICATION_JSON_VALUE)
