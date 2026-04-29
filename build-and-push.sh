@@ -47,7 +47,7 @@ echo -e "${BLUE}═══ BACKEND MICROSERVICES ══════════�
 
 # Standard MS — context = their own directory
 build_and_push "catchopp-user-ms"          "${CATCHOPP_DIR}/UserMicroService"
-build_and_push "catchopp-competence-ms"    "${CATCHOPP_DIR}/MS_CompetenceAndReview"
+build_and_push "catchopp-competanceandreview-ms"    "${CATCHOPP_DIR}/MS_CompetenceAndReview"
 build_and_push "catchopp-paiement-ms"      "${CATCHOPP_DIR}/paiementMS"
 build_and_push "catchopp-communication-ms" "${CATCHOPP_DIR}/MSCommunication"
 build_and_push "catchopp-support-ms"       "${CATCHOPP_DIR}/TechnicalSupportMS"
@@ -65,7 +65,7 @@ echo -e "${GREEN}  ✓ Pushed → hub.docker.com/${DOCKERHUB_USERNAME}/catchopp-
 echo ""
 
 echo -e "${BLUE}═══ FRONTEND ════════════════════════════════════════${NC}"
-build_and_push "catchopp-frontend" "${SCRIPT_DIR}/FrontFreelanceApp"
+build_and_push "catchopp-frontend-ms" "${SCRIPT_DIR}/FrontFreelanceApp"
 
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════════╗${NC}"
