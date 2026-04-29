@@ -41,7 +41,7 @@ services:
     networks:
       - catchopp-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8761/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8761/ || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
