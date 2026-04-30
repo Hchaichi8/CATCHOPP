@@ -136,7 +136,6 @@ class SkillTestServiceTest {
     @Test
     @DisplayName("deleteTest - should call repository delete")
     void deleteTest_shouldCallRepositoryDelete() {
-        when(skillTestRepository.findById(1L)).thenReturn(Optional.of(sampleTest));
         doNothing().when(skillTestRepository).deleteById(1L);
 
         skillTestService.deleteTest(1L);
@@ -147,7 +146,6 @@ class SkillTestServiceTest {
     @Test
     @DisplayName("getQuestionsForTest - should return questions for given test")
     void getQuestionsForTest_shouldReturnQuestions() {
-        when(skillTestRepository.findById(1L)).thenReturn(Optional.of(sampleTest));
         when(questionRepository.findBySkillTestId(1L)).thenReturn(List.of(sampleQuestion));
 
         List<TestQuestion> result = skillTestService.getQuestionsForTest(1L);
