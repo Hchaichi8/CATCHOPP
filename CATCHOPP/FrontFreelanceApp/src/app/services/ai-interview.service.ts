@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8086/SkillTests/ai/interview';
+const API = 'http://localhost:8079/SkillTests/ai/interview';
 
 export interface StartInterviewRequest {
   userId: number;

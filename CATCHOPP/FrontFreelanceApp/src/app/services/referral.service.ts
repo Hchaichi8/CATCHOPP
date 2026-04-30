@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8085/Referral';
+const API = 'http://localhost:8079/Referral';
 
 export interface ReferralCode {
   id?: number;

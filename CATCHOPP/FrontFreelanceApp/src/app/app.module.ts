@@ -53,6 +53,7 @@ import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.c
 import { AiInterviewSimulatorComponent } from './Interfaces_SkillTests/ai-interview-simulator/ai-interview-simulator.component';
 import { AiChatComponent } from './Interfaces_SkillTests/ai-chat/ai-chat.component';
 import { AiVideoCallComponent } from './Interfaces_SkillTests/ai-video-call/ai-video-call.component';
+import { AdminHealthComponent } from './Interfaces_Admin/admin-health/admin-health.component';
 
 @NgModule({
   declarations: [
@@ -102,7 +103,8 @@ import { AiVideoCallComponent } from './Interfaces_SkillTests/ai-video-call/ai-v
         SpinWheelComponent,
         AiInterviewSimulatorComponent,
         AiChatComponent,
-        AiVideoCallComponent
+        AiVideoCallComponent,
+        AdminHealthComponent
   ],
   imports: [
     BrowserModule,

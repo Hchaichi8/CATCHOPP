@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8086/SkillTests/gamification';
+const API = 'http://localhost:8079/SkillTests/gamification';
 const SOCIAL = `${API}/social`;
 
 export interface DailyChallengeView {

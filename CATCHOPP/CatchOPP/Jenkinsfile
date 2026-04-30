@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_USER   = 'bunnybanou'
-        IMAGE_NAME    = 'bunnybanou/catchopp-user'
         SONARQUBE_URL = 'http://localhost:9000'
     }
 
@@ -14,6 +13,7 @@ pipeline {
 
     stages {
 
+        // ── 1. Checkout ──────────────────────────────────────────
         stage('Checkout') {
             steps {
                 git branch: 'gestion_sub',
@@ -21,15 +21,42 @@ pipeline {
             }
         }
 
-        stage('Build Maven') {
-            steps {
-                dir('CATCHOPP/CatchOPP/UserMicroService') {
-                    sh 'mvn clean package -DskipTests'
+        // ── 2. Backend Build ─────────────────────────────────────
+        stage('Build Backend') {
+            parallel {
+                stage('Build UserMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/UserMicroService') {
+                            sh 'mvn clean package -DskipTests'
+                        }
+                    }
+                }
+                stage('Build SkillTestsMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
+                            sh 'mvn clean package -DskipTests'
+                        }
+                    }
+                }
+                stage('Build SubscriptionMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/SubscriptionMicroService') {
+                            sh 'mvn clean package -DskipTests'
+                        }
+                    }
+                }
+                stage('Build ReferralMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/ReferralMicroService') {
+                            sh 'mvn clean package -DskipTests'
+                        }
+                    }
                 }
             }
         }
 
-        stage('Unit Tests') {
+        // ── 3. Backend Unit Tests ────────────────────────────────
+        stage('Backend Unit Tests') {
             steps {
                 dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
                     sh 'mvn test'
@@ -37,19 +64,45 @@ pipeline {
             }
             post {
                 always {
-                    junit 'CATCHOPP/CatchOPP/SkillTestsMicroService/target/surefire-reports/*.xml'
+                    junit allowEmptyResults: true,
+                          testResults: 'CATCHOPP/CatchOPP/SkillTestsMicroService/target/surefire-reports/*.xml'
                 }
             }
         }
 
+        // ── 4. Frontend Build & Tests ────────────────────────────
+        stage('Frontend CI') {
+            steps {
+                dir('CATCHOPP/FrontFreelanceApp') {
+                    sh '''
+                        # Install Node 20 if not present
+                        if ! command -v node &> /dev/null; then
+                            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+                            apt-get install -y nodejs
+                        fi
+                        npm ci
+                        npm run build -- --configuration production
+                        npx ng test --watch=false --browsers=ChromeHeadless
+                    '''
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true,
+                          testResults: 'CATCHOPP/FrontFreelanceApp/test-results/*.xml'
+                }
+            }
+        }
+
+        // ── 5. SonarQube Analysis ────────────────────────────────
         stage('SonarQube Analysis') {
             steps {
-                dir('CATCHOPP/CatchOPP/UserMicroService') {
+                dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
                     withCredentials([string(credentialsId: 'sonar_pi', variable: 'SONAR_TOKEN')]) {
                         sh """
                             mvn sonar:sonar \
-                            -Dsonar.projectKey=catchopp-user-service \
-                            -Dsonar.projectName='CatchOPP UserMicroService' \
+                            -Dsonar.projectKey=catchopp-skilltests \
+                            -Dsonar.projectName='CatchOPP SkillTestsMicroService' \
                             -Dsonar.host.url=${SONARQUBE_URL} \
                             -Dsonar.login=${SONAR_TOKEN} \
                             -Dsonar.java.binaries=target/classes
@@ -59,15 +112,49 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                dir('CATCHOPP/CatchOPP/UserMicroService') {
-                    sh 'docker build -t bunnybanou/catchopp-user:latest .'
+        // ── 6. Build Docker Images ───────────────────────────────
+        stage('Build Docker Images') {
+            parallel {
+                stage('Docker: UserMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/UserMicroService') {
+                            sh 'docker build -t bunnybanou/catchopp-user:latest .'
+                        }
+                    }
+                }
+                stage('Docker: SkillTestsMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
+                            sh 'docker build -t bunnybanou/catchopp-skilltests:latest .'
+                        }
+                    }
+                }
+                stage('Docker: SubscriptionMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/SubscriptionMicroService') {
+                            sh 'docker build -t bunnybanou/catchopp-subscription:latest .'
+                        }
+                    }
+                }
+                stage('Docker: ReferralMicroService') {
+                    steps {
+                        dir('CATCHOPP/CatchOPP/ReferralMicroService') {
+                            sh 'docker build -t bunnybanou/catchopp-referral:latest .'
+                        }
+                    }
+                }
+                stage('Docker: Frontend') {
+                    steps {
+                        dir('CATCHOPP/FrontFreelanceApp') {
+                            sh 'docker build -t bunnybanou/catchopp-frontend:latest .'
+                        }
+                    }
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        // ── 7. Push Docker Images ────────────────────────────────
+        stage('Push Docker Images') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'TokenDevOps',
@@ -77,6 +164,10 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push bunnybanou/catchopp-user:latest
+                        docker push bunnybanou/catchopp-skilltests:latest
+                        docker push bunnybanou/catchopp-subscription:latest
+                        docker push bunnybanou/catchopp-referral:latest
+                        docker push bunnybanou/catchopp-frontend:latest
                         docker logout
                     '''
                 }
@@ -87,10 +178,13 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build, SonarQube analysis and push successful!'
+            echo '✅ Full CI/CD pipeline completed successfully!'
         }
         failure {
-            echo '❌ Build failed. Check the logs.'
+            echo '❌ Pipeline failed. Check the logs above.'
+        }
+        always {
+            cleanWs()
         }
     }
 }

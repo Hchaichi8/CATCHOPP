@@ -4,7 +4,7 @@ import { BehaviorSubject, EMPTY, Subject, of, switchMap, timer } from 'rxjs';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { UserService } from './user.service';
 
-const USER_API = 'http://localhost:8081/User';
+const USER_API = 'http://localhost:8079/User';
 
 export type NotificationType =
   | 'PROPOSAL_NEW'

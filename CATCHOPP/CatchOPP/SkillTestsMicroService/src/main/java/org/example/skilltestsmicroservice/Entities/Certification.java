@@ -25,9 +25,8 @@ public class Certification {
     private String testTitle;  // denormalized for display
     private String category;   // denormalized for display
 
-    public Long getSkillTestId() {
-        return skillTest != null ? skillTest.getId() : null;
-    }
+    private Long testId;       // stored for easy access without join
+
     private Integer score;     // percentage
     private Boolean passed;
     private LocalDateTime completedAt = LocalDateTime.now();

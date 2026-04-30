@@ -1,0 +1,144 @@
+services:
+
+  # ── MySQL Database ──────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: catchopp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: UserDB
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - catchopp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Eureka Service Discovery ────────────────────────────────────
+  eureka-server:
+    build: ./EurekaServer
+    container_name: catchopp-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - catchopp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ── User MicroService ───────────────────────────────────────────
+  user-service:
+    build: ./UserMicroService
+    container_name: catchopp-user
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/UserDB?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ── Subscription MicroService ───────────────────────────────────
+  subscription-service:
+    build: ./SubscriptionMicroService
+    container_name: catchopp-subscription
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/SubscriptionDB?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ── Referral MicroService ───────────────────────────────────────
+  referral-service:
+    build: ./ReferralMicroService
+    container_name: catchopp-referral
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ReferralDB?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ── SkillTests MicroService ─────────────────────────────────────
+  skilltests-service:
+    build: ./SkillTestsMicroService
+    container_name: catchopp-skilltests
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/SkillTestsDB?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ── API Gateway ─────────────────────────────────────────────────
+  gateway:
+    build: ./gateway
+    container_name: catchopp-gateway
+    ports:
+      - "8079:8079"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - catchopp-network
+
+  # ── Angular Frontend ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ../../FrontFreelanceApp
+      dockerfile: Dockerfile
+    container_name: catchopp-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - gateway
+    networks:
+      - catchopp-network
+
+networks:
+  catchopp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

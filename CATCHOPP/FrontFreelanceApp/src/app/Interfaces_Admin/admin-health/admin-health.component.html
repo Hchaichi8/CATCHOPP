@@ -1,0 +1,114 @@
+<div class="admin-layout">
+  <header class="admin-header">
+    <div class="logo" routerLink="/">
+      <span class="logo-mark">C</span>
+      <span class="logo-text">Catch<span>OPP</span> Admin</span>
+    </div>
+    <nav class="admin-nav">
+      <a routerLink="/AdminStatistics" class="nav-link"><i class="fa fa-chart-bar"></i> Statistics</a>
+      <a routerLink="/AdminSubscriptions" class="nav-link"><i class="fa fa-users"></i> Subscriptions</a>
+      <a routerLink="/AdminPromoCodes" class="nav-link"><i class="fa fa-tag"></i> Promo Codes</a>
+      <a routerLink="/AdminHealth" class="nav-link active"><i class="fa fa-heartbeat"></i> Health</a>
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+    </nav>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1>🖥️ Services Health Dashboard</h1>
+        <p>Real-time status of all CatchOPP microservices</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-refresh" (click)="checkAll()">
+          <i class="fa fa-sync-alt"></i> Refresh Now
+        </button>
+        <button class="btn-auto" [class.active]="autoRefresh" (click)="toggleAutoRefresh()">
+          <i class="fa" [class.fa-pause]="autoRefresh" [class.fa-play]="!autoRefresh"></i>
+          {{ autoRefresh ? 'Auto: ON' : 'Auto: OFF' }}
+        </button>
+        <span class="countdown" *ngIf="autoRefresh">
+          Next in {{ countdown }}s
+        </span>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-bar">
+      <div class="summary-card up">
+        <span class="count">{{ upCount }}</span>
+        <span class="label">✅ Services UP</span>
+      </div>
+      <div class="summary-card down">
+        <span class="count">{{ downCount }}</span>
+        <span class="label">❌ Services DOWN</span>
+      </div>
+      <div class="summary-card checking">
+        <span class="count">{{ checkingCount }}</span>
+        <span class="label">⏳ Checking</span>
+      </div>
+      <div class="summary-card total">
+        <span class="count">{{ services.length }}</span>
+        <span class="label">📦 Total</span>
+      </div>
+    </div>
+
+    <!-- Status banner -->
+    <div class="status-banner"
+         [class.all-up]="downCount === 0 && checkingCount === 0"
+         [class.has-down]="downCount > 0">
+      <i class="fa" [class.fa-check-circle]="downCount === 0" [class.fa-exclamation-triangle]="downCount > 0"></i>
+      <span *ngIf="downCount === 0 && checkingCount === 0"> All systems operational</span>
+      <span *ngIf="downCount > 0"> {{ downCount }} service(s) are currently down</span>
+      <span *ngIf="checkingCount > 0 && downCount === 0"> Checking services...</span>
+    </div>
+
+    <!-- Services grid -->
+    <div class="services-grid">
+      <div
+        class="service-card"
+        *ngFor="let service of services"
+        [class.status-up]="service.status === 'UP'"
+        [class.status-down]="service.status === 'DOWN'"
+        [class.status-checking]="service.status === 'CHECKING'"
+      >
+        <div class="card-status-bar"></div>
+
+        <div class="card-body">
+          <div class="card-top">
+            <div class="service-icon">{{ getStatusIcon(service.status) }}</div>
+            <div class="service-info">
+              <h3>{{ service.name }}</h3>
+              <span class="port-badge">:{{ service.port }}</span>
+            </div>
+            <div class="status-badge" [class]="'badge-' + service.status.toLowerCase()">
+              {{ service.status }}
+            </div>
+          </div>
+
+          <div class="card-metrics">
+            <div class="metric" *ngIf="service.responseTime !== null">
+              <span class="metric-label">Response</span>
+              <span class="metric-value" [class]="getResponseClass(service.responseTime)">
+                {{ service.responseTime }}ms
+              </span>
+            </div>
+            <div class="metric" *ngIf="service.lastChecked">
+              <span class="metric-label">Last check</span>
+              <span class="metric-value">{{ service.lastChecked | date:'HH:mm:ss' }}</span>
+            </div>
+          </div>
+
+          <div class="card-url">{{ service.url }}</div>
+
+          <button class="btn-check-single" (click)="checkService(service)">
+            <i class="fa fa-sync-alt"></i> Check now
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

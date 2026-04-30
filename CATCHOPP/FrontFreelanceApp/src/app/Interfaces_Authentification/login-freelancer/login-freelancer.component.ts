@@ -55,7 +55,15 @@ export class LoginFreelancerComponent {
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.errorMessage = 'Invalid email or password';
+        if (error.status === 0) {
+          this.errorMessage = 'Cannot connect to server. Make sure the backend is running.';
+        } else if (error.status === 401 || error.status === 403) {
+          this.errorMessage = 'Invalid email or password';
+        } else if (error.status === 503 || error.status === 502) {
+          this.errorMessage = 'Server unavailable. Please try again shortly.';
+        } else {
+          this.errorMessage = 'Invalid email or password';
+        }
         this.loading = false;
       }
     });

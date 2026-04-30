@@ -55,7 +55,7 @@ export interface WalletStats {
   providedIn: 'root'
 })
 export class DonationService {
-  private baseUrl = 'http://localhost:8085/api';
+  private baseUrl = 'http://localhost:8079/api';
 
   constructor(private http: HttpClient) {}
 

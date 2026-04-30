@@ -37,7 +37,7 @@ export class FlouciService {
   private readonly APP_SECRET = 'YOUR_FLOUCI_APP_SECRET'; // Get from Flouci dashboard
   
   // Backend proxy endpoint (recommended for security)
-  private readonly BACKEND_URL = 'http://localhost:8083/Subscription/flouci';
+  private readonly BACKEND_URL = 'http://localhost:8079/Subscription/flouci';
   private useTestMode = true; // Default to test mode until verified
 
   constructor(private http: HttpClient) {

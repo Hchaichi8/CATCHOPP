@@ -9,8 +9,8 @@ export interface ChatMessage {
 
 @Injectable({ providedIn: 'root' })
 export class AiChatService {
-  private readonly API = 'http://localhost:8086/SkillTests/ai/chat';
-  private readonly VISION_API = 'http://localhost:8086/SkillTests/ai/vision';
+  private readonly API = 'http://localhost:8079/SkillTests/ai/chat';
+  private readonly VISION_API = 'http://localhost:8079/SkillTests/ai/vision';
 
   constructor(private http: HttpClient) {}
 

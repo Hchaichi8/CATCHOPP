@@ -136,6 +136,7 @@ public class SkillTestService {
         cert.setUserId(userId);
         cert.setUserName(userName);
         cert.setSkillTest(test);
+        cert.setTestId(test.getId());
         cert.setTestTitle(test.getTitle());
         cert.setCategory(test.getCategory());
         cert.setScore(score);

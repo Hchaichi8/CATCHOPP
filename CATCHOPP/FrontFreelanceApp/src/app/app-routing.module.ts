@@ -43,6 +43,7 @@ import { AiInterviewSimulatorComponent } from './Interfaces_SkillTests/ai-interv
 import { AiChatComponent } from './Interfaces_SkillTests/ai-chat/ai-chat.component';
 import { AiVideoCallComponent } from './Interfaces_SkillTests/ai-video-call/ai-video-call.component';
 import { AdminGuard } from './guards/admin.guard';
+import { AdminHealthComponent } from './Interfaces_Admin/admin-health/admin-health.component';
 
 const routes: Routes = [
 
@@ -84,6 +85,7 @@ const routes: Routes = [
 {path:'AdminPromoCodes',component:AdminPromoCodesComponent, canActivate: [AdminGuard] },
 {path:'AdminPlans',component:AdminPlansComponent, canActivate: [AdminGuard] },
 {path:'AdminUsers',component:AdminUsersComponent, canActivate: [AdminGuard] },
+{path:'AdminHealth',component:AdminHealthComponent },
 
 // Skill Tests & Certifications
 {path:'SkillTests',component:SkillTestsListComponent, },

@@ -22,7 +22,7 @@ export interface CVAnalysisResponse {
 })
 export class AiCvService {
   // Backend API (using SkillTests microservice)
-  private readonly API_URL = 'http://localhost:8086/SkillTests/ai/cv';
+  private readonly API_URL = 'http://localhost:8079/SkillTests/ai/cv';
 
   constructor(private http: HttpClient) {}
 

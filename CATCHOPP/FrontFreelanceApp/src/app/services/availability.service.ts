@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-const API = 'http://localhost:8085/Referral/availability';
+const API = 'http://localhost:8079/Referral/availability';
 
 export type AvailabilityStatus = 'ONLINE' | 'AVAILABLE' | 'AVAILABLE_TOMORROW' | 'OFFLINE' | 'DO_NOT_DISTURB' | 'CUSTOM';
 

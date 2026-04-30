@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-const API = 'http://localhost:8081/User';
+const API = 'http://localhost:8079/User';
 
 export interface User {
   id?: number;
@@ -60,7 +60,8 @@ export class UserService {
         }
       }),
       catchError((error) => {
-        console.error('Login error:', error);
+        console.error('Login error status:', error.status, error.message);
+        console.error('Login error details:', error);
         return of(null);
       })
     );

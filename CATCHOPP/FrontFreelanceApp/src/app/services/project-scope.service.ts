@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8082/Project/ai/analyze-scope';
+const API = 'http://localhost:8079/Project/ai/analyze-scope';
 
 export interface ProjectScopeAnalysis {
   quality: string;

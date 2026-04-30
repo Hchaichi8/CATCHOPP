@@ -40,7 +40,7 @@ export interface SpinWheelAttempt {
   providedIn: 'root'
 })
 export class PromoCodeService {
-  private baseUrl = 'http://localhost:8083/api';
+  private baseUrl = 'http://localhost:8079/api';
 
   constructor(private http: HttpClient) {}
 

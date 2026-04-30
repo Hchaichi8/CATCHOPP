@@ -6,6 +6,8 @@ import org.example.skilltestsmicroservice.Entities.TestQuestion;
 import org.example.skilltestsmicroservice.Repositories.CertificationRepository;
 import org.example.skilltestsmicroservice.Repositories.SkillTestRepository;
 import org.example.skilltestsmicroservice.Repositories.TestQuestionRepository;
+import org.example.skilltestsmicroservice.Services.gamification.GamificationService;
+import org.example.skilltestsmicroservice.Integration.UserInAppNotificationClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,15 @@ class SkillTestServiceTest {
 
     @Mock
     private CertificationRepository certificationRepository;
+
+    @Mock
+    private GamificationService gamificationService;
+
+    @Mock
+    private UserInAppNotificationClient userInAppNotificationClient;
+
+    @Mock
+    private AiQuestionGeneratorService aiGenerator;
 
     @InjectMocks
     private SkillTestService skillTestService;
@@ -86,7 +97,7 @@ class SkillTestServiceTest {
         List<SkillTest> result = skillTestService.getAllActiveTests();
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).isActive()).isTrue();
+        assertThat(result.get(0).getActive()).isTrue();
     }
 
     @Test
@@ -162,7 +173,7 @@ class SkillTestServiceTest {
         Map<String, String> answers = Map.of("1", "A", "2", "B");
         Certification cert = skillTestService.submitTest(10L, 1L, answers, "TestUser");
 
-        assertThat(cert.isPassed()).isTrue();
+        assertThat(cert.getPassed()).isTrue();
         assertThat(cert.getScore()).isEqualTo(100);
     }
 
@@ -181,7 +192,7 @@ class SkillTestServiceTest {
         Map<String, String> answers = Map.of("1", "C", "2", "D"); // wrong answers
         Certification cert = skillTestService.submitTest(10L, 1L, answers, "TestUser");
 
-        assertThat(cert.isPassed()).isFalse();
+        assertThat(cert.getPassed()).isFalse();
         assertThat(cert.getScore()).isEqualTo(0);
     }
 
@@ -203,7 +214,7 @@ class SkillTestServiceTest {
         Certification cert = skillTestService.submitTest(10L, 1L, answers, "TestUser");
 
         assertThat(cert.getScore()).isEqualTo(75);
-        assertThat(cert.isPassed()).isTrue();
+        assertThat(cert.getPassed()).isTrue();
     }
 
     @Test
