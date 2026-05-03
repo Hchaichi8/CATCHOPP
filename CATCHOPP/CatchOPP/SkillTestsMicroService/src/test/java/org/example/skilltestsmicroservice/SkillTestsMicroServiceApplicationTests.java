@@ -1,16 +1,10 @@
 package org.example.skilltestsmicroservice;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * Basic smoke test — does not load full Spring context
- * to avoid requiring a real database connection in CI.
- */
+@SpringBootTest
 class SkillTestsMicroServiceApplicationTests {
-
     @Test
-    void contextLoads() {
-        // Unit tests are in SkillTestServiceTest and SkillTestControllerTest
-        // Full integration tests require a running database
-    }
+    void contextLoads() {}
 }

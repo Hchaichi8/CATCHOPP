@@ -1,14 +1,21 @@
 pipeline {
     agent any
 
+    // ── SCM Polling: check for changes every 5 minutes ──────────
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
     environment {
         DOCKER_USER   = 'bunnybanou'
         SONARQUBE_URL = 'http://localhost:9000'
+        GIT_BRANCH    = 'gestion_sub'
     }
 
     tools {
         jdk 'jdk'
         maven 'mvn'
+        nodejs 'nodejs'
     }
 
     stages {
@@ -16,47 +23,58 @@ pipeline {
         // ── 1. Checkout ──────────────────────────────────────────
         stage('Checkout') {
             steps {
-                git branch: 'gestion_sub',
+                git branch: "${GIT_BRANCH}",
                     url: 'https://github.com/Hchaichi8/CATCHOPP.git'
             }
         }
 
-        // ── 2. Backend Build ─────────────────────────────────────
-        stage('Build Backend') {
-            parallel {
-                stage('Build UserMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/UserMicroService') {
-                            sh 'mvn clean package -DskipTests'
-                        }
-                    }
-                }
-                stage('Build SkillTestsMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
-                            sh 'mvn clean package -DskipTests'
-                        }
-                    }
-                }
-                stage('Build SubscriptionMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/SubscriptionMicroService') {
-                            sh 'mvn clean package -DskipTests'
-                        }
-                    }
-                }
-                stage('Build ReferralMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/ReferralMicroService') {
-                            sh 'mvn clean package -DskipTests'
-                        }
-                    }
+        // ── 2. Detect what changed ───────────────────────────────
+        stage('Detect Changes') {
+            steps {
+                script {
+                    // Get list of changed files compared to previous build
+                    def changedFiles = sh(
+                        script: "git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD 2>/dev/null || echo 'all'",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Changed files:\n${changedFiles}"
+
+                    env.BACKEND_CHANGED  = changedFiles.contains('CatchOPP/SkillTestsMicroService') ? 'true' : 'false'
+                    env.FRONTEND_CHANGED = changedFiles.contains('FrontFreelanceApp') ? 'true' : 'false'
+                    env.ALL_CHANGED      = changedFiles == 'all' ? 'true' : 'false'
+
+                    echo "Backend changed: ${env.BACKEND_CHANGED}"
+                    echo "Frontend changed: ${env.FRONTEND_CHANGED}"
                 }
             }
         }
 
-        // ── 3. Backend Unit Tests ────────────────────────────────
-        stage('Backend Unit Tests') {
+        // ══════════════════════════════════════════════════════════
+        // BACKEND CI — only runs when SkillTestsMicroService changed
+        // ══════════════════════════════════════════════════════════
+
+        stage('Backend CI — Build') {
+            when {
+                anyOf {
+                    environment name: 'BACKEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
+            steps {
+                dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Backend CI — Unit Tests') {
+            when {
+                anyOf {
+                    environment name: 'BACKEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
             steps {
                 dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
                     sh 'mvn test'
@@ -70,32 +88,13 @@ pipeline {
             }
         }
 
-        // ── 4. Frontend Build & Tests ────────────────────────────
-        stage('Frontend CI') {
-            steps {
-                dir('CATCHOPP/FrontFreelanceApp') {
-                    sh '''
-                        # Install Node 20 if not present
-                        if ! command -v node &> /dev/null; then
-                            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-                            apt-get install -y nodejs
-                        fi
-                        npm ci
-                        npm run build -- --configuration production
-                        npx ng test --watch=false --browsers=ChromeHeadless
-                    '''
+        stage('Backend CI — SonarQube') {
+            when {
+                anyOf {
+                    environment name: 'BACKEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
                 }
             }
-            post {
-                always {
-                    junit allowEmptyResults: true,
-                          testResults: 'CATCHOPP/FrontFreelanceApp/test-results/*.xml'
-                }
-            }
-        }
-
-        // ── 5. SonarQube Analysis ────────────────────────────────
-        stage('SonarQube Analysis') {
             steps {
                 dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
                     withCredentials([string(credentialsId: 'sonar_pi', variable: 'SONAR_TOKEN')]) {
@@ -112,49 +111,31 @@ pipeline {
             }
         }
 
-        // ── 6. Build Docker Images ───────────────────────────────
-        stage('Build Docker Images') {
-            parallel {
-                stage('Docker: UserMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/UserMicroService') {
-                            sh 'docker build -t bunnybanou/catchopp-user:latest .'
-                        }
-                    }
+        // ══════════════════════════════════════════════════════════
+        // BACKEND CD — Docker build & push
+        // ══════════════════════════════════════════════════════════
+
+        stage('Backend CD — Docker Build') {
+            when {
+                anyOf {
+                    environment name: 'BACKEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
                 }
-                stage('Docker: SkillTestsMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
-                            sh 'docker build -t bunnybanou/catchopp-skilltests:latest .'
-                        }
-                    }
-                }
-                stage('Docker: SubscriptionMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/SubscriptionMicroService') {
-                            sh 'docker build -t bunnybanou/catchopp-subscription:latest .'
-                        }
-                    }
-                }
-                stage('Docker: ReferralMicroService') {
-                    steps {
-                        dir('CATCHOPP/CatchOPP/ReferralMicroService') {
-                            sh 'docker build -t bunnybanou/catchopp-referral:latest .'
-                        }
-                    }
-                }
-                stage('Docker: Frontend') {
-                    steps {
-                        dir('CATCHOPP/FrontFreelanceApp') {
-                            sh 'docker build -t bunnybanou/catchopp-frontend:latest .'
-                        }
-                    }
+            }
+            steps {
+                dir('CATCHOPP/CatchOPP/SkillTestsMicroService') {
+                    sh 'docker build -t bunnybanou/catchopp-skilltests:latest .'
                 }
             }
         }
 
-        // ── 7. Push Docker Images ────────────────────────────────
-        stage('Push Docker Images') {
+        stage('Backend CD — Docker Push') {
+            when {
+                anyOf {
+                    environment name: 'BACKEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'TokenDevOps',
@@ -163,10 +144,85 @@ pipeline {
                 )]) {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push bunnybanou/catchopp-user:latest
                         docker push bunnybanou/catchopp-skilltests:latest
-                        docker push bunnybanou/catchopp-subscription:latest
-                        docker push bunnybanou/catchopp-referral:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // FRONTEND CI — only runs when FrontFreelanceApp changed
+        // ══════════════════════════════════════════════════════════
+
+        stage('Frontend CI — Install & Build') {
+            when {
+                anyOf {
+                    environment name: 'FRONTEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
+            steps {
+                dir('CATCHOPP/FrontFreelanceApp') {
+                    sh 'npm ci'
+                    sh 'npm run build -- --configuration production'
+                }
+            }
+        }
+
+        stage('Frontend CI — Unit Tests') {
+            when {
+                anyOf {
+                    environment name: 'FRONTEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
+            steps {
+                dir('CATCHOPP/FrontFreelanceApp') {
+                    sh 'npx ng test --watch=false --browsers=ChromeHeadless'
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true,
+                          testResults: 'CATCHOPP/FrontFreelanceApp/test-results/*.xml'
+                }
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // FRONTEND CD — Docker build & push
+        // ══════════════════════════════════════════════════════════
+
+        stage('Frontend CD — Docker Build') {
+            when {
+                anyOf {
+                    environment name: 'FRONTEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
+            steps {
+                dir('CATCHOPP/FrontFreelanceApp') {
+                    sh 'docker build -t bunnybanou/catchopp-frontend:latest .'
+                }
+            }
+        }
+
+        stage('Frontend CD — Docker Push') {
+            when {
+                anyOf {
+                    environment name: 'FRONTEND_CHANGED', value: 'true'
+                    environment name: 'ALL_CHANGED', value: 'true'
+                }
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'TokenDevOps',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                         docker push bunnybanou/catchopp-frontend:latest
                         docker logout
                     '''
@@ -178,7 +234,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Full CI/CD pipeline completed successfully!'
+            echo "✅ Pipeline completed. Backend changed: ${env.BACKEND_CHANGED}, Frontend changed: ${env.FRONTEND_CHANGED}"
         }
         failure {
             echo '❌ Pipeline failed. Check the logs above.'

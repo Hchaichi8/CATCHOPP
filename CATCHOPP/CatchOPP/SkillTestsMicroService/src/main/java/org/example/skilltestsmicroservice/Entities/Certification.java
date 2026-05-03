@@ -15,7 +15,7 @@ public class Certification {
     private Long id;
 
     private Long userId;
-    private String userName;  // optional, for admin display
+    private String userName;  // optional, for admin display//testtt
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_test_id")
