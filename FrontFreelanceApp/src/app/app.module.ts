@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BaseChartDirective } from 'ng2-charts'; 
+import { NgChartsModule } from 'ng2-charts'; 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { HomeAppComponent } from './home-app/home-app.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { AppComponent } from './app.component';import { HomeAppComponent } from './home-app/home-app.component';
 import { CreatePubComponent } from './Interfaces_Client/create-pub/create-pub.component';
 import { AuthComponent } from './Interfaces_Authentification/auth/auth.component';
 import { LoginFreelancerComponent } from './Interfaces_Authentification/login-freelancer/login-freelancer.component';
@@ -36,7 +37,6 @@ import { JobsAdminComponent } from './Interfaces_Admin/jobs-admin/jobs-admin.com
 import { DetailJobsAdminComponent } from './Interfaces_Admin/detail-jobs-admin/detail-jobs-admin.component';
 import { DisputesAdminComponent } from './Interfaces_Admin/disputes-admin/disputes-admin.component';
 import { FinanceAdminComponent } from './Interfaces_Admin/finance-admin/finance-admin.component';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CompetenceAdminComponent } from './Interfaces_Admin/competence-admin/competence-admin.component';
 import { ContractCreationComponent } from './Interfaces_Client/contract-creation/contract-creation.component';
@@ -193,11 +193,17 @@ import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-su
     CommonModule,
     HttpClientModule,
     FormsModule,
-    BaseChartDirective
+    NgChartsModule
   
     
 ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

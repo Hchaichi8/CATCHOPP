@@ -1,8 +1,8 @@
 <!-- Top Navigation -->
 <nav class="top-navbar">
   <div class="nav-container">
-    <div class="nav-brand">
-      <div class="logo-circle">C</div>
+    <div class="nav-brand" (click)="goBack()" style="cursor:pointer">
+      <img src="assets/logo.png" alt="CatchOPP" style="width:36px;height:36px;object-fit:contain;border-radius:8px" />
       <span class="brand-text">CatchOPP</span>
     </div>
 
@@ -43,7 +43,7 @@
       <h3>Communities & Clubs</h3>
       <p>Join groups, attend events and grow your network.</p>
       <div class="quick-links">
-        <button class="quick-link-btn" [routerLink]="['/groups']">
+        <button class="quick-link-btn" [routerLink]="['/GroupList']">
           <i class="fa fa-users"></i> Groups
         </button>
         <button class="quick-link-btn active">
@@ -77,7 +77,7 @@
         <h1>Communities & Clubs</h1>
         <p>Join groups, attend events and grow your network</p>
       </div>
-      <button class="btn-create" (click)="createClub()">
+      <button class="btn-create" (click)="openCreateModal()">
         <i class="fa fa-plus"></i> Create Club
       </button>
     </div>
@@ -116,10 +116,16 @@
 
             <div class="club-actions">
               <button class="btn-secondary" (click)="viewClub(club.id); $event.stopPropagation()">
-                View wall
+                <i class="fa fa-eye"></i> View wall
               </button>
-              <button class="btn-primary" (click)="joinClub(club, $event)">
-                Join
+              <button class="btn-primary"
+                      *ngIf="!isJoined(club.id)"
+                      [disabled]="isJoining(club.id)"
+                      (click)="joinClub(club, $event)">
+                <i class="fa fa-user-plus"></i> Join
+              </button>
+              <button class="btn-joined" *ngIf="isJoined(club.id)" disabled>
+                <i class="fa fa-check"></i> Joined
               </button>
             </div>
           </div>
@@ -210,3 +216,41 @@
 </div>
 
 
+
+<!-- ── Create Club Modal ──────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="fa fa-users-cog"></i> Create New Club</h3>
+      <button class="modal-close" (click)="closeCreateModal()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-error" *ngIf="createError">
+        <i class="fa fa-exclamation-circle"></i> {{ createError }}
+      </div>
+      <div class="form-group">
+        <label>Club Name <span style="color:#dc3545">*</span></label>
+        <input type="text" class="form-input" [(ngModel)]="clubForm.name" placeholder="Enter club name" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label>Description <span style="color:#dc3545">*</span></label>
+        <textarea class="form-input form-textarea" [(ngModel)]="clubForm.description" placeholder="Describe your club..." rows="3" maxlength="500"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Interests <span style="color:#9ca3af;font-weight:400">(comma separated)</span></label>
+        <input type="text" class="form-input" [(ngModel)]="clubForm.interests" placeholder="e.g. Technology, AI, Programming" />
+      </div>
+      <div class="form-group">
+        <label>Banner Image URL <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+        <input type="url" class="form-input" [(ngModel)]="clubForm.bannerUrl" placeholder="https://example.com/image.jpg" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeCreateModal()" [disabled]="createLoading">Cancel</button>
+      <button class="btn-submit" (click)="submitCreateClub()" [disabled]="createLoading">
+        <i class="fa" [ngClass]="createLoading ? 'fa-spinner fa-spin' : 'fa-plus'"></i>
+        {{ createLoading ? 'Creating...' : 'Create Club' }}
+      </button>
+    </div>
+  </div>
+</div>

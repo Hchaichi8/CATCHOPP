@@ -64,14 +64,19 @@ import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-ge
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
 
+// Events & Communities
+import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
+import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { ClubComponent } from './interfaces_events/club/club.component';
+import { ClubPageComponent } from './interfaces_events/club-page/club-page.component';
+import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
+import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
 import { GroupListComponent } from './interfaces_events/group-list/group-list.component';
 import { GroupPageComponent } from './interfaces_events/group-page/group-page.component';
 import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
-import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
-import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
-import { ClubComponent } from './interfaces_events/club/club.component';
-import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
-import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { PostCommentsComponent } from './interfaces_events/post-comments/post-comments.component';
+import { PostReactionsComponent } from './interfaces_events/post-reactions/post-reactions.component';
+import { CommentReactionsComponent } from './interfaces_events/comment-reactions/comment-reactions.component';
 import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
 import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-support.component';
 
@@ -177,15 +182,18 @@ const routes: Routes = [
 
 
 // Events & Communities routes
+{path:'ClubDashboard', component: ClubDashboardComponent, canActivate: [authGuard] },
+{path:'ClubsList', component: ClubsListComponent, canActivate: [authGuard] },
+{path:'Club/:id', component: ClubComponent, canActivate: [authGuard] },
+{path:'ClubPage/:id', component: ClubPageComponent, canActivate: [authGuard] },
+{path:'EventsList', component: EventsListComponent, canActivate: [authGuard] },
+{path:'EventDetails/:id', component: EventDetailsComponent, canActivate: [authGuard] },
+{path:'GroupList', component: GroupListComponent, canActivate: [authGuard] },
+{path:'GroupPage/:id', component: GroupPageComponent, canActivate: [authGuard] },
+{path:'PostComments/:id', component: PostCommentsComponent, canActivate: [authGuard] },
+{path:'PostReactions/:id', component: PostReactionsComponent, canActivate: [authGuard] },
+{path:'CommentReactions/:id', component: CommentReactionsComponent, canActivate: [authGuard] },
 
-{ path: 'groups', component: GroupListComponent },
-{ path: 'groups/:id', component: GroupPageComponent },
-{ path: 'events', component: EventsListComponent },
-{ path: 'events/:id', component: EventDetailsComponent },
-{ path: 'clubs', component: ClubsListComponent },
-{ path: 'clubs/:id', component: ClubComponent },
-{ path: 'ClubDashboard', component: ClubDashboardComponent },
-{ path: 'admin/dashboard', component: AdminDashboardComponent }
 
 
 

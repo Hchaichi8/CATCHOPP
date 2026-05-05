@@ -109,6 +109,9 @@
                 <button class="icon-btn delete-btn" title="Delete announcement" (click)="deletePost(a.id)" *ngIf="canModerate">
                   <i class="fa fa-trash"></i>
                 </button>
+                <button class="icon-btn report-btn" title="Report post" (click)="openReportModal('POST', a.id)">
+                  <i class="fa fa-flag"></i>
+                </button>
               </div>
             </div>
             <div class="post-body">
@@ -128,8 +131,41 @@
               <!-- Reactions Component -->
               <app-post-reactions [postId]="a.id" [currentUserId]="1"></app-post-reactions>
               
-              <!-- Comments Component -->
-              <app-post-comments [postId]="a.id" [currentUserId]="1"></app-post-comments>
+              <!-- Real Comments -->
+              <div class="comments-section">
+                <button class="btn-toggle-comments" (click)="toggleRealComments(a.id)">
+                  <i class="fa fa-comment"></i>
+                  {{ getCommentsCount(a.id) }} Comments
+                  <i class="fa" [ngClass]="showComments[a.id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div *ngIf="showComments[a.id]" class="comments-list">
+                  <div *ngIf="loadingComments[a.id]" class="comment-loading">
+                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                  </div>
+                  <div class="comment-item" *ngFor="let c of getComments(a.id)">
+                    <img [src]="'https://i.pravatar.cc/150?u=' + c.authorId" class="comment-avatar" alt="user">
+                    <div class="comment-body">
+                      <span class="comment-author">User {{ c.authorId }}</span>
+                      <p class="comment-text">{{ c.content }}</p>
+                    </div>
+                    <div class="comment-actions">
+                      <button class="icon-btn report-btn" title="Report comment" (click)="openReportModal('COMMENT', c.id)">
+                        <i class="fa fa-flag"></i>
+                      </button>
+                      <button class="icon-btn delete-btn" title="Delete comment" (click)="deleteRealComment(c.id, a.id)" *ngIf="canModerate">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="add-comment">
+                    <input type="text" [(ngModel)]="newRealComment[a.id]" placeholder="Write a comment..."
+                           (keyup.enter)="submitRealComment(a.id)" />
+                    <button class="btn-comment-submit" (click)="submitRealComment(a.id)">
+                      <i class="fa fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </article>
         </div>
@@ -156,6 +192,9 @@
                 <button class="icon-btn delete-btn" title="Delete post" (click)="deletePost(p.id)" *ngIf="canModerate">
                   <i class="fa fa-trash"></i>
                 </button>
+                <button class="icon-btn report-btn" title="Report post" (click)="openReportModal('POST', p.id)">
+                  <i class="fa fa-flag"></i>
+                </button>
               </div>
             </div>
             <div class="post-body">
@@ -175,8 +214,41 @@
               <!-- Reactions Component -->
               <app-post-reactions [postId]="p.id" [currentUserId]="1"></app-post-reactions>
               
-              <!-- Comments Component -->
-              <app-post-comments [postId]="p.id" [currentUserId]="1"></app-post-comments>
+              <!-- Real Comments -->
+              <div class="comments-section">
+                <button class="btn-toggle-comments" (click)="toggleRealComments(p.id)">
+                  <i class="fa fa-comment"></i>
+                  {{ getCommentsCount(p.id) }} Comments
+                  <i class="fa" [ngClass]="showComments[p.id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div *ngIf="showComments[p.id]" class="comments-list">
+                  <div *ngIf="loadingComments[p.id]" class="comment-loading">
+                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                  </div>
+                  <div class="comment-item" *ngFor="let c of getComments(p.id)">
+                    <img [src]="'https://i.pravatar.cc/150?u=' + c.authorId" class="comment-avatar" alt="user">
+                    <div class="comment-body">
+                      <span class="comment-author">User {{ c.authorId }}</span>
+                      <p class="comment-text">{{ c.content }}</p>
+                    </div>
+                    <div class="comment-actions">
+                      <button class="icon-btn report-btn" title="Report comment" (click)="openReportModal('COMMENT', c.id)">
+                        <i class="fa fa-flag"></i>
+                      </button>
+                      <button class="icon-btn delete-btn" title="Delete comment" (click)="deleteRealComment(c.id, p.id)" *ngIf="canModerate">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="add-comment">
+                    <input type="text" [(ngModel)]="newRealComment[p.id]" placeholder="Write a comment..."
+                           (keyup.enter)="submitRealComment(p.id)" />
+                    <button class="btn-comment-submit" (click)="submitRealComment(p.id)">
+                      <i class="fa fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </article>
         </div>
@@ -286,5 +358,50 @@
         </div>
       </section>
     </aside>
+  </div>
+</div>
+
+<!-- ── Report Modal ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showReportModal" (click)="closeReportModal()">
+  <div class="report-modal" (click)="$event.stopPropagation()">
+
+    <!-- Success state -->
+    <div *ngIf="reportSuccess" class="report-success">
+      <i class="fa fa-check-circle"></i>
+      <h3>Report submitted</h3>
+      <p>Thank you. Our team will review this content.</p>
+    </div>
+
+    <!-- Form state -->
+    <div *ngIf="!reportSuccess">
+      <div class="report-modal-header">
+        <h3><i class="fa fa-flag"></i> Report {{ reportTargetType === 'POST' ? 'Post' : 'Comment' }}</h3>
+        <button class="modal-close" (click)="closeReportModal()"><i class="fa fa-times"></i></button>
+      </div>
+
+      <div class="report-modal-body">
+        <p class="report-desc">Why are you reporting this content?</p>
+
+        <div class="report-reasons">
+          <button class="reason-btn" *ngFor="let r of ['Spam', 'Harassment', 'Hate speech', 'Misinformation', 'Inappropriate content', 'Other']"
+                  [class.selected]="reportReason === r"
+                  (click)="reportReason = r">
+            {{ r }}
+          </button>
+        </div>
+
+        <textarea class="report-textarea" [(ngModel)]="reportReason"
+                  placeholder="Describe the issue in detail..." rows="3"></textarea>
+      </div>
+
+      <div class="report-modal-footer">
+        <button class="btn-cancel-report" (click)="closeReportModal()">Cancel</button>
+        <button class="btn-submit-report" (click)="submitReport()"
+                [disabled]="!reportReason.trim() || reportSubmitting">
+          <i class="fa" [ngClass]="reportSubmitting ? 'fa-spinner fa-spin' : 'fa-flag'"></i>
+          {{ reportSubmitting ? 'Submitting...' : 'Submit Report' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>

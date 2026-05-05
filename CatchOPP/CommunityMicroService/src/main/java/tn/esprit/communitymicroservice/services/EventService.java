@@ -42,6 +42,10 @@ public class EventService {
         event.setLocation(updated.getLocation());
         event.setStartDate(updated.getStartDate());
         event.setEndDate(updated.getEndDate());
+        // Preserve status if provided (approve/reject flows)
+        if (updated.getStatus() != null) {
+            event.setStatus(updated.getStatus());
+        }
         return eventRepository.save(event);
     }
 

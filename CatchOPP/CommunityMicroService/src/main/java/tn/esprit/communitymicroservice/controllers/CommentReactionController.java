@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/comment-reactions")
-@CrossOrigin(origins = "*")
 public class CommentReactionController {
 
     @Autowired

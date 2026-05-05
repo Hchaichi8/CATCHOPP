@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { Router } from '@angular/router';
+import { trigger, style, transition, animate } from '@angular/animations';
 import { NotificationService, NotificationItem } from '../notification.service';
 import { Subscription } from 'rxjs';
 
-interface ToastNotification extends NotificationItem {
-  show: boolean;
-  countdown?: number;
+interface Toast extends NotificationItem {
+  progress: number;       // 100 → 0 over 5 seconds
+  timer?: any;
+  progressTimer?: any;
 }
 
 @Component({
@@ -14,130 +16,117 @@ interface ToastNotification extends NotificationItem {
   styleUrls: ['./notification-toast.component.css'],
   animations: [
     trigger('slideIn', [
-      state('void', style({
-        transform: 'translateX(400px)',
-        opacity: 0
-      })),
-      state('*', style({
-        transform: 'translateX(0)',
-        opacity: 1
-      })),
-      transition('void => *', animate('300ms ease-out')),
-      transition('* => void', animate('300ms ease-in'))
+      transition(':enter', [
+        style({ transform: 'translateX(120%)', opacity: 0 }),
+        animate('350ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+          style({ transform: 'translateX(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('250ms ease-in',
+          style({ transform: 'translateX(120%)', opacity: 0 }))
+      ])
     ])
   ]
 })
 export class NotificationToastComponent implements OnInit, OnDestroy {
-  toasts: ToastNotification[] = [];
-  private subscription?: Subscription;
-  private countdownIntervals: Map<number, any> = new Map();
+  toasts: Toast[] = [];
+  private sub?: Subscription;
+  private shownIds = new Set<number>();
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Subscribe to new notifications
-    this.subscription = this.notificationService.items$.subscribe(items => {
-      // Get the latest unread notification
-      const latestUnread = items.find(item => !item.read && !this.toasts.find(t => t.id === item.id));
-      
-      if (latestUnread) {
-        this.showToast(latestUnread);
+    this.sub = this.notificationService.items$.subscribe(items => {
+      const latest = items.find(i => !i.read && !this.shownIds.has(i.id));
+      if (latest) {
+        this.shownIds.add(latest.id);
+        this.addToast(latest);
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-    // Clear all countdown intervals
-    this.countdownIntervals.forEach(interval => clearInterval(interval));
+    this.sub?.unsubscribe();
+    this.toasts.forEach(t => { clearTimeout(t.timer); clearInterval(t.progressTimer); });
   }
 
-  showToast(notification: NotificationItem): void {
-    const toast: ToastNotification = {
-      ...notification,
-      show: true
-    };
+  addToast(item: NotificationItem): void {
+    const toast: Toast = { ...item, progress: 100 };
 
-    // Add countdown for event reminders
-    if (notification.type === 'event' && notification.message.includes('starts in')) {
-      const minutesMatch = notification.message.match(/(\d+) minutes/);
-      if (minutesMatch) {
-        toast.countdown = parseInt(minutesMatch[1]);
-        this.startCountdown(toast);
+    // Progress bar: decrease from 100 to 0 over 5000ms (every 50ms = 1%)
+    toast.progressTimer = setInterval(() => {
+      toast.progress -= 1;
+      if (toast.progress <= 0) {
+        clearInterval(toast.progressTimer);
       }
-    }
+    }, 50);
 
-    this.toasts.push(toast);
+    // Auto-dismiss after 5s
+    toast.timer = setTimeout(() => this.dismiss(toast.id), 5000);
 
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      this.removeToast(toast.id);
-    }, 5000);
-  }
+    this.toasts.unshift(toast); // newest on top
 
-  startCountdown(toast: ToastNotification): void {
-    const interval = setInterval(() => {
-      if (toast.countdown && toast.countdown > 0) {
-        toast.countdown--;
-      } else {
-        clearInterval(interval);
-        this.countdownIntervals.delete(toast.id);
-      }
-    }, 60000); // Update every minute
-
-    this.countdownIntervals.set(toast.id, interval);
-  }
-
-  removeToast(id: number): void {
-    const index = this.toasts.findIndex(t => t.id === id);
-    if (index !== -1) {
-      this.toasts.splice(index, 1);
-      
-      // Clear countdown interval if exists
-      const interval = this.countdownIntervals.get(id);
-      if (interval) {
-        clearInterval(interval);
-        this.countdownIntervals.delete(id);
-      }
+    // Max 3 toasts visible
+    if (this.toasts.length > 3) {
+      const old = this.toasts.pop();
+      if (old) { clearTimeout(old.timer); clearInterval(old.progressTimer); }
     }
   }
 
-  closeToast(toast: ToastNotification): void {
-    this.removeToast(toast.id);
+  dismiss(id: number): void {
+    const idx = this.toasts.findIndex(t => t.id === id);
+    if (idx === -1) return;
+    const t = this.toasts[idx];
+    clearTimeout(t.timer);
+    clearInterval(t.progressTimer);
+    this.toasts.splice(idx, 1);
   }
 
-  getToastIcon(type: string): string {
-    const icons: any = {
-      'event': '📅',
-      'club': '🎯',
-      'group': '👥',
-      'system': '🔔'
+  navigate(toast: Toast): void {
+    this.notificationService.markAsRead(toast.id);
+    this.dismiss(toast.id);
+    if (toast.relatedRoute) this.router.navigateByUrl(toast.relatedRoute);
+  }
+
+  pauseTimer(toast: Toast): void {
+    clearTimeout(toast.timer);
+    clearInterval(toast.progressTimer);
+  }
+
+  resumeTimer(toast: Toast): void {
+    const remaining = toast.progress * 50; // ms left
+    toast.progressTimer = setInterval(() => {
+      toast.progress -= 1;
+      if (toast.progress <= 0) clearInterval(toast.progressTimer);
+    }, 50);
+    toast.timer = setTimeout(() => this.dismiss(toast.id), remaining);
+  }
+
+  getIcon(type: string): string {
+    const map: Record<string, string> = {
+      event: '📅', club: '🎯', group: '👥', system: '🔔'
     };
-    return icons[type] || '🔔';
+    return map[type] || '🔔';
   }
 
-  getToastClass(importance: string): string {
-    const classes: any = {
-      'high': 'toast-high',
-      'normal': 'toast-normal',
-      'low': 'toast-low'
+  getAccentColor(importance: string): string {
+    const map: Record<string, string> = {
+      high: '#ef4444', normal: '#198754', low: '#6b7280'
     };
-    return classes[importance] || 'toast-normal';
+    return map[importance] || '#198754';
   }
 
-  getTimeAgo(date: Date): string {
-    const now = new Date();
-    const diff = now.getTime() - new Date(date).getTime();
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
+  getProgressColor(importance: string): string {
+    const map: Record<string, string> = {
+      high: '#ef4444', normal: '#198754', low: '#9ca3af'
+    };
+    return map[importance] || '#198754';
+  }
 
-    if (seconds < 60) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
+  trackById(_: number, toast: Toast): number {
+    return toast.id;
   }
 }

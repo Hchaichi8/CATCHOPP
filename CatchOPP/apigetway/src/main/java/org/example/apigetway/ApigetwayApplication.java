@@ -16,12 +16,16 @@ public class ApigetwayApplication {
     }
 
     @Bean
-    public RouteLocator gatewayroute(RouteLocatorBuilder builder){
+    public RouteLocator gatewayroute(RouteLocatorBuilder builder) {
         return builder.routes()
+
+                // ── Existing microservices ────────────────────────────────
                 .route("idroute1project", r -> r.path("/Project/**")
                         .uri("lb://PROJECTMICROSERVICE"))
+
                 .route("idroute1user", r -> r.path("/users/**")
                         .uri("lb://USERMICROSERVICE"))
+
                 .route("idroute1contract", r -> r.path("/Contract/**")
                         .uri("lb://PROJECTMICROSERVICE"))
 
@@ -40,7 +44,54 @@ public class ApigetwayApplication {
                 .route("idroutechat", r -> r.path("/chat/**", "/ws/**")
                         .uri("http://catchopp-communication-ms:8086"))
 
+                // ── CommunityMicroService routes ──────────────────────────
+
+                // Groups CRUD
+                .route("community-groups", r -> r.path("/api/groups/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Events CRUD + approve/reject/pending
+                .route("community-events", r -> r.path("/api/events/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Clubs CRUD + pause/unpause/search
+                .route("community-clubs", r -> r.path("/api/clubs/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Posts CRUD + group/club/engagement
+                .route("community-posts", r -> r.path("/api/posts/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Comments CRUD + count
+                .route("community-comments", r -> r.path("/api/comments/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Post reactions
+                .route("community-reactions", r -> r.path("/api/reactions/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Comment reactions
+                .route("community-comment-reactions", r -> r.path("/api/comment-reactions/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Group members + enriched
+                .route("community-group-members", r -> r.path("/api/group-members/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Join requests (INVITE_ONLY groups)
+                .route("community-join-requests", r -> r.path("/api/join-requests/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Reports / signalements
+                .route("community-reports", r -> r.path("/api/reports/**")
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
+                // Swagger / OpenAPI docs for CommunityMicroService
+                .route("community-swagger", r -> r.path("/community/api-docs/**", "/community/swagger-ui/**")
+                        .filters(f -> f.rewritePath("/community/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://COMMUNITYMICROSERVICE"))
+
                 .build();
     }
-
 }
+

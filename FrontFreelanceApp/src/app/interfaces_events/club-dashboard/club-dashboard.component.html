@@ -21,9 +21,9 @@
         <i class="fas fa-calendar"></i>
         <span>Calendar</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'announcements'" (click)="setSection('announcements')">
-        <i class="fas fa-bullhorn"></i>
-        <span>Announcements</span>
+      <a class="nav-item" [class.active]="activeSection === 'reports'" (click)="setSection('reports')">
+        <i class="fas fa-flag"></i>
+        <span>Reports</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'clubs'" (click)="setSection('clubs')">
         <i class="fas fa-users-cog"></i>
@@ -190,7 +190,7 @@
               </div>
               <div class="action-label">New Club</div>
             </button>
-            <button class="quick-action-btn" (click)="setSection('announcements'); setAnnouncementTab('posts')">
+            <button class="quick-action-btn" (click)="setSection('reports'); setAnnouncementTab('posts')">
               <div class="action-icon purple">
                 <i class="fas fa-eye"></i>
               </div>
@@ -223,7 +223,7 @@
                     {{ group.type }}
                   </span>
                   <span class="separator">•</span>
-                  <span>{{ getRandomMembers() }} members</span>
+                  <span>{{ stats.randomMembers }} members</span>
                 </div>
               </div>
               <div class="group-actions-compact">
@@ -454,7 +454,7 @@
         <section class="card">
           <div class="card-header">
             <h2 class="card-title">Top Posts</h2>
-            <button class="btn-text" (click)="setSection('announcements'); setAnnouncementTab('posts')">
+            <button class="btn-text" (click)="setSection('reports'); setAnnouncementTab('posts')">
               View All
             </button>
           </div>
@@ -489,7 +489,7 @@
                 <i class="fas fa-fire"></i>
               </div>
               <div class="pulse-content">
-                <div class="pulse-value">{{ getCommunityScore() }}%</div>
+                <div class="pulse-value">{{ stats.communityScore }}%</div>
                 <div class="pulse-label">Engagement</div>
               </div>
             </div>
@@ -498,7 +498,7 @@
                 <i class="fas fa-chart-line"></i>
               </div>
               <div class="pulse-content">
-                <div class="pulse-value">+{{ getGrowthRate() }}%</div>
+                <div class="pulse-value">+{{ stats.growthRate }}%</div>
                 <div class="pulse-label">Growth</div>
               </div>
             </div>
@@ -534,7 +534,7 @@
             <i class="fas fa-users"></i>
           </div>
           <div class="mini-stat-content">
-            <div class="mini-stat-value">{{ getTotalAttendees() }}</div>
+            <div class="mini-stat-value">{{ stats.totalAttendees }}</div>
             <div class="mini-stat-label">Total Attendees</div>
           </div>
         </div>
@@ -774,221 +774,117 @@
       </div>
     </div>
 
-    <!-- Announcements Section -->
-    <div class="announcements-section" *ngIf="activeSection === 'announcements'">
-      <!-- Announcements Stats -->
+    <!-- Reports Section -->
+    <div class="reports-section" *ngIf="activeSection === 'reports'">
+
+      <!-- Stats -->
       <div class="announcements-stats">
         <div class="mini-stat-card">
-          <div class="mini-stat-icon green">
-            <i class="fas fa-bullhorn"></i>
+          <div class="mini-stat-icon orange">
+            <i class="fas fa-flag"></i>
           </div>
           <div class="mini-stat-content">
-            <div class="mini-stat-value">{{ announcements.length }}</div>
-            <div class="mini-stat-label">Total Announcements</div>
+            <div class="mini-stat-value">{{ allReports.length }}</div>
+            <div class="mini-stat-label">Total Reports</div>
+          </div>
+        </div>
+        <div class="mini-stat-card">
+          <div class="mini-stat-icon red">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-value">{{ pendingReports.length }}</div>
+            <div class="mini-stat-label">Pending</div>
+          </div>
+        </div>
+        <div class="mini-stat-card">
+          <div class="mini-stat-icon green">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-value">{{ reviewedReports.length }}</div>
+            <div class="mini-stat-label">Reviewed</div>
           </div>
         </div>
         <div class="mini-stat-card">
           <div class="mini-stat-icon blue">
-            <i class="fas fa-comments"></i>
+            <i class="fas fa-ban"></i>
           </div>
           <div class="mini-stat-content">
-            <div class="mini-stat-value">{{ posts.length }}</div>
-            <div class="mini-stat-label">Community Posts</div>
-          </div>
-        </div>
-        <div class="mini-stat-card">
-          <div class="mini-stat-icon purple">
-            <i class="fas fa-eye"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-value">{{ getTotalViews() }}</div>
-            <div class="mini-stat-label">Total Views</div>
-          </div>
-        </div>
-        <div class="mini-stat-card">
-          <div class="mini-stat-icon orange">
-            <i class="fas fa-heart"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-value">{{ getTotalLikes() }}</div>
-            <div class="mini-stat-label">Total Likes</div>
+            <div class="mini-stat-value">{{ dismissedReports.length }}</div>
+            <div class="mini-stat-label">Dismissed</div>
           </div>
         </div>
       </div>
 
-      <!-- Content Tabs -->
+      <!-- Filter tabs -->
       <div class="content-tabs">
-        <button 
-          class="tab-btn" 
-          [class.active]="announcementTab === 'announcements'"
-          (click)="setAnnouncementTab('announcements')">
-          <i class="fas fa-bullhorn"></i> Announcements
+        <button class="tab-btn" [class.active]="reportFilter === 'all'" (click)="setReportFilter('all')">
+          <i class="fas fa-list"></i> All ({{ allReports.length }})
         </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="announcementTab === 'posts'"
-          (click)="setAnnouncementTab('posts')">
-          <i class="fas fa-comments"></i> Community Posts
+        <button class="tab-btn" [class.active]="reportFilter === 'PENDING'" (click)="setReportFilter('PENDING')">
+          <i class="fas fa-clock"></i> Pending ({{ pendingReports.length }})
+        </button>
+        <button class="tab-btn" [class.active]="reportFilter === 'REVIEWED'" (click)="setReportFilter('REVIEWED')">
+          <i class="fas fa-check"></i> Reviewed
+        </button>
+        <button class="tab-btn" [class.active]="reportFilter === 'DISMISSED'" (click)="setReportFilter('DISMISSED')">
+          <i class="fas fa-ban"></i> Dismissed
         </button>
       </div>
 
-      <!-- Announcements Tab -->
-      <div class="announcements-container" *ngIf="announcementTab === 'announcements'">
-        <div class="announcements-header">
-          <div class="search-filter-bar">
-            <div class="search-box">
-              <i class="fas fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Search announcements..." 
-                [(ngModel)]="announcementSearchQuery"
-                (input)="filterAnnouncements()">
-            </div>
-            <select class="filter-select" [(ngModel)]="announcementFilter" (change)="filterAnnouncements()">
-              <option value="all">All Groups</option>
-              <option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" (click)="openAnnouncementModal()">
-            <i class="fas fa-plus"></i> New Announcement
-          </button>
-        </div>
-
-        <div class="announcements-list">
-          <div class="announcement-card" *ngFor="let announcement of filteredAnnouncements">
-            <div class="announcement-header">
-              <div class="announcement-icon">
-                <i class="fas fa-bullhorn"></i>
-              </div>
-              <div class="announcement-meta">
-                <h3 class="announcement-title">{{ announcement.title }}</h3>
-                <div class="announcement-info">
-                  <span class="announcement-author">{{ announcement.author }}</span>
-                  <span class="separator">•</span>
-                  <span class="announcement-date">{{ announcement.createdAt | date: 'MMM d, yyyy' }}</span>
-                  <span class="separator">•</span>
-                  <span class="announcement-views"><i class="fas fa-eye"></i> {{ announcement.views || 0 }} views</span>
-                </div>
-              </div>
-              <div class="announcement-actions">
-                <button class="btn-icon" (click)="openAnnouncementModal(announcement)">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-icon danger" (click)="deleteAnnouncement(announcement.id)">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-            <div class="announcement-content">
-              <p>{{ announcement.content }}</p>
-            </div>
-            <div class="announcement-footer" *ngIf="announcement.targetGroup">
-              <span class="target-badge">
-                <i class="fas fa-users"></i> {{ getGroupName(announcement.targetGroup) }}
-              </span>
-            </div>
-          </div>
-
-          <div class="empty-state" *ngIf="filteredAnnouncements.length === 0">
-            <i class="fas fa-bullhorn"></i>
-            <h3>No announcements found</h3>
-            <p>Create your first announcement to notify your community</p>
-            <button class="btn btn-primary" (click)="openAnnouncementModal()">
-              <i class="fas fa-plus"></i> Create Announcement
-            </button>
-          </div>
-        </div>
+      <!-- Loading -->
+      <div class="loading-reports" *ngIf="loadingReports">
+        <i class="fas fa-spinner fa-spin"></i> Loading reports...
       </div>
 
-      <!-- Posts Tab -->
-      <div class="posts-container" *ngIf="announcementTab === 'posts'">
-        <div class="posts-header">
-          <div class="search-filter-bar">
-            <div class="search-box">
-              <i class="fas fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Search posts..." 
-                [(ngModel)]="postSearchQuery"
-                (input)="filterPosts()">
+      <!-- Reports list -->
+      <div class="reports-list" *ngIf="!loadingReports">
+        <div class="report-card" *ngFor="let r of filteredReports">
+          <div class="report-card-header">
+            <div class="report-type-badge" [ngClass]="r.targetType === 'POST' ? 'badge-post' : 'badge-comment'">
+              <i class="fas" [ngClass]="r.targetType === 'POST' ? 'fa-file-alt' : 'fa-comment'"></i>
+              {{ r.targetType }}
             </div>
-            <select class="filter-select" [(ngModel)]="postFilter" (change)="filterPosts()">
-              <option value="all">All Groups</option>
-              <option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</option>
-            </select>
-            <select class="filter-select" [(ngModel)]="postSortBy" (change)="filterPosts()">
-              <option value="recent">Most Recent</option>
-              <option value="popular">Most Popular</option>
-              <option value="likes">Most Liked</option>
-            </select>
+            <div class="report-status-badge" [ngClass]="{
+              'status-pending':   r.status === 'PENDING',
+              'status-reviewed':  r.status === 'REVIEWED',
+              'status-dismissed': r.status === 'DISMISSED'
+            }">
+              {{ r.status }}
+            </div>
+            <span class="report-date">{{ r.createdAt | date:'MMM d, yyyy' }}</span>
           </div>
-          <button class="btn btn-primary" (click)="openPostModal()">
-            <i class="fas fa-plus"></i> New Post
-          </button>
-        </div>
 
-        <div class="posts-grid">
-          <div class="post-card" *ngFor="let post of filteredPosts">
-            <div class="post-header">
-              <div class="post-author-info">
-                <div class="author-avatar">
-                  <i class="fas fa-user"></i>
-                </div>
-                <div class="author-details">
-                  <div class="author-name">{{ post.author }}</div>
-                  <div class="post-time">{{ post.createdAt | date: 'MMM d, yyyy - h:mm a' }}</div>
-                </div>
-              </div>
-              <div class="post-actions-menu">
-                <button class="btn-icon" (click)="openPostModal(post)">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-icon danger" (click)="deletePost(post.id)">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+          <div class="report-card-body">
+            <div class="report-info-row">
+              <span class="report-label"><i class="fas fa-user"></i> Reporter:</span>
+              <span>User {{ r.reporterId }}</span>
             </div>
-
-            <div class="post-content">
-              <h3 class="post-title" *ngIf="post.title">{{ post.title }}</h3>
-              <p class="post-text">{{ post.content }}</p>
-              <div class="post-image" *ngIf="post.imageUrl">
-                <img [src]="post.imageUrl" [alt]="post.title">
-              </div>
+            <div class="report-info-row">
+              <span class="report-label"><i class="fas fa-crosshairs"></i> Target ID:</span>
+              <span>#{{ r.targetId }}</span>
             </div>
-
-            <div class="post-footer">
-              <div class="post-interactions">
-                <!-- Reactions Component -->
-                <app-post-reactions 
-                  [postId]="post.id"
-                  [currentUserId]="1"
-                  (reactionChanged)="loadPosts()">
-                </app-post-reactions>
-                
-                <!-- Comments Component -->
-                <app-post-comments 
-                  [postId]="post.id"
-                  [currentUserId]="1"
-                  [showComments]="false"
-                  (commentAdded)="loadPosts()">
-                </app-post-comments>
-              </div>
-              
-              <div class="post-group-badge" *ngIf="post.groupId">
-                <i class="fas fa-users"></i> {{ getGroupName(post.groupId) }}
-              </div>
+            <div class="report-reason">
+              <span class="report-label"><i class="fas fa-comment-alt"></i> Reason:</span>
+              <p>{{ r.reason }}</p>
             </div>
           </div>
 
-          <div class="empty-state" *ngIf="filteredPosts.length === 0">
-            <i class="fas fa-comments"></i>
-            <h3>No posts yet</h3>
-            <p>Be the first to create a post in your community</p>
-            <button class="btn btn-primary" (click)="openPostModal()">
-              <i class="fas fa-plus"></i> Create Post
+          <div class="report-card-actions" *ngIf="r.status === 'PENDING'">
+            <button class="btn-report-action dismiss" (click)="dismissReport(r.id)">
+              <i class="fas fa-ban"></i> Dismiss
+            </button>
+            <button class="btn-report-action delete-content" (click)="deleteReportedContent(r.id)">
+              <i class="fas fa-trash"></i> Delete Content
             </button>
           </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredReports.length === 0">
+          <i class="fas fa-flag"></i>
+          <h3>No reports found</h3>
+          <p>No reports match the selected filter</p>
         </div>
       </div>
     </div>
@@ -1005,7 +901,7 @@
             <div class="stat-value-large">{{ groups.length }}</div>
             <div class="stat-label-large">Total Groups</div>
             <div class="stat-trend positive">
-              <i class="fas fa-arrow-up"></i> +{{ getNewGroupsThisWeek() }} this week
+              <i class="fas fa-arrow-up"></i> +{{ stats.newGroupsThisWeek }} this week
             </div>
           </div>
         </div>
@@ -1015,10 +911,10 @@
             <i class="fas fa-user-friends"></i>
           </div>
           <div class="stat-details">
-            <div class="stat-value-large">{{ getTotalMembers() }}</div>
+            <div class="stat-value-large">{{ stats.totalMembers }}</div>
             <div class="stat-label-large">Total Members</div>
             <div class="stat-trend positive">
-              <i class="fas fa-arrow-up"></i> +{{ getNewMembersThisWeek() }} this week
+              <i class="fas fa-arrow-up"></i> +{{ stats.newMembersThisWeek }} this week
             </div>
           </div>
         </div>
@@ -1028,10 +924,10 @@
             <i class="fas fa-comments"></i>
           </div>
           <div class="stat-details">
-            <div class="stat-value-large">{{ getPublicGroupsCount() }}</div>
+            <div class="stat-value-large">{{ stats.publicGroupsCount }}</div>
             <div class="stat-label-large">Public Groups</div>
             <div class="stat-info">
-              {{ getPrivateGroupsCount() }} private groups
+              {{ stats.privateGroupsCount }} private groups
             </div>
           </div>
         </div>
@@ -1041,7 +937,7 @@
             <i class="fas fa-chart-line"></i>
           </div>
           <div class="stat-details">
-            <div class="stat-value-large">{{ getEngagementRate() }}%</div>
+            <div class="stat-value-large">{{ stats.engagementRate }}%</div>
             <div class="stat-label-large">Engagement Rate</div>
             <div class="stat-trend positive">
               <i class="fas fa-arrow-up"></i> +5% from last month
@@ -1124,7 +1020,7 @@
             <div class="group-stats-mini">
               <div class="stat-mini">
                 <i class="fas fa-user-friends"></i>
-                <span>{{ getRandomMembers() }} members</span>
+                <span>{{ stats.randomMembers }} members</span>
               </div>
               <div class="stat-mini">
                 <i class="fas fa-calendar"></i>
@@ -1134,7 +1030,7 @@
             
             <div class="group-tags" *ngIf="group.bannerUrl">
               <span class="mini-tag">Active</span>
-              <span class="mini-tag">{{ getRandomActivity() }}</span>
+              <span class="mini-tag">{{ stats.randomActivity }}</span>
             </div>
           </div>
           
@@ -1171,7 +1067,7 @@
             </div>
             <p class="group-list-description">{{ group.description }}</p>
             <div class="group-list-meta">
-              <span><i class="fas fa-user-friends"></i> {{ getRandomMembers() }} members</span>
+              <span><i class="fas fa-user-friends"></i> {{ stats.randomMembers }} members</span>
               <span><i class="fas fa-calendar"></i> {{ getGroupEventsCountById(group.id) }} events</span>
               <span><i class="fas fa-clock"></i> Created {{ group.createdAt | date: 'MMM d, yyyy' }}</span>
             </div>
@@ -1237,19 +1133,19 @@
             <div class="stat-breakdown">
               <div class="breakdown-item">
                 <span class="breakdown-label">Public</span>
-                <span class="breakdown-value">{{ getPublicGroupsCount() }}</span>
+                <span class="breakdown-value">{{ stats.publicGroupsCount }}</span>
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Private</span>
-                <span class="breakdown-value">{{ getPrivateGroupsCount() }}</span>
+                <span class="breakdown-value">{{ stats.privateGroupsCount }}</span>
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Members</span>
-                <span class="breakdown-value">{{ getTotalMembers() }}</span>
+                <span class="breakdown-value">{{ stats.totalMembers }}</span>
               </div>
             </div>
             <div class="trend-indicator positive">
-              <i class="fas fa-arrow-up"></i> +{{ getNewGroupsThisWeek() }} this week
+              <i class="fas fa-arrow-up"></i> +{{ stats.newGroupsThisWeek }} this week
             </div>
           </div>
         </div>
@@ -1276,11 +1172,11 @@
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Attendees</span>
-                <span class="breakdown-value">{{ getTotalAttendees() }}</span>
+                <span class="breakdown-value">{{ stats.totalAttendees }}</span>
               </div>
             </div>
             <div class="trend-indicator positive">
-              <i class="fas fa-arrow-up"></i> +{{ getNewEventsThisWeek() }} this week
+              <i class="fas fa-arrow-up"></i> +{{ stats.newEventsThisWeek }} this week
             </div>
           </div>
         </div>
@@ -1303,11 +1199,11 @@
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Interests</span>
-                <span class="breakdown-value">{{ getTotalInterests() }}</span>
+                <span class="breakdown-value">{{ stats.totalInterests }}</span>
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Members</span>
-                <span class="breakdown-value">{{ getClubMembers() }}</span>
+                <span class="breakdown-value">{{ stats.clubMembers }}</span>
               </div>
             </div>
             <div class="trend-indicator positive">
@@ -1325,20 +1221,20 @@
             <h3>Posts & Activity</h3>
           </div>
           <div class="overview-card-body">
-            <div class="big-number">{{ getTotalPosts() }}</div>
+            <div class="big-number">{{ stats.totalPosts }}</div>
             <div class="stat-label">Total Posts</div>
             <div class="stat-breakdown">
               <div class="breakdown-item">
                 <span class="breakdown-label">This Week</span>
-                <span class="breakdown-value">{{ getPostsThisWeek() }}</span>
+                <span class="breakdown-value">{{ stats.postsThisWeek }}</span>
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Comments</span>
-                <span class="breakdown-value">{{ getTotalComments() }}</span>
+                <span class="breakdown-value">{{ stats.totalComments }}</span>
               </div>
               <div class="breakdown-item">
                 <span class="breakdown-label">Engagement</span>
-                <span class="breakdown-value">{{ getEngagementRate() }}%</span>
+                <span class="breakdown-value">{{ stats.engagementRate }}%</span>
               </div>
             </div>
             <div class="trend-indicator positive">
@@ -1411,7 +1307,7 @@
               <div class="performer-rank">{{ i + 1 }}</div>
               <div class="performer-info">
                 <div class="performer-name">{{ group.name }}</div>
-                <div class="performer-meta">{{ getRandomMembers() }} members</div>
+                <div class="performer-meta">{{ stats.randomMembers }} members</div>
               </div>
               <div class="performer-badge">
                 <i class="fas fa-fire"></i>
@@ -1476,7 +1372,7 @@
             <i class="fas fa-users"></i>
           </div>
           <div class="stat-details">
-            <div class="stat-value-large">{{ getClubMembers() }}</div>
+            <div class="stat-value-large">{{ stats.clubMembers }}</div>
             <div class="stat-label-large">Total Members</div>
             <div class="stat-info">
               Across all clubs
@@ -1489,7 +1385,7 @@
             <i class="fas fa-tags"></i>
           </div>
           <div class="stat-details">
-            <div class="stat-value-large">{{ getTotalInterests() }}</div>
+            <div class="stat-value-large">{{ stats.totalInterests }}</div>
             <div class="stat-label-large">Interest Categories</div>
             <div class="stat-info">
               Diverse interests
@@ -1574,7 +1470,7 @@
             <div class="club-stats-mini">
               <div class="stat-mini">
                 <i class="fas fa-users"></i>
-                <span>{{ club.membersCount || getRandomMembers() }} members</span>
+                <span>{{ club.membersCount || stats.randomMembers }} members</span>
               </div>
               <div class="stat-mini">
                 <i class="fas fa-calendar"></i>
@@ -1633,7 +1529,7 @@
             </div>
             <p class="club-list-description">{{ club.description }}</p>
             <div class="club-list-meta">
-              <span><i class="fas fa-users"></i> {{ club.membersCount || getRandomMembers() }} members</span>
+              <span><i class="fas fa-users"></i> {{ club.membersCount || stats.randomMembers }} members</span>
               <span><i class="fas fa-calendar"></i> {{ club.eventsCount || 0 }} events</span>
               <span><i class="fas fa-clock"></i> Created {{ club.createdAt | date: 'MMM d, yyyy' }}</span>
             </div>

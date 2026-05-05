@@ -21,11 +21,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
         </processorPath>
         <module name="CommunityMicroService" />
       </profile>
-      <profile name="Annotation profile for CatchOPP" enabled="true">
+      <profile name="Annotation profile for UserMicroService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -34,8 +34,8 @@
         </processorPath>
         <module name="ProjectMicroService" />
         <module name="CatchOPP" />
-        <module name="MS_CompetenceAndReview" />
         <module name="UserMicroService" />
+        <module name="MS_CompetenceAndReview" />
       </profile>
     </annotationProcessing>
   </component>

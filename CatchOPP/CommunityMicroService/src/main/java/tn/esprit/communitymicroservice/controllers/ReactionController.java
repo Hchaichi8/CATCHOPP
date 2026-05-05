@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reactions")
-@CrossOrigin(origins = "*")
 public class ReactionController {
 
     @Autowired

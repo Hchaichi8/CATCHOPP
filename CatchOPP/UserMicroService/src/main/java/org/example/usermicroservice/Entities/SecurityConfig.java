@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -18,23 +19,30 @@ import java.util.Date;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // ── Shared secret — must match jwt.secret in every microservice ────────
+    // Minimum 256 bits (32 chars) for HS256
+    public static final String JWT_SECRET =
+            "catchopp_super_secret_key_2024_must_be_at_least_256_bits_long_for_hs256";
+
+    private static final long EXPIRATION_TIME = 86400000; // 24h
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Désactive la protection CSRF pour les API REST
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Autorise toutes les requêtes (pour l'instant)
+                        .anyRequest().permitAll()
                 );
         return http.build();
     }
-
-
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 86400000;
 
     public String generateToken(Long id, String email, String role) {
         return Jwts.builder()
@@ -43,7 +51,7 @@ public class SecurityConfig {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 }
