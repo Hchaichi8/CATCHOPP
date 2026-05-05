@@ -62,6 +62,8 @@ import { AdminPlansComponent } from './Interfaces_Admin/admin-plans/admin-plans.
 import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/admin-skill-tests.component';
 import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
 import { ClientReliabilityPredictorComponent } from './Interfaces_AI/client-reliability-predictor/client-reliability-predictor.component';
+import { ProjectRecommenderComponent } from './Interfaces_AI/project-recommender/project-recommender.component';
+import { PricePredictorComponent } from './Interfaces_AI/price-predictor/price-predictor.component';
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
 
@@ -179,6 +181,12 @@ const routes: Routes = [
 
 // ML Client Reliability Predictor (no auth required)
 {path:'ClientReliabilityPredictor',component:ClientReliabilityPredictorComponent},
+
+// ML Project Recommender — BO2 (no auth required)
+{path:'ProjectRecommender',component:ProjectRecommenderComponent},
+
+// ML Price Predictor — BO3 (no auth required)
+{path:'PricePredictor',component:PricePredictorComponent},
 
 // Rewards & Promo Codes
 {path:'rewards',component:RewardsDashboardComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},

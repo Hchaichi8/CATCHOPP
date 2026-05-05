@@ -68,6 +68,8 @@ import { AdminPlansComponent } from './Interfaces_Admin/admin-plans/admin-plans.
 import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/admin-skill-tests.component';
 import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
 import { ClientReliabilityPredictorComponent } from './Interfaces_AI/client-reliability-predictor/client-reliability-predictor.component';
+import { ProjectRecommenderComponent } from './Interfaces_AI/project-recommender/project-recommender.component';
+import { PricePredictorComponent } from './Interfaces_AI/price-predictor/price-predictor.component';
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
 import { NotificationCenterComponent } from './shared/notification-center/notification-center.component';
@@ -164,6 +166,8 @@ import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-su
         AdminSkillTestsComponent,
         AiCvGeneratorComponent,
         ClientReliabilityPredictorComponent,
+        ProjectRecommenderComponent,
+        PricePredictorComponent,
         RewardsDashboardComponent,
         SpinWheelComponent,
 

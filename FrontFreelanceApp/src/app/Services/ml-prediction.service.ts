@@ -52,7 +52,7 @@ export interface PcaResponse {
 
 @Injectable({ providedIn: 'root' })
 export class MlPredictionService {
-  private readonly baseUrl = 'http://localhost:8089';
+  private readonly baseUrl = 'http://localhost:8091';
 
   constructor(private http: HttpClient) {}
 

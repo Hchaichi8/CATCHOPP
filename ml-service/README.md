@@ -3,7 +3,7 @@
 Python Flask microservice exposing the freelance client reliability ML pipeline.
 
 ## Port
-`8089`
+`8091`
 
 ## Quick Start (local)
 

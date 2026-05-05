@@ -1,0 +1,174 @@
+<div class="rec-wrapper">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="rec-header">
+    <div class="header-icon">🎯</div>
+    <div>
+      <h1>Project Recommender</h1>
+      <p class="subtitle">Find the best matching projects for your skills — powered by Content-Based Filtering</p>
+    </div>
+    <div class="status-badge" [class.online]="engineReady" [class.offline]="!engineReady">
+      <span class="dot"></span>
+      {{ engineReady ? 'Engine Ready' : 'Engine Not Trained' }}
+    </div>
+  </div>
+
+  <!-- ── Alerts ─────────────────────────────────────────────────────────── -->
+  <div class="alert alert-error"   *ngIf="errorMsg">   ⚠️ {{ errorMsg }}   </div>
+  <div class="alert alert-success" *ngIf="successMsg"> ✅ {{ successMsg }} </div>
+
+  <!-- ── Tabs ───────────────────────────────────────────────────────────── -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'recommend'" (click)="onTabChange('recommend')">🔍 Find Projects</button>
+    <button class="tab-btn" [class.active]="activeTab === 'train'"     (click)="onTabChange('train')">🏋️ Train Engine</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: RECOMMEND                                                       -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'recommend'">
+
+    <div class="search-card">
+      <h2 class="card-title">Your Skills</h2>
+
+      <!-- Skill tag pills -->
+      <div class="skill-tags-label">Quick select:</div>
+      <div class="skill-tags">
+        <button *ngFor="let skill of suggestedSkills"
+                class="skill-tag"
+                [class.selected]="isSkillSelected(skill)"
+                (click)="toggleSkill(skill)">
+          {{ skill }}
+        </button>
+      </div>
+
+      <!-- Free text input -->
+      <div class="form-group" style="margin-top:16px">
+        <label>Or type your skills</label>
+        <input type="text" [(ngModel)]="skillsInput" class="form-control"
+               placeholder="e.g. python machine learning data analysis" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Number of results</label>
+          <select [(ngModel)]="topN" class="form-control">
+            <option [value]="3">3</option>
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+          </select>
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end">
+          <button class="btn btn-primary" (click)="onRecommend()"
+                  [disabled]="isLoading || !engineReady">
+            <span *ngIf="!isLoading">🎯 Find Matching Projects</span>
+            <span *ngIf="isLoading" class="spinner"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div *ngIf="results.length > 0">
+      <div class="results-header">
+        <h2>Top {{ results.length }} matches for <em>"{{ queryUsed }}"</em></h2>
+      </div>
+
+      <div class="result-card" *ngFor="let proj of results; let i = index">
+        <div class="result-rank">#{{ i + 1 }}</div>
+
+        <div class="result-body">
+          <div class="result-title">{{ proj.job_title || 'Untitled Project' }}</div>
+
+          <div class="result-tags" *ngIf="proj.tags">
+            <span class="tag-pill" *ngFor="let tag of proj.tags.split(',').slice(0,6)">
+              {{ tag.trim() }}
+            </span>
+          </div>
+
+          <div class="result-meta">
+            <span class="meta-item">💰 ${{ proj.avg_price | number:'1.0-0' }}</span>
+            <span class="meta-item">📋 {{ proj.rate_type }}</span>
+            <span class="meta-item">🌍 {{ proj.client_country }}</span>
+            <span class="meta-item stars">{{ getRatingStars(proj.client_rating) }} {{ proj.client_rating | number:'1.1-1' }}</span>
+          </div>
+        </div>
+
+        <div class="result-score">
+          <div class="score-label">Match</div>
+          <div class="score-circle" [style.border-color]="getScoreColor(proj.score)">
+            <span [style.color]="getScoreColor(proj.score)">{{ getScorePercent(proj.score) }}%</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill"
+                 [style.width.%]="getScorePercent(proj.score)"
+                 [style.background]="getScoreColor(proj.score)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="card placeholder-card" *ngIf="results.length === 0 && !isLoading">
+      <div class="placeholder-icon">🔍</div>
+      <p>Select your skills above and click <strong>Find Matching Projects</strong>.</p>
+      <p class="hint">The engine uses TF-IDF + Cosine Similarity on job titles, tags, and project metadata.</p>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: TRAIN                                                           -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'train'">
+    <div class="card">
+      <h2 class="card-title">Train Recommendation Engine</h2>
+      <p class="card-desc">
+        Upload the <code>freelancer_job_postings.csv</code> dataset to index all projects.
+        The engine builds a TF-IDF matrix from job titles, tags, rate type, and country.
+      </p>
+
+      <div class="upload-zone">
+        <label class="upload-label" for="recCsvFile">
+          <span class="upload-icon">📂</span>
+          <span>{{ selectedFile ? selectedFile.name : 'Click to select CSV file (optional)' }}</span>
+        </label>
+        <input id="recCsvFile" type="file" accept=".csv" (change)="onFileSelected($event)" hidden />
+      </div>
+
+      <button class="btn btn-primary" (click)="onTrain()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">🏋️ Train Engine</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <div class="train-result" *ngIf="trainResult">
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-value">{{ trainResult.projects_indexed }}</div>
+            <div class="stat-label">Projects Indexed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">TF-IDF</div>
+            <div class="stat-label">Algorithm</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">Cosine</div>
+            <div class="stat-label">Similarity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card info-card">
+      <h3>How does it work?</h3>
+      <ol class="steps-list">
+        <li><strong>Content Extraction</strong> — Combines job_title + tags + rate_type + client_country into a text field</li>
+        <li><strong>TF-IDF Vectorisation</strong> — Converts text into a 500-feature numeric matrix</li>
+        <li><strong>Cosine Similarity</strong> — Measures angle between your skill vector and each project vector</li>
+        <li><strong>Ranking</strong> — Returns top N projects sorted by similarity score</li>
+      </ol>
+    </div>
+  </div>
+
+</div>
