@@ -202,8 +202,25 @@ services:
     networks:
       - catchopp-net
 
+  # ── ML / Data-Science MicroService (Python Flask) ───────────────────────────
+  ml-service:
+    build:
+      context: ../ml-service
+    container_name: catchopp-ml-service
+    restart: unless-stopped
+    ports:
+      - "8089:8089"
+    environment:
+      - DATA_PATH=/app/freelancer_job_postings.csv
+      - MODEL_DIR=/app/models
+    volumes:
+      - ml_models:/app/models
+    networks:
+      - catchopp-net
+
 volumes:
   mysql_data:
+  ml_models:
 
 networks:
   catchopp-net:

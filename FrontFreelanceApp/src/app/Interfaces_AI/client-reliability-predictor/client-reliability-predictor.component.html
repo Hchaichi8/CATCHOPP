@@ -1,0 +1,347 @@
+<div class="predictor-wrapper">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="predictor-header">
+    <div class="header-icon">🤖</div>
+    <div>
+      <h1>Client Reliability Predictor</h1>
+      <p class="subtitle">ML-powered analysis to help you find trustworthy clients</p>
+    </div>
+    <div class="status-badge" [class.online]="serviceOnline" [class.offline]="!serviceOnline">
+      <span class="dot"></span>
+      {{ serviceOnline ? 'ML Service Online' : 'ML Service Offline' }}
+    </div>
+  </div>
+
+  <!-- ── Global error ───────────────────────────────────────────────────── -->
+  <div class="alert alert-error" *ngIf="errorMsg">
+    <span>⚠️</span> {{ errorMsg }}
+  </div>
+  <div class="alert alert-success" *ngIf="successMsg">
+    <span>✅</span> {{ successMsg }}
+  </div>
+
+  <!-- ── Tabs ───────────────────────────────────────────────────────────── -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'predict'"   (click)="onTabChange('predict')">🔍 Predict</button>
+    <button class="tab-btn" [class.active]="activeTab === 'train'"     (click)="onTabChange('train')">🏋️ Train</button>
+    <button class="tab-btn" [class.active]="activeTab === 'benchmark'" (click)="onTabChange('benchmark')">📊 Benchmark</button>
+    <button class="tab-btn" [class.active]="activeTab === 'pca'"       (click)="onTabChange('pca')">🔬 PCA View</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: PREDICT                                                         -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'predict'">
+    <div class="card-grid">
+
+      <!-- Form card -->
+      <div class="card">
+        <h2 class="card-title">Client Data</h2>
+
+        <div class="form-group">
+          <label>Model</label>
+          <select [(ngModel)]="selectedModel" class="form-control">
+            <option value="rf">Random Forest (recommended)</option>
+            <option value="lr">Logistic Regression</option>
+            <option value="mlp">Neural Network (MLP)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Min Price ($)</label>
+            <input type="number" [(ngModel)]="form.min_price" class="form-control" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Max Price ($)</label>
+            <input type="number" [(ngModel)]="form.max_price" class="form-control" min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Average Price ($)</label>
+          <input type="number" [(ngModel)]="form.avg_price" class="form-control" min="0" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Client Rating (0–5)</label>
+            <input type="number" [(ngModel)]="form.client_average_rating"
+                   class="form-control" min="0" max="5" step="0.1" />
+          </div>
+          <div class="form-group">
+            <label>Review Count</label>
+            <input type="number" [(ngModel)]="form.client_review_count"
+                   class="form-control" min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rate Type</label>
+          <select [(ngModel)]="form.rate_type" class="form-control">
+            <option value="Fixed">Fixed</option>
+            <option value="Hourly">Hourly</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" (click)="onPredict()" [disabled]="isLoading || !serviceOnline">
+          <span *ngIf="!isLoading">🔍 Predict Reliability</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+
+      <!-- Result card -->
+      <div class="card result-card" *ngIf="predictionResult">
+        <h2 class="card-title">Prediction Result</h2>
+
+        <div class="result-badge" [class.reliable]="predictionResult.good_match === 1"
+                                  [class.unreliable]="predictionResult.good_match === 0">
+          <div class="result-icon">{{ predictionResult.good_match === 1 ? '✅' : '❌' }}</div>
+          <div class="result-label">{{ predictionResult.label }}</div>
+        </div>
+
+        <div class="probability-section">
+          <div class="prob-label">Reliability Probability</div>
+          <div class="prob-bar-track">
+            <div class="prob-bar-fill"
+                 [style.width.%]="predictionResult.probability_good * 100"
+                 [style.background]="getProbabilityColor(predictionResult.probability_good)">
+            </div>
+          </div>
+          <div class="prob-value"
+               [style.color]="getProbabilityColor(predictionResult.probability_good)">
+            {{ (predictionResult.probability_good * 100).toFixed(1) }}%
+          </div>
+        </div>
+
+        <div class="result-explanation">
+          <p *ngIf="predictionResult.good_match === 1">
+            This client has a <strong>high rating (≥ 4/5)</strong> and a proven review history.
+            They are likely a reliable partner for your project.
+          </p>
+          <p *ngIf="predictionResult.good_match === 0">
+            This client does not meet the reliability threshold (rating ≥ 4/5 with reviews).
+            Proceed with caution or request more information.
+          </p>
+        </div>
+
+        <div class="criteria-list">
+          <div class="criterion">
+            <span class="criterion-icon">⭐</span>
+            <span>Rating: <strong>{{ form.client_average_rating }}/5</strong></span>
+            <span class="criterion-status" [class.pass]="form.client_average_rating >= 4">
+              {{ form.client_average_rating >= 4 ? '✓' : '✗' }}
+            </span>
+          </div>
+          <div class="criterion">
+            <span class="criterion-icon">💬</span>
+            <span>Reviews: <strong>{{ form.client_review_count }}</strong></span>
+            <span class="criterion-status" [class.pass]="form.client_review_count > 0">
+              {{ form.client_review_count > 0 ? '✓' : '✗' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder when no result yet -->
+      <div class="card placeholder-card" *ngIf="!predictionResult">
+        <div class="placeholder-icon">🎯</div>
+        <p>Fill in the client data and click <strong>Predict Reliability</strong> to get an instant ML-powered assessment.</p>
+        <p class="hint">The model was trained on thousands of freelance job postings to identify reliable clients.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: TRAIN                                                           -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'train'">
+    <div class="card">
+      <h2 class="card-title">Train / Re-train Models</h2>
+      <p class="card-desc">
+        Upload a CSV file matching the <code>freelancer_job_postings.csv</code> schema, or use the
+        server-side dataset if it's already placed in the <code>ml-service/</code> folder.
+      </p>
+
+      <div class="upload-zone">
+        <label class="upload-label" for="csvFile">
+          <span class="upload-icon">📂</span>
+          <span>{{ selectedFile ? selectedFile.name : 'Click to select CSV file (optional)' }}</span>
+        </label>
+        <input id="csvFile" type="file" accept=".csv" (change)="onFileSelected($event)" hidden />
+      </div>
+
+      <div class="schema-hint">
+        <strong>Required columns:</strong>
+        <code>min_price, max_price, avg_price, client_average_rating, client_review_count, rate_type, client_state, client_country</code>
+      </div>
+
+      <button class="btn btn-primary" (click)="onTrain()" [disabled]="isLoading || !serviceOnline">
+        <span *ngIf="!isLoading">🏋️ Start Training</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <div class="train-result" *ngIf="trainResult">
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-value">{{ trainResult.rows_used }}</div>
+            <div class="stat-label">Rows Processed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Models Trained</div>
+          </div>
+        </div>
+        <p class="train-note">Models saved to disk. Switch to the <strong>Benchmark</strong> tab to compare results.</p>
+      </div>
+    </div>
+
+    <div class="card info-card">
+      <h3>What happens during training?</h3>
+      <ol class="steps-list">
+        <li><strong>Data Cleaning</strong> — Missing values handled, rows with unknown country dropped</li>
+        <li><strong>One-Hot Encoding</strong> — <code>rate_type</code> column encoded into binary columns</li>
+        <li><strong>MinMax Scaling</strong> — Numeric columns normalised to [0, 1]</li>
+        <li><strong>Target Creation</strong> — <code>good_match = 1</code> if rating ≥ 4/5 AND reviews > 0</li>
+        <li><strong>80/20 Split</strong> — Stratified train/test split</li>
+        <li><strong>3 Models</strong> — Random Forest, Logistic Regression, Neural Network (MLP)</li>
+        <li><strong>Evaluation</strong> — Accuracy, F1-Score, Precision, Recall per class</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: BENCHMARK                                                       -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'benchmark'">
+
+    <div class="card" *ngIf="!benchmark">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <p>No benchmark data yet. Train the models first.</p>
+        <button class="btn btn-secondary" (click)="onTabChange('train')">Go to Train</button>
+      </div>
+    </div>
+
+    <div *ngIf="benchmark">
+      <!-- Bar chart -->
+      <div class="card">
+        <h2 class="card-title">Model Comparison</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [datasets]="barChartDatasets"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            type="bar">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Metrics table -->
+      <div class="card">
+        <h2 class="card-title">Detailed Metrics</h2>
+        <div class="metrics-grid">
+          <div class="metric-card" *ngFor="let key of benchmarkKeys">
+            <div class="metric-model-name">{{ key }}</div>
+            <div class="metric-row">
+              <span class="metric-name">Accuracy</span>
+              <span class="metric-val">{{ getMetricPercent(benchmark![key].accuracy) }}</span>
+              <div class="mini-bar"><div [style.width]="getMetricPercent(benchmark![key].accuracy)" class="mini-fill acc"></div></div>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">F1-Score</span>
+              <span class="metric-val">{{ getMetricPercent(benchmark![key].f1_score) }}</span>
+              <div class="mini-bar"><div [style.width]="getMetricPercent(benchmark![key].f1_score)" class="mini-fill f1"></div></div>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">Precision (Reliable)</span>
+              <span class="metric-val">{{ getMetricPercent(benchmark![key].precision_1) }}</span>
+              <div class="mini-bar"><div [style.width]="getMetricPercent(benchmark![key].precision_1)" class="mini-fill prec"></div></div>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">Recall (Reliable)</span>
+              <span class="metric-val">{{ getMetricPercent(benchmark![key].recall_1) }}</span>
+              <div class="mini-bar"><div [style.width]="getMetricPercent(benchmark![key].recall_1)" class="mini-fill rec"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explanation -->
+      <div class="card info-card">
+        <h3>Which model should I use?</h3>
+        <ul class="model-desc-list">
+          <li><strong>Random Forest</strong> — Best overall accuracy. Robust, handles non-linear patterns. Recommended default.</li>
+          <li><strong>Logistic Regression</strong> — Fast and interpretable. Good baseline for linearly separable data.</li>
+          <li><strong>Neural Network (MLP)</strong> — Learns complex patterns. May need more data to outperform RF.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: PCA                                                             -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'pca'">
+
+    <div class="card" *ngIf="pcaPoints.length === 0 && !isLoading">
+      <div class="empty-state">
+        <div class="empty-icon">🔬</div>
+        <p>PCA visualisation requires trained models and the dataset on the server.</p>
+        <button class="btn btn-primary" (click)="loadPca()" [disabled]="!serviceOnline">Load PCA Data</button>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="isLoading">
+      <div class="loading-state">
+        <span class="spinner large"></span>
+        <p>Computing PCA projection…</p>
+      </div>
+    </div>
+
+    <div *ngIf="pcaPoints.length > 0">
+      <div class="card">
+        <h2 class="card-title">PCA Scatter Plot — 2 Principal Components</h2>
+        <p class="card-desc">
+          Each point is a job posting projected into 2D space.
+          <span class="legend-dot reliable"></span> Reliable clients &nbsp;
+          <span class="legend-dot unreliable"></span> Unreliable clients
+        </p>
+        <div class="chart-container">
+          <canvas baseChart
+            [datasets]="scatterDatasets"
+            [options]="scatterOptions"
+            type="scatter">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="card info-card">
+        <h3>Interpreting the PCA Plot</h3>
+        <p>
+          PCA reduces the 5+ numeric features into 2 dimensions while preserving maximum variance.
+          Overlapping clusters suggest the classes are not linearly separable in this 2D projection —
+          which is why non-linear models like <strong>Random Forest</strong> and <strong>Neural Networks</strong>
+          tend to outperform Logistic Regression on this dataset.
+        </p>
+        <div class="pca-stats">
+          <div class="stat-box">
+            <div class="stat-value">{{ pcaReliable.length }}</div>
+            <div class="stat-label">Reliable points</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ pcaUnreliable.length }}</div>
+            <div class="stat-label">Unreliable points</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ pcaPoints.length }}</div>
+            <div class="stat-label">Total (sample)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
