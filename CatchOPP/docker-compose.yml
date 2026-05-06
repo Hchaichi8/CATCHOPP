@@ -12,6 +12,8 @@ version: "3.9"
 #    • paiement-ms       (paiementMS        – 8088)
 #    • communication-ms  (MSCommunication   – 8086)
 #    • support-ms        (TechnicalSupportMS– 8087)
+#    • community-ms      (CommunityMicroService – 8090)
+#    • ml-service        (Python Flask ML   – 8091)
 # ─────────────────────────────────────────────────────────────
 
 services:
@@ -215,6 +217,30 @@ services:
       - MODEL_DIR=/app/models
     volumes:
       - ml_models:/app/models
+    networks:
+      - catchopp-net
+
+  # ── Community MicroService ───────────────────────────────────
+  community-ms:
+    build:
+      context: ./CommunityMicroService
+    container_name: catchopp-community-ms
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/catchop_community_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-catchopp}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-catchopp}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka/
+      - JWT_SECRET=${JWT_SECRET:-catchopp_super_secret_key_2024_must_be_at_least_256_bits_long_for_hs256}
+      - USER_SERVICE_URL=http://user-ms:8083
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
     networks:
       - catchopp-net
 

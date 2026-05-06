@@ -1,0 +1,1 @@
+{"Linear Regression": {"mae": 0.0, "rmse": 0.0, "r2": 1.0}, "Decision Tree": {"mae": 375.71, "rmse": 10082.32, "r2": 0.968}, "ANN (MLPRegressor)": {"mae": 811.72, "rmse": 4783.34, "r2": 0.9928}}
