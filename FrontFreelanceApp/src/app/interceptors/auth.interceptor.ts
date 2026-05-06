@@ -35,7 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
         return JSON.parse(stored).token ?? null;
       }
       return stored;
-    } catch {
+    } catch (error) {
       return null;
     }
   }
