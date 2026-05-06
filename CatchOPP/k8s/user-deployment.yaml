@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: user-ms
-        image: hchaichi8/usermicroservice:latest
-        imagePullPolicy: Always
+        image: ghassenhchaichi/catchopp-user-ms:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8083
         env:

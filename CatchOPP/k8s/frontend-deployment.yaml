@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: hchaichi8/frontend:latest
-        imagePullPolicy: Always
+        image: ghassenhchaichi/catchopp-frontend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
 

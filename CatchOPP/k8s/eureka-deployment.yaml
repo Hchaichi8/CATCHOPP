@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: eureka
-        image: hchaichi8/eureka:latest
-        imagePullPolicy: Always
+        image: ghassenhchaichi/catchopp-eureka:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8761
 

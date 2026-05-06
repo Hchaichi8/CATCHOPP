@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: apigateway
-        image: hchaichi8/apigateway:latest
-        imagePullPolicy: Always
+        image: ghassenhchaichi/catchopp-apigateway:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8085
 
