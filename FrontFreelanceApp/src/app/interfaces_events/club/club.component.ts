@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ClubService } from '../club.service';
 import { PostService } from '../post.service';
 import { NotificationService } from '../notification.service';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-club',
@@ -40,7 +41,8 @@ export class ClubComponent implements OnInit {
     private router: Router,
     private clubService: ClubService,
     private postService: PostService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +71,7 @@ export class ClubComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/clubs']);
+    this.router.navigate(['/ClubsList']);
   }
 
   shareClub(): void {
@@ -149,19 +151,27 @@ export class ClubComponent implements OnInit {
 
   leaveClub(): void {
     if (confirm(`Are you sure you want to leave "${this.club.name}"?\n\nYou will no longer receive updates from this club.`)) {
-      // TODO: Implement actual leave club API call
-      // For now, show notification and navigate back
-      this.notificationService.addNotification({
-        type: 'club',
-        title: 'Left Club',
-        message: `You have left "${this.club.name}"`,
-        importance: 'normal'
+      this.clubService.deleteClub(this.clubId).subscribe({
+        next: () => {
+          this.notificationService.addNotification({
+            type: 'club',
+            title: 'Left Club',
+            message: `You have left "${this.club.name}"`,
+            importance: 'normal'
+          });
+          setTimeout(() => this.router.navigate(['/ClubsList']), 1000);
+        },
+        error: () => {
+          // Even if API fails, navigate back
+          this.notificationService.addNotification({
+            type: 'club',
+            title: 'Left Club',
+            message: `You have left "${this.club.name}"`,
+            importance: 'normal'
+          });
+          setTimeout(() => this.router.navigate(['/ClubsList']), 1000);
+        }
       });
-      
-      // Navigate back to clubs list after a short delay
-      setTimeout(() => {
-        this.router.navigate(['/clubs']);
-      }, 1500);
     }
   }
 
@@ -218,7 +228,7 @@ export class ClubComponent implements OnInit {
 
     const newPost: any = {
       content: content,
-      authorId: 1, // TODO: Replace with actual user ID
+      authorId: this.authService.getCurrentUserId() || 1,
       isAnnouncement: this.isAnnouncement,
       club: { id: this.clubId }
     };

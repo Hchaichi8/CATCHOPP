@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-ms
+  labels:
+    app: user-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-ms
+  template:
+    metadata:
+      labels:
+        app: user-ms
+    spec:
+      containers:
+      - name: user-ms
+        image: hchaichi8/usermicroservice:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "docker"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-ms-service
+spec:
+  selector:
+    app: user-ms
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
+      name: http
+  type: ClusterIP
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: user-ms-monitor
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: user-ms
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+  - port: http
+    path: /actuator/prometheus
+    interval: 15s

@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClubService } from '../club.service';
 import { EventService } from '../event.service';
 import { GroupService, Group } from '../group.service';
 import { PostService } from '../post.service';
 import { NotificationService } from '../notification.service';
+import { ReportService, CommunityReport } from '../report.service';
 import { Club, Post } from '../models';
 
 @Component({
@@ -119,11 +120,30 @@ export class ClubDashboardComponent implements OnInit {
   trendingTopics: any[] = [];
   topPosts: any[] = [];
   
-  // Stats
+  // Stats — all values are stable properties updated only in updateStats()
   stats = {
     activeGroups: 0,
     totalClubs: 0,
-    eventsThisMonth: 0
+    eventsThisMonth: 0,
+    communityScore: 0,
+    growthRate: 0,
+    totalAttendees: 0,
+    totalMembers: 0,
+    newGroupsThisWeek: 0,
+    newMembersThisWeek: 0,
+    publicGroupsCount: 0,
+    privateGroupsCount: 0,
+    engagementRate: 0,
+    newEventsThisWeek: 0,
+    totalInterests: 0,
+    clubMembers: 0,
+    totalPosts: 0,
+    postsThisWeek: 0,
+    totalComments: 0,
+    totalViews: 0,
+    totalLikes: 0,
+    randomMembers: 0,
+    randomActivity: 'Active'
   };
 
   // Dashboard filtering and sorting
@@ -201,8 +221,8 @@ export class ClubDashboardComponent implements OnInit {
     private eventService: EventService,
     private groupService: GroupService,
     private postService: PostService,
-    private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private reportService: ReportService
   ) {}
 
   ngOnInit(): void {
@@ -269,41 +289,45 @@ export class ClubDashboardComponent implements OnInit {
     // Load groups
     this.groupService.getAllGroups().subscribe({
       next: (data) => {
-        this.groups = data;
-        this.updateStats();
-        this.generateGroupActivities();
-        this.filterGroups();
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.groups = data;
+          this.updateStats();
+          this.generateGroupActivities();
+          this.filterGroups();
+        });
       },
       error: (err) => {
         console.error('Error loading groups:', err);
-        this.groups = [];
-        this.filterGroups();
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.groups = [];
+          this.filterGroups();
+        });
       }
     });
     
     // Load clubs
     this.clubService.getAllClubs().subscribe({
       next: (data) => {
-        this.clubs = data;
-        this.filteredClubs = data;
-        this.filterClubs();
-        if (data.length > 0) {
-          this.selectedClub = data[0];
-        }
-        this.updateStats();
-        this.loadEvents();
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.clubs = data;
+          this.filteredClubs = data;
+          this.filterClubs();
+          if (data.length > 0) {
+            this.selectedClub = data[0];
+          }
+          this.updateStats();
+          this.loadEvents();
+        });
       },
       error: () => {
-        this.clubs = this.mockClubs;
-        this.filteredClubs = this.mockClubs;
-        this.filterClubs();
-        this.selectedClub = this.mockClubs[0];
-        this.recentActivities = this.mockActivities;
-        this.loadEvents();
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.clubs = this.mockClubs;
+          this.filteredClubs = this.mockClubs;
+          this.filterClubs();
+          this.selectedClub = this.mockClubs[0];
+          this.recentActivities = this.mockActivities;
+          this.loadEvents();
+        });
       }
     });
   }
@@ -381,17 +405,46 @@ export class ClubDashboardComponent implements OnInit {
   }
 
   updateStats(): void {
-    this.stats.activeGroups = this.groups.length;
-    this.stats.totalClubs = this.clubs.length;
-    
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    this.stats.eventsThisMonth = this.events.filter(e => {
-      const eventDate = new Date(e.startDate);
-      return eventDate >= startOfMonth && eventDate <= endOfMonth;
+    const endOfMonth   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const weekAgo      = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    this.stats.activeGroups     = this.groups.length;
+    this.stats.totalClubs       = this.clubs.length;
+    this.stats.eventsThisMonth  = this.events.filter(e => {
+      const d = new Date(e.startDate);
+      return d >= startOfMonth && d <= endOfMonth;
     }).length;
+
+    // Computed stats — stable, deterministic
+    const gScore = Math.min(this.groups.length * 10, 50);
+    const eScore = Math.min(this.events.length * 5, 30);
+    const cScore = Math.min(this.clubs.length * 4, 20);
+    this.stats.communityScore   = Math.min(gScore + eScore + cScore, 100);
+    this.stats.growthRate       = this.groups.length > 0 ? Math.min(this.groups.length * 3, 99) : 0;
+    this.stats.totalAttendees   = this.events.reduce((s: number, e: any) => s + (e.attendees || 0), 0);
+    this.stats.totalMembers     = this.groups.length * 5;
+    this.stats.newGroupsThisWeek = this.groups.filter(g => g.createdAt && new Date(g.createdAt) >= weekAgo).length;
+    this.stats.newMembersThisWeek = this.stats.newGroupsThisWeek * 2;
+    this.stats.publicGroupsCount  = this.groups.filter(g => g.type === 'PUBLIC').length;
+    this.stats.privateGroupsCount = this.groups.filter(g => g.type !== 'PUBLIC').length;
+    this.stats.engagementRate   = this.groups.length === 0 ? 0 :
+      Math.min(Math.round((this.events.length / Math.max(this.groups.length, 1)) * 20), 100);
+    this.stats.newEventsThisWeek = this.events.filter(e => e.startDate && new Date(e.startDate) >= weekAgo).length;
+
+    const allInterests = this.clubs.map(c => (c as any).interests || '').join(',')
+      .split(',').map((i: string) => i.trim()).filter((i: string) => i.length > 0);
+    this.stats.totalInterests   = new Set(allInterests).size;
+    this.stats.clubMembers      = this.clubs.reduce((s: number, c: any) => s + (c.membersCount || 0), 0);
+    this.stats.totalPosts       = this.posts.length;
+    this.stats.postsThisWeek    = this.posts.filter((p: any) => p.createdAt && new Date(p.createdAt) >= weekAgo).length;
+    this.stats.totalComments    = this.posts.reduce((s: number, p: any) => s + (p.comments || 0), 0);
+    this.stats.totalViews       = this.announcements.reduce((s: number, a: any) => s + (a.views || 0), 0);
+    this.stats.totalLikes       = this.posts.reduce((s: number, p: any) => s + (p.likes || 0), 0);
+    this.stats.randomMembers    = this.groups.length > 0 ? this.groups.length * 3 : 0;
+    const acts = ['Active', 'Growing', 'Popular', 'New'];
+    this.stats.randomActivity   = acts[this.groups.length % acts.length];
   }
 
   // Group CRUD Methods
@@ -601,13 +654,16 @@ export class ClubDashboardComponent implements OnInit {
     if (section === 'calendar') {
       this.generateCalendar();
     }
+    if (section === 'reports') {
+      this.loadReports();
+    }
   }
 
   getPageTitle(): string {
     switch (this.activeSection) {
       case 'groups': return 'Groups & Communities';
       case 'calendar': return 'Calendar';
-      case 'announcements': return 'Announcements';
+      case 'reports': return 'Reports & Moderation';
       case 'overview': return 'Statistics & Overview';
       case 'clubs': return 'Clubs Management';
       default: return 'Clubs dashboard';
@@ -1976,4 +2032,54 @@ export class ClubDashboardComponent implements OnInit {
     const index = (club.id || 0) % gradients.length;
     return gradients[index];
   }
+
+  // ── Reports ───────────────────────────────────────────────────────────────
+  allReports: CommunityReport[] = [];
+  reportFilter = 'all';
+  loadingReports = false;
+
+  get pendingReports(): CommunityReport[] {
+    return this.allReports.filter(r => r.status === 'PENDING');
+  }
+  get reviewedReports(): CommunityReport[] {
+    return this.allReports.filter(r => r.status === 'REVIEWED');
+  }
+  get dismissedReports(): CommunityReport[] {
+    return this.allReports.filter(r => r.status === 'DISMISSED');
+  }
+  get filteredReports(): CommunityReport[] {
+    if (this.reportFilter === 'all') return this.allReports;
+    return this.allReports.filter(r => r.status === this.reportFilter);
+  }
+
+  setReportFilter(filter: string): void {
+    this.reportFilter = filter;
+  }
+
+  loadReports(): void {
+    this.loadingReports = true;
+    this.reportService.getAllReports().subscribe({
+      next: (reports) => { this.allReports = reports; this.loadingReports = false; },
+      error: () => { this.allReports = []; this.loadingReports = false; }
+    });
+  }
+
+  dismissReport(reportId: number): void {
+    this.reportService.dismissReport(reportId).subscribe({
+      next: (updated) => {
+        const idx = this.allReports.findIndex(r => r.id === reportId);
+        if (idx !== -1) this.allReports[idx] = updated;
+      },
+      error: () => alert('Failed to dismiss report.')
+    });
+  }
+
+  deleteReportedContent(reportId: number): void {
+    if (!confirm('Delete the reported content permanently?')) return;
+    this.reportService.deleteReportedContent(reportId).subscribe({
+      next: () => { this.allReports = this.allReports.filter(r => r.id !== reportId); },
+      error: () => alert('Failed to delete content.')
+    });
+  }
+
 }

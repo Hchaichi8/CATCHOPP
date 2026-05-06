@@ -1,0 +1,257 @@
+<div class="price-wrapper">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="price-header">
+    <div class="header-icon">💰</div>
+    <div>
+      <h1>Project Price Predictor</h1>
+      <p class="subtitle">Estimate the average project budget using regression models</p>
+    </div>
+    <div class="status-badge" [class.online]="serviceOnline" [class.offline]="!serviceOnline">
+      <span class="dot"></span>
+      {{ serviceOnline ? 'ML Service Online' : 'ML Service Offline' }}
+    </div>
+  </div>
+
+  <!-- ── Alerts ─────────────────────────────────────────────────────────── -->
+  <div class="alert alert-error"   *ngIf="errorMsg">   ⚠️ {{ errorMsg }}   </div>
+  <div class="alert alert-success" *ngIf="successMsg"> ✅ {{ successMsg }} </div>
+
+  <!-- ── Tabs ───────────────────────────────────────────────────────────── -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'predict'"   (click)="onTabChange('predict')">💰 Predict Price</button>
+    <button class="tab-btn" [class.active]="activeTab === 'train'"     (click)="onTabChange('train')">🏋️ Train</button>
+    <button class="tab-btn" [class.active]="activeTab === 'benchmark'" (click)="onTabChange('benchmark')">📊 Benchmark</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: PREDICT                                                         -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'predict'">
+    <div class="card-grid">
+
+      <!-- Form -->
+      <div class="card">
+        <h2 class="card-title">Project Details</h2>
+
+        <div class="form-group">
+          <label>Regression Model</label>
+          <select [(ngModel)]="selectedModel" class="form-control">
+            <option value="dt">Decision Tree (recommended)</option>
+            <option value="lr">Linear Regression</option>
+            <option value="ann">Neural Network (MLP)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Min Price ($)</label>
+            <input type="number" [(ngModel)]="form.min_price" class="form-control" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Max Price ($)</label>
+            <input type="number" [(ngModel)]="form.max_price" class="form-control" min="0" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Client Rating (0–5)</label>
+            <input type="number" [(ngModel)]="form.client_average_rating"
+                   class="form-control" min="0" max="5" step="0.1" />
+          </div>
+          <div class="form-group">
+            <label>Client Review Count</label>
+            <input type="number" [(ngModel)]="form.client_review_count"
+                   class="form-control" min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rate Type</label>
+          <select [(ngModel)]="form.rate_type" class="form-control">
+            <option value="Fixed">Fixed</option>
+            <option value="Hourly">Hourly</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" (click)="onPredict()" [disabled]="isLoading || !serviceOnline">
+          <span *ngIf="!isLoading">💰 Predict Price</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div class="card result-card" *ngIf="predictedPrice !== null">
+        <h2 class="card-title">Predicted Average Price</h2>
+
+        <div class="price-display">
+          <div class="price-amount">${{ predictedPrice | number:'1.2-2' }}</div>
+          <div class="price-category"
+               [style.background]="getPriceCategory(predictedPrice).color + '22'"
+               [style.color]="getPriceCategory(predictedPrice).color">
+            {{ getPriceCategory(predictedPrice).label }}
+          </div>
+        </div>
+
+        <div class="price-range-visual">
+          <div class="range-label">Your input range</div>
+          <div class="range-bar-track">
+            <div class="range-bar-min" [style.width.%]="(form.min_price / form.max_price) * 100"></div>
+            <div class="range-bar-pred"
+                 [style.left.%]="(predictedPrice / form.max_price) * 100 > 100 ? 95 : (predictedPrice / form.max_price) * 100">
+              <span class="pred-marker">▲</span>
+            </div>
+          </div>
+          <div class="range-labels-row">
+            <span>${{ form.min_price }}</span>
+            <span class="pred-label">Predicted: ${{ predictedPrice | number:'1.0-0' }}</span>
+            <span>${{ form.max_price }}</span>
+          </div>
+        </div>
+
+        <div class="insight-box">
+          <div class="insight-title">💡 Insight</div>
+          <p *ngIf="predictedPrice <= form.min_price">
+            The predicted price is at or below your minimum. Consider lowering your range or the client's profile suggests a lower budget.
+          </p>
+          <p *ngIf="predictedPrice > form.min_price && predictedPrice <= form.max_price">
+            The predicted price falls <strong>within your range</strong> — this is a well-calibrated project budget.
+          </p>
+          <p *ngIf="predictedPrice > form.max_price">
+            The predicted price exceeds your maximum. Similar projects on the platform tend to pay more — consider adjusting your expectations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Placeholder -->
+      <div class="card placeholder-card" *ngIf="predictedPrice === null">
+        <div class="placeholder-icon">📊</div>
+        <p>Enter project details and click <strong>Predict Price</strong> to get an ML-based budget estimate.</p>
+        <p class="hint">Trained on historical freelance project data using Linear Regression, Decision Tree, and Neural Network.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: TRAIN                                                           -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'train'">
+    <div class="card">
+      <h2 class="card-title">Train Price Regression Models</h2>
+      <p class="card-desc">
+        Upload the <code>freelancer_job_postings.csv</code> dataset to train all 3 regression models.
+        The target variable is <code>avg_price</code>.
+      </p>
+
+      <div class="upload-zone">
+        <label class="upload-label" for="priceCsvFile">
+          <span class="upload-icon">📂</span>
+          <span>{{ selectedFile ? selectedFile.name : 'Click to select CSV file (optional)' }}</span>
+        </label>
+        <input id="priceCsvFile" type="file" accept=".csv" (change)="onFileSelected($event)" hidden />
+      </div>
+
+      <button class="btn btn-primary" (click)="onTrain()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">🏋️ Start Training</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <div class="train-result" *ngIf="trainResult">
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-value">{{ trainResult.rows_used }}</div>
+            <div class="stat-label">Rows Processed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Models Trained</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card info-card">
+      <h3>Training Pipeline</h3>
+      <ol class="steps-list">
+        <li><strong>Target</strong> — <code>avg_price</code> (rows with price = 0 removed)</li>
+        <li><strong>Features</strong> — min_price, max_price, client_average_rating, client_review_count, rate_type (encoded)</li>
+        <li><strong>Scaling</strong> — MinMaxScaler on both X and y</li>
+        <li><strong>Split</strong> — 80% train / 20% test</li>
+        <li><strong>Models</strong> — Linear Regression, Decision Tree (depth=8), MLP Regressor (64→32)</li>
+        <li><strong>Metrics</strong> — MAE, RMSE, R² score</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: BENCHMARK                                                       -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <div class="tab-content" *ngIf="activeTab === 'benchmark'">
+
+    <div class="card" *ngIf="!benchmark">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <p>No benchmark data yet. Train the models first.</p>
+        <button class="btn btn-secondary" (click)="onTabChange('train')">Go to Train</button>
+      </div>
+    </div>
+
+    <div *ngIf="benchmark">
+      <!-- Bar chart: MAE + RMSE -->
+      <div class="card">
+        <h2 class="card-title">Error Comparison (lower is better)</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [datasets]="barChartDatasets"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            type="bar">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Metrics cards -->
+      <div class="card">
+        <h2 class="card-title">Detailed Metrics</h2>
+        <div class="metrics-grid">
+          <div class="metric-card" *ngFor="let key of benchmarkKeys">
+            <div class="metric-model-name">{{ key }}</div>
+
+            <div class="metric-row">
+              <span class="metric-name">MAE</span>
+              <span class="metric-val">${{ benchmark![key].mae | number:'1.0-0' }}</span>
+              <span class="metric-hint">Mean Absolute Error</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">RMSE</span>
+              <span class="metric-val">${{ benchmark![key].rmse | number:'1.0-0' }}</span>
+              <span class="metric-hint">Root Mean Squared Error</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-name">R²</span>
+              <span class="metric-val r2" [style.color]="getR2Color(benchmark![key].r2)">
+                {{ benchmark![key].r2 | number:'1.3-3' }}
+              </span>
+              <span class="metric-hint">Coefficient of Determination</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card info-card">
+        <h3>How to read these metrics?</h3>
+        <ul class="model-desc-list">
+          <li><strong>MAE</strong> — Average dollar error. Lower = better.</li>
+          <li><strong>RMSE</strong> — Penalises large errors more. Lower = better.</li>
+          <li><strong>R²</strong> — Proportion of variance explained (0–1). Closer to 1 = better.</li>
+          <li><strong>Decision Tree</strong> — Best for capturing non-linear price patterns.</li>
+          <li><strong>Linear Regression</strong> — Fast baseline, assumes linear relationships.</li>
+          <li><strong>Neural Network</strong> — Can outperform with more data and tuning.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

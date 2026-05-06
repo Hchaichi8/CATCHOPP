@@ -1,9 +1,10 @@
-﻿/**
+/**
  * API Configuration for Events & Communities Module
+ * All requests go through the API Gateway (port 8085)
  */
 
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.110.134:8090',
+  BASE_URL: 'http://192.168.65.136:30085',
   ENDPOINTS: {
     GROUPS: '/api/groups',
     EVENTS: '/api/events',
@@ -11,7 +12,10 @@ export const API_CONFIG = {
     POSTS: '/api/posts',
     GROUP_MEMBERS: '/api/group-members',
     COMMENTS: '/api/comments',
-    REACTIONS: '/api/reactions'
+    REACTIONS: '/api/reactions',
+    COMMENT_REACTIONS: '/api/comment-reactions',
+    JOIN_REQUESTS: '/api/join-requests',
+    REPORTS: '/api/reports'
   }
 };
 

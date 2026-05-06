@@ -1,16 +1,13 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  NotificationService,
-  NotificationGroup,
-  NotificationItem
-} from '../notification.service';
+import { NotificationService, NotificationGroup, NotificationItem } from '../notification.service';
 import { GroupService } from '../group.service';
 import { GroupMemberService } from '../group-member.service';
+import { JoinRequestService } from '../join-request.service';
 import { EventService } from '../event.service';
 import { ClubService } from '../club.service';
 import { Club } from '../models';
-import { forkJoin } from 'rxjs';
+import { AuthService } from '../../Services/auth.service';
 
 type GroupType = 'Public' | 'Private' | 'Invitation only';
 
@@ -22,6 +19,8 @@ interface GroupDisplay {
   bannerUrl?: string;
   memberCount?: number;
   isJoined?: boolean;
+  isJoining?: boolean;
+  requestPending?: boolean;
 }
 
 const TYPE_TO_DISPLAY: Record<string, GroupType> = {
@@ -29,9 +28,10 @@ const TYPE_TO_DISPLAY: Record<string, GroupType> = {
   PRIVATE: 'Private',
   INVITE_ONLY: 'Invitation only'
 };
+
 const TYPE_TO_API: Record<GroupType, string> = {
-  Public: 'PUBLIC',
-  Private: 'PRIVATE',
+  'Public': 'PUBLIC',
+  'Private': 'PRIVATE',
   'Invitation only': 'INVITE_ONLY'
 };
 
@@ -41,24 +41,32 @@ const TYPE_TO_API: Record<GroupType, string> = {
   styleUrls: ['./group-list.component.css']
 })
 export class GroupListComponent implements OnInit {
+
   groups: GroupDisplay[] = [];
   loading = false;
   saveError: string | null = null;
 
   searchTerm = '';
-  selectedGroupType: string = 'All';
+  selectedGroupType = 'all';
+  showAllGroups = false;
+  currentPage = 1;
+  pageSize = 6;
+
+  currentUserId = 0;
+  currentUserName = '';
+  currentUserRole = '';
+
   isNotificationsOpen = false;
   upcomingEvents: any[] = [];
-  showAllGroups = false;
-  currentUserId: number = 1; // Simulated user ID - in real app, get from auth service
-  
-  // Clubs data
+  currentMonth = new Date();
+  calendarDays: any[] = [];
+
   clubs: Club[] = [];
   filteredClubs: Club[] = [];
   loadingClubs = false;
   selectedInterest = 'all';
   showAllClubs = false;
-  
+
   interests = [
     { value: 'all', label: 'All Interests', icon: 'fa-th' },
     { value: 'technology', label: 'Technology', icon: 'fa-laptop-code' },
@@ -71,384 +79,298 @@ export class GroupListComponent implements OnInit {
     { value: 'photography', label: 'Photography', icon: 'fa-camera' }
   ];
 
+  showModal = false;
+  isEditMode = false;
+  modalLoading = false;
+  modalError: string | null = null;
+  editingGroupId: number | null = null;
+  groupForm = { name: '', description: '', type: 'PUBLIC' as 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY', bannerUrl: '' };
+
+  showDeleteConfirm = false;
+  deletingGroup: GroupDisplay | null = null;
+
   constructor(
     private router: Router,
     public notificationService: NotificationService,
     private groupService: GroupService,
     private groupMemberService: GroupMemberService,
+    private joinRequestService: JoinRequestService,
     private eventService: EventService,
-    private clubService: ClubService
+    private clubService: ClubService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUserId = this.authService.getCurrentUserId();
+    this.currentUserName = this.authService.getCurrentUserName();
+    this.currentUserRole = this.authService.getCurrentUserRole();
+    this.authService.userName$.subscribe(name => { if (name) this.currentUserName = name; });
     this.loadGroups();
     this.loadUpcomingEvents();
     this.loadClubs();
     this.generateCalendar();
   }
 
+  // ── Load Groups — show immediately, load member info in background ─────────
   loadGroups(): void {
     this.loading = true;
     this.saveError = null;
+
     this.groupService.getGroups().subscribe({
       next: (list) => {
-        const groups = (list || []).map(api => this.apiToDisplay(api));
-        
-        // Load member counts and check if user is already a member
-        if (groups.length > 0) {
-          const memberCountRequests = groups.map(group => 
-            this.groupMemberService.countMembersByGroupId(group.id)
-          );
-          
-          const membershipRequests = groups.map(group =>
-            this.groupMemberService.getMembersByGroupId(group.id)
-          );
-          
-          forkJoin([
-            forkJoin(memberCountRequests),
-            forkJoin(membershipRequests)
-          ]).subscribe({
-            next: ([counts, memberships]) => {
-              groups.forEach((group, index) => {
-                group.memberCount = counts[index] || 0;
-                // Check if current user is already a member
-                group.isJoined = memberships[index].some(m => m.userId === this.currentUserId);
-              });
-              this.groups = groups;
-              this.loading = false;
-            },
-            error: () => {
-              // If member count/check fails, still show groups
-              this.groups = groups;
-              this.loading = false;
-            }
-          });
-        } else {
-          this.groups = groups;
-          this.loading = false;
-        }
-      },
-      error: () => {
+        // Display groups right away — no blocking on member counts
+        this.groups = (list || []).map(api => this.apiToDisplay(api));
         this.loading = false;
-        this.saveError = 'Impossible de charger les groupes. Vérifiez que le backend tourne sur http://192.168.110.134:8089.';
+        this.loadPendingJoinRequests();
+
+        // Load member counts per group independently (non-blocking)
+        this.groups.forEach(group => {
+          this.groupMemberService.countMembersByGroupId(group.id).subscribe({
+            next: (count) => { group.memberCount = count || 0; },
+            error: () => { group.memberCount = 0; }
+          });
+          if (this.currentUserId > 0) {
+            this.groupMemberService.getMembersByGroupId(group.id).subscribe({
+              next: (members) => {
+                group.isJoined = members.some(m => m.userId === this.currentUserId);
+              },
+              error: () => { group.isJoined = false; }
+            });
+          }
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('loadGroups error:', err);
+        this.saveError = 'Cannot connect to backend. Make sure the API Gateway is running on http://localhost:8085.';
       }
     });
   }
 
-  private apiToDisplay(api: { id?: number; name: string; description?: string; type?: string; bannerUrl?: string }): GroupDisplay {
+  private apiToDisplay(api: any): GroupDisplay {
     return {
       id: api.id ?? 0,
       name: api.name,
       description: api.description || '',
       type: TYPE_TO_DISPLAY[api.type || ''] ?? 'Public',
-      bannerUrl: api.bannerUrl || ''
+      bannerUrl: api.bannerUrl || '',
+      memberCount: 0,
+      isJoined: false
     };
   }
 
-  openGroup(id: number): void {
-    this.router.navigate(['/groups', id]);
-  }
-
-  navigateToEvents(): void {
-    this.router.navigate(['/events']);
-  }
-
-  // Notifications avancées
-  get unreadNotificationsCount(): number {
-    return this.notificationService.unreadCount;
-  }
-
-  get notificationGroups(): NotificationGroup[] {
-    return this.notificationService.getGroups();
-  }
-
-  toggleNotifications(): void {
-    this.isNotificationsOpen = !this.isNotificationsOpen;
-  }
-
-  openFromNotification(n: NotificationItem, event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-    this.notificationService.markAsRead(n.id);
-    if (n.relatedRoute) {
-      this.router.navigate([n.relatedRoute]);
-    }
-  }
-
+  // ── Filters ───────────────────────────────────────────────────────────────
   get filteredGroups(): GroupDisplay[] {
-    let filtered = this.groups;
-
-    // Apply search filter
+    let result = this.groups;
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(g =>
-        g.name.toLowerCase().includes(term) ||
-        g.description.toLowerCase().includes(term)
+      result = result.filter(g =>
+        g.name.toLowerCase().includes(term) || g.description.toLowerCase().includes(term)
       );
     }
-
-    // Apply group type filter
-    if (this.selectedGroupType && this.selectedGroupType !== 'All' && this.selectedGroupType !== 'all') {
-      // Handle both display format and API format
-      if (this.selectedGroupType === 'PUBLIC' || this.selectedGroupType === 'Public') {
-        filtered = filtered.filter(g => g.type === 'Public');
-      } else if (this.selectedGroupType === 'PRIVATE' || this.selectedGroupType === 'Private') {
-        filtered = filtered.filter(g => g.type === 'Private');
-      } else if (this.selectedGroupType === 'INVITE_ONLY' || this.selectedGroupType === 'Invitation only') {
-        filtered = filtered.filter(g => g.type === 'Invitation only');
-      }
+    if (this.selectedGroupType && this.selectedGroupType !== 'all') {
+      const map: Record<string, GroupType> = { PUBLIC: 'Public', PRIVATE: 'Private', INVITE_ONLY: 'Invitation only' };
+      const display = map[this.selectedGroupType];
+      if (display) result = result.filter(g => g.type === display);
     }
+    return result;
+  }
 
-    // Limit to 4 groups if not showing all
-    if (!this.showAllGroups) {
-      filtered = filtered.slice(0, 4);
+  get paginatedGroups(): GroupDisplay[] {
+    const all = this.filteredGroups;
+    if (!this.showAllGroups) return all.slice(0, 4);
+    const start = (this.currentPage - 1) * this.pageSize;
+    return all.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number { return Math.ceil(this.filteredGroups.length / this.pageSize); }
+  get pageNumbers(): number[] { return Array.from({ length: this.totalPages }, (_, i) => i + 1); }
+
+  goToPage(p: number): void { if (p >= 1 && p <= this.totalPages) { this.currentPage = p; window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+  onGroupTypeChange(e: any): void { this.selectedGroupType = e.target.value; this.currentPage = 1; }
+  onSearch(): void { this.currentPage = 1; }
+  toggleShowAllGroups(): void { this.showAllGroups = !this.showAllGroups; this.currentPage = 1; }
+  filterGroups(): void { this.currentPage = 1; }
+
+  // ── CRUD Create ───────────────────────────────────────────────────────────
+  openCreateModal(): void {
+    this.isEditMode = false;
+    this.editingGroupId = null;
+    this.groupForm = { name: '', description: '', type: 'PUBLIC', bannerUrl: '' };
+    this.modalError = null;
+    this.showModal = true;
+  }
+
+  // ── CRUD Edit ─────────────────────────────────────────────────────────────
+  openEditModal(group: GroupDisplay, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    this.isEditMode = true;
+    this.editingGroupId = group.id;
+    this.groupForm = {
+      name: group.name,
+      description: group.description,
+      type: (TYPE_TO_API[group.type] || 'PUBLIC') as 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY',
+      bannerUrl: group.bannerUrl || ''
+    };
+    this.modalError = null;
+    this.showModal = true;
+  }
+
+  closeModal(): void { this.showModal = false; this.modalError = null; }
+
+  submitGroupForm(): void {
+    if (!this.groupForm.name.trim() || !this.groupForm.description.trim()) {
+      this.modalError = 'Name and description are required.';
+      return;
     }
+    this.modalLoading = true;
+    this.modalError = null;
+    const payload = {
+      name: this.groupForm.name.trim(),
+      description: this.groupForm.description.trim(),
+      type: this.groupForm.type as 'PUBLIC' | 'PRIVATE' | 'INVITE_ONLY',
+      bannerUrl: this.groupForm.bannerUrl.trim() || undefined
+    };
 
-    return filtered;
+    if (this.isEditMode && this.editingGroupId !== null) {
+      this.groupService.updateGroup(this.editingGroupId, payload).subscribe({
+        next: () => { this.modalLoading = false; this.showModal = false; this.loadGroups(); },
+        error: (err) => { this.modalLoading = false; this.modalError = 'Failed to update group.'; console.error(err); }
+      });
+    } else {
+      this.groupService.createGroup(payload).subscribe({
+        next: (created) => {
+          this.modalLoading = false; this.showModal = false; this.loadGroups(); this.launchConfetti();
+          this.notificationService.addNotification({ type: 'group', title: `Group "${created.name}" created!`, message: 'Your group has been created.', importance: 'normal', relatedRoute: `/GroupPage/${created.id}` });
+        },
+        error: (err) => { this.modalLoading = false; this.modalError = 'Failed to create group.'; console.error(err); }
+      });
+    }
   }
 
-  onGroupTypeChange(event: any): void {
-    this.selectedGroupType = event.target.value;
-    // Trigger filtering
-    this.filterGroups();
+  // ── CRUD Delete ───────────────────────────────────────────────────────────
+  confirmDelete(group: GroupDisplay, event?: MouseEvent): void { if (event) event.stopPropagation(); this.deletingGroup = group; this.showDeleteConfirm = true; }
+  cancelDelete(): void { this.showDeleteConfirm = false; this.deletingGroup = null; }
+
+  executeDelete(): void {
+    if (!this.deletingGroup) return;
+    const id = this.deletingGroup.id;
+    const name = this.deletingGroup.name;
+    this.showDeleteConfirm = false;
+    this.deletingGroup = null;
+    this.groupService.deleteGroup(id).subscribe({
+      next: () => {
+        this.groups = this.groups.filter(g => g.id !== id);
+        this.notificationService.addNotification({ type: 'group', title: `Group "${name}" deleted`, message: 'The group has been permanently deleted.', importance: 'normal' });
+      },
+      error: (err) => { console.error('Delete failed:', err); alert('Failed to delete group.'); }
+    });
   }
 
-  toggleShowAllGroups(): void {
-    this.showAllGroups = !this.showAllGroups;
+  // ── Join ──────────────────────────────────────────────────────────────────
+  joinGroup(group: GroupDisplay, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    if (group.isJoined || group.isJoining) return;
+    if (group.type === 'Invitation only') { this.requestInvite(group, event); return; }
+    group.isJoining = true;
+    this.groupMemberService.addMember({ group: { id: group.id }, userId: this.currentUserId, role: 'MEMBER' }).subscribe({
+      next: () => {
+        group.memberCount = (group.memberCount || 0) + 1;
+        group.isJoined = true; group.isJoining = false; this.launchConfetti();
+        this.notificationService.addNotification({ type: 'group', title: `Joined ${group.name}`, message: `You are now a member of "${group.name}".`, importance: 'normal', relatedRoute: `/GroupPage/${group.id}` });
+      },
+      error: (err) => { group.isJoining = false; if (err.status === 409 || err.status === 400) { group.isJoined = true; } else { alert('Error joining group.'); } }
+    });
   }
 
-  filterGroups(): void {
-    // This method is called to trigger change detection
-    // The actual filtering happens in the filteredGroups getter
+  requestInvite(group: GroupDisplay, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    if (group.isJoining) return;
+    group.isJoining = true;
+    this.joinRequestService.requestJoin(group.id, this.currentUserId).subscribe({
+      next: () => { group.isJoining = false; group.requestPending = true; this.notificationService.addNotification({ type: 'group', title: '✉️ Request Sent', message: `Your request to join "${group.name}" has been sent.`, importance: 'normal', relatedRoute: `/GroupPage/${group.id}` }); },
+      error: () => { group.isJoining = false; group.requestPending = true; }
+    });
   }
 
-  viewGroup(groupId: number): void {
-    this.openGroup(groupId);
+  // ── Navigation ────────────────────────────────────────────────────────────
+  viewGroup(id: number): void { this.router.navigate(['/GroupPage', id]); }
+  navigateToEvents(): void { this.router.navigate(['/EventsList']); }
+  goBack(): void {
+    if (this.currentUserRole === 'FREELANCER') this.router.navigate(['/FreelancerFeed']);
+    else if (this.currentUserRole === 'CLIENT') this.router.navigate(['/ClientFeed']);
+    else this.router.navigate(['/']);
   }
 
-  createGroup(): void {
-    alert('Create group functionality - Coming soon!');
+  // ── Notifications ─────────────────────────────────────────────────────────
+  get unreadNotificationsCount(): number { return this.notificationService.unreadCount; }
+  get notificationGroups(): NotificationGroup[] { return this.notificationService.getGroups(); }
+  toggleNotifications(): void { this.isNotificationsOpen = !this.isNotificationsOpen; }
+  openFromNotification(n: NotificationItem, event?: MouseEvent): void {
+    if (event) { event.stopPropagation(); event.preventDefault(); }
+    this.notificationService.markAsRead(n.id);
+    if (n.relatedRoute) this.router.navigateByUrl(n.relatedRoute);
   }
+  handleNotificationClick(n: any): void { this.openFromNotification(n); }
 
-  handleNotificationClick(notification: any): void {
-    this.openFromNotification(notification);
-  }
-
-  // Calendar methods
-  currentMonth = new Date();
-  calendarDays: any[] = [];
-
-  previousMonth(): void {
-    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1);
-    this.generateCalendar();
-  }
-
-  nextMonth(): void {
-    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1);
-    this.generateCalendar();
-  }
+  // ── Calendar ──────────────────────────────────────────────────────────────
+  previousMonth(): void { this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1); this.generateCalendar(); }
+  nextMonth(): void { this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1); this.generateCalendar(); }
 
   generateCalendar(): void {
-    const year = this.currentMonth.getFullYear();
-    const month = this.currentMonth.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const year = this.currentMonth.getFullYear(), month = this.currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
-
     this.calendarDays = [];
-
-    // Previous month days
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    for (let i = firstDay - 1; i >= 0; i--) {
-      this.calendarDays.push({
-        date: prevMonthDays - i,
-        isOtherMonth: true,
-        isToday: false,
-        hasEvent: false
-      });
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      const isToday = today.getDate() === i && 
-                      today.getMonth() === month && 
-                      today.getFullYear() === year;
-      this.calendarDays.push({
-        date: i,
-        isOtherMonth: false,
-        isToday,
-        hasEvent: false
-      });
-    }
-
-    // Next month days
-    const remainingDays = 42 - this.calendarDays.length;
-    for (let i = 1; i <= remainingDays; i++) {
-      this.calendarDays.push({
-        date: i,
-        isOtherMonth: true,
-        isToday: false,
-        hasEvent: false
-      });
-    }
+    const prev = new Date(year, month, 0).getDate();
+    for (let i = firstDay - 1; i >= 0; i--) this.calendarDays.push({ date: prev - i, isOtherMonth: true, isToday: false, hasEvent: false });
+    for (let i = 1; i <= daysInMonth; i++) this.calendarDays.push({ date: i, isOtherMonth: false, isToday: today.getDate() === i && today.getMonth() === month && today.getFullYear() === year, hasEvent: false });
+    for (let i = 1; i <= 42 - this.calendarDays.length; i++) this.calendarDays.push({ date: i, isOtherMonth: true, isToday: false, hasEvent: false });
   }
 
+  // ── Events ────────────────────────────────────────────────────────────────
   loadUpcomingEvents(): void {
     this.eventService.getAllEvents().subscribe({
       next: (events) => {
         const now = new Date();
-        // Filter approved and upcoming events
-        this.upcomingEvents = events
-          .filter(e => e.status === 'APPROVED' || !e.status)
-          .filter(e => new Date(e.startDate) >= now)
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-          .slice(0, 2); // Show only 2 upcoming events
+        this.upcomingEvents = events.filter(e => e.status === 'APPROVED' || !e.status).filter(e => new Date(e.startDate) >= now).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()).slice(0, 2);
       },
-      error: (err) => {
-        console.error('Error loading events:', err);
-      }
+      error: () => {}
     });
   }
 
-  formatEventDate(dateString: string): { day: string, month: string } {
-    const date = new Date(dateString);
-    return {
-      day: date.getDate().toString(),
-      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
-    };
-  }
-
-  formatEventTime(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  joinGroup(group: GroupDisplay, event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
-
-    if (group.type === 'Invitation only') {
-      alert('This group is invitation only. You need an invitation to join.');
-      return;
-    }
-
-    // Create new member
-    const newMember = {
-      group: { id: group.id },
-      userId: this.currentUserId,
-      role: 'MEMBER' as const
-    };
-
-    this.groupMemberService.addMember(newMember).subscribe({
-      next: () => {
-        // Update member count
-        if (group.memberCount !== undefined) {
-          group.memberCount++;
-        } else {
-          group.memberCount = 1;
-        }
-        group.isJoined = true;
-        
-        // Show success message
-        alert(`Successfully joined ${group.name}!`);
-      },
-      error: (err) => {
-        console.error('Error joining group:', err);
-        alert('Error joining group. Please try again.');
-      }
-    });
-  }
-
-  // Clubs methods
+  // ── Clubs ─────────────────────────────────────────────────────────────────
   loadClubs(): void {
     this.loadingClubs = true;
     this.clubService.getAllClubs().subscribe({
-      next: (data) => {
-        this.clubs = data;
-        this.filterClubs();
-        this.loadingClubs = false;
-      },
-      error: (error) => {
-        console.error('Error loading clubs:', error);
-        this.loadingClubs = false;
-      }
+      next: (data) => { this.clubs = data; this.filterClubs(); this.loadingClubs = false; },
+      error: () => { this.loadingClubs = false; }
     });
   }
 
   filterClubs(): void {
-    let filtered = this.clubs;
-
-    // Filter by interest
-    if (this.selectedInterest !== 'all') {
-      filtered = filtered.filter(club => 
-        club.interests?.toLowerCase().includes(this.selectedInterest.toLowerCase())
-      );
-    }
-
-    // Filter by search term
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(club =>
-        club.name.toLowerCase().includes(term) ||
-        club.description.toLowerCase().includes(term) ||
-        club.interests?.toLowerCase().includes(term)
-      );
-    }
-
-    // Limit to 4 clubs if not showing all
-    if (!this.showAllClubs) {
-      filtered = filtered.slice(0, 4);
-    }
-
-    this.filteredClubs = filtered;
+    let f = this.clubs;
+    if (this.selectedInterest !== 'all') f = f.filter(c => c.interests?.toLowerCase().includes(this.selectedInterest));
+    if (this.searchTerm.trim()) { const t = this.searchTerm.toLowerCase(); f = f.filter(c => c.name.toLowerCase().includes(t) || c.description.toLowerCase().includes(t) || c.interests?.toLowerCase().includes(t)); }
+    this.filteredClubs = this.showAllClubs ? f : f.slice(0, 4);
   }
 
-  onInterestChange(interest: string): void {
-    this.selectedInterest = interest;
-    this.filterClubs();
-  }
-
-  toggleShowAllClubs(): void {
-    this.showAllClubs = !this.showAllClubs;
-    this.filterClubs();
-  }
-
-  viewClubDetails(clubId: number, event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    this.router.navigate(['/clubs', clubId]);
-  }
-
-  joinClub(club: Club, event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    
-    const confirmed = confirm(`Do you want to join "${club.name}"?`);
-    
-    if (confirmed) {
-      // Navigate to club details after joining
-      this.router.navigate(['/clubs', club.id]);
-    }
-  }
+  onInterestChange(i: string): void { this.selectedInterest = i; this.filterClubs(); }
+  toggleShowAllClubs(): void { this.showAllClubs = !this.showAllClubs; this.filterClubs(); }
+  viewClubDetails(id: number, e?: MouseEvent): void { if (e) e.stopPropagation(); this.router.navigate(['/Club', id]); }
+  joinClub(club: Club, e?: MouseEvent): void { if (e) e.stopPropagation(); if (confirm(`Join "${club.name}"?`)) this.router.navigate(['/Club', club.id]); }
 
   getClubIcon(interests: string | undefined): string {
     if (!interests) return 'fa-users';
-    
-    const interest = interests.toLowerCase();
-    if (interest.includes('tech')) return 'fa-laptop-code';
-    if (interest.includes('sport')) return 'fa-futbol';
-    if (interest.includes('art') || interest.includes('culture')) return 'fa-palette';
-    if (interest.includes('music')) return 'fa-music';
-    if (interest.includes('business')) return 'fa-briefcase';
-    if (interest.includes('science')) return 'fa-flask';
-    if (interest.includes('gaming') || interest.includes('game')) return 'fa-gamepad';
-    if (interest.includes('photo')) return 'fa-camera';
-    
+    const i = interests.toLowerCase();
+    if (i.includes('tech')) return 'fa-laptop-code';
+    if (i.includes('sport')) return 'fa-futbol';
+    if (i.includes('art') || i.includes('culture')) return 'fa-palette';
+    if (i.includes('music')) return 'fa-music';
+    if (i.includes('business')) return 'fa-briefcase';
+    if (i.includes('science')) return 'fa-flask';
+    if (i.includes('gaming') || i.includes('game')) return 'fa-gamepad';
+    if (i.includes('photo')) return 'fa-camera';
     return 'fa-users';
   }
 
@@ -456,5 +378,68 @@ export class GroupListComponent implements OnInit {
     if (!interests) return [];
     return interests.split(',').map(i => i.trim()).filter(i => i.length > 0);
   }
-}
 
+  // ── Join Requests (admin panel) ───────────────────────────────────────────
+  pendingJoinRequests: any[] = [];
+
+  loadPendingJoinRequests(): void {
+    // Load pending requests for all INVITE_ONLY groups
+    const inviteGroups = this.groups.filter(g => g.type === 'Invitation only');
+    this.pendingJoinRequests = [];
+    inviteGroups.forEach(group => {
+      this.joinRequestService.getPendingRequests(group.id).subscribe({
+        next: (reqs) => {
+          this.pendingJoinRequests = [
+            ...this.pendingJoinRequests,
+            ...reqs.map(r => ({ ...r, group: { id: group.id, name: group.name } }))
+          ];
+        },
+        error: () => {}
+      });
+    });
+  }
+
+  acceptJoinRequest(requestId: number): void {
+    this.joinRequestService.acceptRequest(requestId).subscribe({
+      next: () => {
+        this.pendingJoinRequests = this.pendingJoinRequests.filter(r => r.id !== requestId);
+        this.loadGroups(); // Refresh member counts
+        this.notificationService.addNotification({
+          type: 'group', title: '✅ Request Accepted',
+          message: 'The join request has been accepted.', importance: 'normal'
+        });
+      },
+      error: () => alert('Failed to accept request.')
+    });
+  }
+
+  rejectJoinRequest(requestId: number): void {
+    this.joinRequestService.rejectRequest(requestId).subscribe({
+      next: () => {
+        this.pendingJoinRequests = this.pendingJoinRequests.filter(r => r.id !== requestId);
+        this.notificationService.addNotification({
+          type: 'group', title: '❌ Request Rejected',
+          message: 'The join request has been rejected.', importance: 'normal'
+        });
+      },
+      error: () => alert('Failed to reject request.')
+    });
+  }
+
+  // ── Confetti ──────────────────────────────────────────────────────────────
+  launchConfetti(): void {
+    const colors = ['#198754', '#20c997', '#0d6efd', '#f59e0b', '#ef4444', '#8b5cf6'];
+    for (let i = 0; i < 50; i++) {
+      const el = document.createElement('div');
+      el.style.cssText = `position:fixed;width:8px;height:8px;border-radius:${Math.random() > .5 ? '50%' : '2px'};background:${colors[Math.floor(Math.random() * colors.length)]};left:${Math.random() * 100}vw;top:-10px;animation:confettiFall ${1 + Math.random() * 2}s ease-in forwards;z-index:9999;pointer-events:none;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+    if (!document.getElementById('confetti-style')) {
+      const style = document.createElement('style');
+      style.id = 'confetti-style';
+      style.textContent = `@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}`;
+      document.head.appendChild(style);
+    }
+  }
+}

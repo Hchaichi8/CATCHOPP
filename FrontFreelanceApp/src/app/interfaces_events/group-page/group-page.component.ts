@@ -5,6 +5,8 @@ import { GroupService } from '../group.service';
 import { EventService } from '../event.service';
 import { PostService } from '../post.service';
 import { GroupMemberService } from '../group-member.service';
+import { ReportService } from '../report.service';
+import { CommentService } from '../comment.service';
 import { Post } from '../models';
 
 interface GroupMember {
@@ -91,7 +93,9 @@ export class GroupPageComponent implements OnInit {
     private groupService: GroupService,
     private eventService: EventService,
     private postService: PostService,
-    private memberService: GroupMemberService
+    private memberService: GroupMemberService,
+    private reportService: ReportService,
+    private commentService: CommentService
   ) {}
 
   ngOnInit(): void {
@@ -524,5 +528,94 @@ export class GroupPageComponent implements OnInit {
         hasEvent: eventDays.has(day)
       });
     }
+  }
+
+  // ── Report Modal ──────────────────────────────────────────────────────────
+  showReportModal = false;
+  reportTargetType: 'POST' | 'COMMENT' = 'POST';
+  reportTargetId = 0;
+  reportReason = '';
+  reportSubmitting = false;
+  reportSuccess = false;
+
+  openReportModal(targetType: 'POST' | 'COMMENT', targetId: number): void {
+    this.reportTargetType = targetType;
+    this.reportTargetId = targetId;
+    this.reportReason = '';
+    this.reportSuccess = false;
+    this.showReportModal = true;
+  }
+
+  closeReportModal(): void {
+    this.showReportModal = false;
+    this.reportReason = '';
+    this.reportSuccess = false;
+  }
+
+  submitReport(): void {
+    if (!this.reportReason.trim()) return;
+    this.reportSubmitting = true;
+    this.reportService.createReport(1, this.reportTargetType, this.reportTargetId, this.reportReason.trim())
+      .subscribe({
+        next: () => {
+          this.reportSubmitting = false;
+          this.reportSuccess = true;
+          setTimeout(() => this.closeReportModal(), 2000);
+        },
+        error: (err) => {
+          this.reportSubmitting = false;
+          if (err.status === 409) {
+            this.reportSuccess = true;
+            setTimeout(() => this.closeReportModal(), 2000);
+          } else {
+            alert('Failed to submit report. Please try again.');
+          }
+        }
+      });
+  }
+
+  // ── Real Comments ─────────────────────────────────────────────────────────
+  realComments: { [key: number]: any[] } = {};
+  loadingComments: { [key: number]: boolean } = {};
+  newRealComment: { [key: number]: string } = {};
+
+  loadRealComments(postId: number): void {
+    this.loadingComments[postId] = true;
+    this.commentService.getCommentsByPost(postId).subscribe({
+      next: (comments) => { this.realComments[postId] = comments; this.loadingComments[postId] = false; },
+      error: () => { this.realComments[postId] = []; this.loadingComments[postId] = false; }
+    });
+  }
+
+  toggleRealComments(postId: number): void {
+    this.showComments[postId] = !this.showComments[postId];
+    if (this.showComments[postId] && !this.realComments[postId]) {
+      this.loadRealComments(postId);
+    }
+  }
+
+  submitRealComment(postId: number): void {
+    const content = (this.newRealComment[postId] || '').trim();
+    if (!content) return;
+    this.commentService.addComment({ postId, authorId: 1, content }).subscribe({
+      next: () => { this.newRealComment[postId] = ''; this.loadRealComments(postId); },
+      error: () => alert('Failed to add comment.')
+    });
+  }
+
+  getComments(postId: number): any[] {
+    return this.realComments[postId] || [];
+  }
+
+  getCommentsCount(postId: number): number {
+    return (this.realComments[postId] || []).length;
+  }
+
+  deleteRealComment(commentId: number, postId: number): void {
+    if (!confirm('Delete this comment?')) return;
+    this.commentService.deleteComment(commentId).subscribe({
+      next: () => this.loadRealComments(postId),
+      error: () => alert('Failed to delete comment.')
+    });
   }
 }

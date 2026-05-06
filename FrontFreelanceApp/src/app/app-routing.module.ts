@@ -61,17 +61,25 @@ import { WorldClockViewComponent } from './Interfaces_Availability/world-clock-v
 import { AdminPlansComponent } from './Interfaces_Admin/admin-plans/admin-plans.component';
 import { AdminSkillTestsComponent } from './Interfaces_Admin/admin-skill-tests/admin-skill-tests.component';
 import { AiCvGeneratorComponent } from './Interfaces_AI/ai-cv-generator/ai-cv-generator.component';
+import { ClientReliabilityPredictorComponent } from './Interfaces_AI/client-reliability-predictor/client-reliability-predictor.component';
+import { ProjectRecommenderComponent } from './Interfaces_AI/project-recommender/project-recommender.component';
+import { PricePredictorComponent } from './Interfaces_AI/price-predictor/price-predictor.component';
 import { RewardsDashboardComponent } from './Interfaces_Rewards/rewards-dashboard/rewards-dashboard.component';
 import { SpinWheelComponent } from './Interfaces_Rewards/spin-wheel/spin-wheel.component';
 
+// Events & Communities
+import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
+import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { ClubComponent } from './interfaces_events/club/club.component';
+import { ClubPageComponent } from './interfaces_events/club-page/club-page.component';
+import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
+import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
 import { GroupListComponent } from './interfaces_events/group-list/group-list.component';
 import { GroupPageComponent } from './interfaces_events/group-page/group-page.component';
 import { AdminDashboardComponent } from './interfaces_events/admin-dashboard/admin-dashboard.component';
-import { EventsListComponent } from './interfaces_events/events-list/events-list.component';
-import { EventDetailsComponent } from './interfaces_events/event-details/event-details.component';
-import { ClubComponent } from './interfaces_events/club/club.component';
-import { ClubDashboardComponent } from './interfaces_events/club-dashboard/club-dashboard.component';
-import { ClubsListComponent } from './interfaces_events/clubs-list/clubs-list.component';
+import { PostCommentsComponent } from './interfaces_events/post-comments/post-comments.component';
+import { PostReactionsComponent } from './interfaces_events/post-reactions/post-reactions.component';
+import { CommentReactionsComponent } from './interfaces_events/comment-reactions/comment-reactions.component';
 import { AdminFinanceComponent } from './Interfaces_Admin/admin-finance/admin-finance.component';
 import { AdminSupportComponent } from './Interfaces_Admin/admin-support/admin-support.component';
 
@@ -171,21 +179,33 @@ const routes: Routes = [
 // AI CV Generator (Premium/Enterprise only)
 {path:'AICVGenerator',component:AiCvGeneratorComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 
+// ML Client Reliability Predictor (no auth required)
+{path:'ClientReliabilityPredictor',component:ClientReliabilityPredictorComponent},
+
+// ML Project Recommender — BO2 (no auth required)
+{path:'ProjectRecommender',component:ProjectRecommenderComponent},
+
+// ML Price Predictor — BO3 (no auth required)
+{path:'PricePredictor',component:PricePredictorComponent},
+
 // Rewards & Promo Codes
 {path:'rewards',component:RewardsDashboardComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 {path:'rewards/spin-wheel',component:SpinWheelComponent, canActivate: [authGuard], data: { role: 'FREELANCER' }},
 
 
 // Events & Communities routes
+{path:'ClubDashboard', component: ClubDashboardComponent, canActivate: [authGuard] },
+{path:'ClubsList', component: ClubsListComponent, canActivate: [authGuard] },
+{path:'Club/:id', component: ClubComponent, canActivate: [authGuard] },
+{path:'ClubPage/:id', component: ClubPageComponent, canActivate: [authGuard] },
+{path:'EventsList', component: EventsListComponent, canActivate: [authGuard] },
+{path:'EventDetails/:id', component: EventDetailsComponent, canActivate: [authGuard] },
+{path:'GroupList', component: GroupListComponent, canActivate: [authGuard] },
+{path:'GroupPage/:id', component: GroupPageComponent, canActivate: [authGuard] },
+{path:'PostComments/:id', component: PostCommentsComponent, canActivate: [authGuard] },
+{path:'PostReactions/:id', component: PostReactionsComponent, canActivate: [authGuard] },
+{path:'CommentReactions/:id', component: CommentReactionsComponent, canActivate: [authGuard] },
 
-{ path: 'groups', component: GroupListComponent },
-{ path: 'groups/:id', component: GroupPageComponent },
-{ path: 'events', component: EventsListComponent },
-{ path: 'events/:id', component: EventDetailsComponent },
-{ path: 'clubs', component: ClubsListComponent },
-{ path: 'clubs/:id', component: ClubComponent },
-{ path: 'ClubDashboard', component: ClubDashboardComponent },
-{ path: 'admin/dashboard', component: AdminDashboardComponent }
 
 
 

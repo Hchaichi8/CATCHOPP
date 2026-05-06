@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { EventService } from '../event.service';
 import { GroupService } from '../group.service';
 import { NotificationService } from '../notification.service';
+import { AuthService } from '../../Services/auth.service';
 
 @Component({
   selector: 'app-events-list',
@@ -10,24 +11,30 @@ import { NotificationService } from '../notification.service';
   styleUrls: ['./events-list.component.css']
 })
 export class EventsListComponent implements OnInit {
+
   events: any[] = [];
   filteredEvents: any[] = [];
   featuredEvents: any[] = [];
   availableGroups: any[] = [];
   loading = false;
   searchTerm = '';
-  selectedFilter: 'all' | 'upcoming' | 'past' = 'upcoming';
+  selectedFilter: 'all' | 'upcoming' | 'past' = 'all';
   statusFilter: 'all' | 'upcoming' | 'past' = 'all';
   typeFilter: 'all' | 'online' | 'in-person' = 'all';
   isCreateModalOpen = false;
-  isCreateEventModalOpen = false;
 
   // Stats
   upcomingEventsCount = 0;
   totalAttendeesCount = 0;
   uniqueLocationsCount = 0;
 
-  // Categories
+  // Attended events tracking
+  attendedEvents: Set<number> = new Set<number>();
+
+  // User info
+  currentUserName = '';
+  currentUserRole = '';
+
   popularCategories = [
     { name: 'Technology', icon: 'fa fa-laptop-code' },
     { name: 'Business', icon: 'fa fa-briefcase' },
@@ -49,64 +56,64 @@ export class EventsListComponent implements OnInit {
     private router: Router,
     private eventService: EventService,
     private groupService: GroupService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUserName = this.authService.getCurrentUserName();
+    this.currentUserRole = this.authService.getCurrentUserRole();
+    this.authService.userName$.subscribe(n => { if (n) this.currentUserName = n; });
     this.loadEvents();
     this.loadGroups();
   }
 
+  // ── Load ──────────────────────────────────────────────────────────────────
   loadEvents(): void {
     this.loading = true;
     this.eventService.getAllEvents().subscribe({
       next: (events) => {
-        // Only show approved events to regular users
-        this.events = events.filter(e => e.status === 'APPROVED' || !e.status);
-        this.featuredEvents = this.events.slice(0, 1); // First event as featured
+        this.events = events;
+        this.featuredEvents = events.filter(e => e.status === 'APPROVED' || !e.status).slice(0, 1);
         this.updateStats();
         this.filterEvents();
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading events:', err);
-        this.loading = false;
-      }
+      error: () => { this.loading = false; }
     });
   }
 
+  loadGroups(): void {
+    this.groupService.getAllGroups().subscribe({
+      next: (groups) => { this.availableGroups = groups; },
+      error: () => {}
+    });
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
   updateStats(): void {
     this.upcomingEventsCount = this.events.filter(e => this.isUpcoming(e)).length;
-    this.totalAttendeesCount = this.events.reduce((sum, e) => sum + (e.attendeesCount || 0), 0);
+    this.totalAttendeesCount = this.events.reduce((s, e) => s + (e.attendeesCount || 0), 0);
     this.uniqueLocationsCount = new Set(this.events.map(e => e.location)).size;
   }
 
+  // ── Filter ────────────────────────────────────────────────────────────────
   filterEvents(): void {
     const now = new Date();
-    let filtered = [...this.events]; // Create a copy
+    let filtered = [...this.events];
 
-    // Filter by status (upcoming/past)
     if (this.statusFilter === 'upcoming') {
       filtered = filtered.filter(e => new Date(e.startDate) >= now);
     } else if (this.statusFilter === 'past') {
-      filtered = filtered.filter(e => new Date(e.endDate) < now);
+      filtered = filtered.filter(e => new Date(e.endDate || e.startDate) < now);
     }
 
-    // Also apply selectedFilter for backward compatibility
-    if (this.selectedFilter === 'upcoming') {
-      filtered = filtered.filter(e => new Date(e.startDate) >= now);
-    } else if (this.selectedFilter === 'past') {
-      filtered = filtered.filter(e => new Date(e.endDate) < now);
-    }
-
-    // Filter by type (online/in-person)
     if (this.typeFilter === 'online') {
-      filtered = filtered.filter(e => e.isOnline);
+      filtered = filtered.filter(e => e.location && e.location.toLowerCase().includes('online'));
     } else if (this.typeFilter === 'in-person') {
-      filtered = filtered.filter(e => !e.isOnline);
+      filtered = filtered.filter(e => !e.location || !e.location.toLowerCase().includes('online'));
     }
 
-    // Filter by search term
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(e =>
@@ -116,53 +123,11 @@ export class EventsListComponent implements OnInit {
       );
     }
 
-    // Sort by start date (upcoming first)
     filtered.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
     this.filteredEvents = filtered;
   }
 
-  loadGroups(): void {
-    this.groupService.getAllGroups().subscribe({
-      next: (groups) => {
-        this.availableGroups = groups;
-      },
-      error: (err) => {
-        console.error('Error loading groups:', err);
-      }
-    });
-  }
-
-  applyFilters(): void {
-    const now = new Date();
-    let filtered = this.events;
-
-    // Filter by time
-    if (this.selectedFilter === 'upcoming') {
-      filtered = filtered.filter(e => new Date(e.startDate) >= now);
-    } else if (this.selectedFilter === 'past') {
-      filtered = filtered.filter(e => new Date(e.endDate) < now);
-    }
-
-    // Filter by search term
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(term) ||
-        e.description.toLowerCase().includes(term) ||
-        e.location.toLowerCase().includes(term)
-      );
-    }
-
-    // Sort by start date
-    filtered.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-    this.filteredEvents = filtered;
-  }
-
-  onSearchChange(): void {
-    this.filterEvents();
-  }
+  onSearchChange(): void { this.filterEvents(); }
 
   onFilterChange(filter: 'all' | 'upcoming' | 'past'): void {
     this.selectedFilter = filter;
@@ -181,32 +146,32 @@ export class EventsListComponent implements OnInit {
     this.filterEvents();
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+  filterByCategory(category: any): void {
+    this.searchTerm = category.name;
+    this.filterEvents();
   }
 
-  formatTime(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+  // ── Attend ────────────────────────────────────────────────────────────────
+  attendEvent(eventId: number): void {
+    if (this.attendedEvents.has(eventId)) return;
+    const event = this.events.find(e => e.id === eventId);
+    if (event) {
+      this.attendedEvents.add(eventId);
+      this.totalAttendeesCount++;
+      this.notificationService.addNotification({
+        type: 'event',
+        title: '✅ Joined Event!',
+        message: `You have joined "${event.title}"`,
+        importance: 'normal'
+      });
+    }
   }
 
-  getMonthDay(dateString: string): { day: string, month: string } {
-    const date = new Date(dateString);
-    return {
-      day: date.getDate().toString(),
-      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
-    };
+  isAttending(eventId: number): boolean {
+    return this.attendedEvents.has(eventId);
   }
 
+  // ── Helpers ───────────────────────────────────────────────────────────────
   isUpcoming(event: any): boolean {
     return new Date(event.startDate) >= new Date();
   }
@@ -219,58 +184,19 @@ export class EventsListComponent implements OnInit {
     return this.events.filter(e => !this.isUpcoming(e)).length;
   }
 
-  navigateToGroups(): void {
-    this.router.navigate(['/groups']);
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  navigateToClubDashboard(): void {
-    this.router.navigate(['/ClubDashboard']);
+  formatTime(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   }
 
-  openCreateEventModal(): void {
-    this.newEventForm = {
-      title: '',
-      description: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      groupId: this.availableGroups.length > 0 ? this.availableGroups[0].id : 0,
-      status: 'PENDING'
-    };
-    this.isCreateModalOpen = true;
-    this.isCreateEventModalOpen = true;
-  }
-
-  closeCreateEventModal(): void {
-    this.isCreateModalOpen = false;
-    this.isCreateEventModalOpen = false;
-  }
-
-  createEvent(): void {
-    this.submitEvent();
-  }
-
-  attendEvent(eventId: number): void {
-    const event = this.events.find(e => e.id === eventId);
-    if (event) {
-      this.notificationService.addNotification({
-        type: 'event',
-        title: 'Joined Event!',
-        message: `You have joined "${event.title}"`,
-        importance: 'normal'
-      });
-      alert(`You have successfully joined "${event.title}"!`);
-    }
-  }
-
-  viewEventDetails(eventId: number): void {
-    // Navigate to event details page
-    this.router.navigate(['/events', eventId]);
-  }
-
-  filterByCategory(category: any): void {
-    this.searchTerm = category.name;
-    this.filterEvents();
+  getMonthDay(dateString: string): { day: string; month: string } {
+    const date = new Date(dateString);
+    return { day: date.getDate().toString(), month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() };
   }
 
   getStatusClass(status: string): string {
@@ -282,9 +208,32 @@ export class EventsListComponent implements OnInit {
     }
   }
 
+  // ── Navigation ────────────────────────────────────────────────────────────
+  navigateToGroups(): void { this.router.navigate(['/GroupList']); }
+  navigateToClubDashboard(): void { this.router.navigate(['/ClubDashboard']); }
+  viewEventDetails(eventId: number): void { this.router.navigate(['/EventDetails', eventId]); }
+
+  // ── Create Event Modal ────────────────────────────────────────────────────
+  openCreateEventModal(): void {
+    this.newEventForm = {
+      title: '', description: '', location: '', startDate: '', endDate: '',
+      groupId: this.availableGroups.length > 0 ? this.availableGroups[0].id : 0,
+      status: 'PENDING'
+    };
+    this.isCreateModalOpen = true;
+  }
+
+  closeCreateEventModal(): void {
+    this.isCreateModalOpen = false;
+  }
+
+  createEvent(): void {
+    this.submitEvent();
+  }
+
   submitEvent(): void {
-    if (!this.newEventForm.title || !this.newEventForm.description || 
-        !this.newEventForm.location || !this.newEventForm.startDate || 
+    if (!this.newEventForm.title || !this.newEventForm.description ||
+        !this.newEventForm.location || !this.newEventForm.startDate ||
         !this.newEventForm.endDate || !this.newEventForm.groupId) {
       alert('Please fill in all required fields');
       return;
@@ -302,18 +251,13 @@ export class EventsListComponent implements OnInit {
 
     this.eventService.createEvent(eventData).subscribe({
       next: (created) => {
-        // Send notification about new event
         this.notificationService.addNotification({
           type: 'event',
           title: 'Event Submitted',
           message: `"${created.title}" has been submitted and is pending approval`,
-          importance: 'normal',
-          relatedRoute: `/events`
+          importance: 'normal'
         });
-        
-        alert('Event submitted successfully! It will be visible after admin approval.');
         this.closeCreateEventModal();
-        // Don't reload events since pending events won't show
       },
       error: (err) => {
         console.error('Error creating event:', err);

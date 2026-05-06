@@ -1,74 +1,88 @@
-<!-- Top Navigation -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TOP NAVIGATION
+═══════════════════════════════════════════════════════════════════════ -->
 <nav class="top-navbar">
   <div class="nav-container">
-    <div class="nav-brand">
-      <div class="logo-circle">C</div>
+
+    <!-- Logo -->
+    <div class="nav-brand" (click)="goBack()" style="cursor:pointer">
+      <img src="assets/logo.png" alt="CatchOPP" class="logo-img" />
       <span class="brand-text">CatchOPP</span>
     </div>
 
+    <!-- Search -->
     <div class="nav-search">
       <i class="fa fa-search"></i>
-      <input
-        type="text"
-        placeholder="Search by group, interest or skill"
-        [(ngModel)]="searchTerm"
-        (input)="filterGroups()">
+      <input type="text" placeholder="Search by group, interest or skill"
+             [(ngModel)]="searchTerm" (input)="onSearch()" />
     </div>
 
+    <!-- Actions -->
     <div class="nav-actions">
-      <button class="nav-icon-btn" [routerLink]="['/clubs']" title="Clubs">
+      <button class="nav-icon-btn" [routerLink]="['/ClubsList']" title="Clubs">
         <i class="fa fa-users-cog"></i>
       </button>
       <button class="nav-icon-btn" (click)="navigateToEvents()" title="Events">
         <i class="fa fa-calendar-alt"></i>
       </button>
-      <app-notification-bell></app-notification-bell>
+
+      <!-- Notification Bell -->
+      <button class="nav-icon-btn" (click)="toggleNotifications()" title="Notifications">
+        <i class="fa fa-bell"></i>
+        <span class="notification-badge" *ngIf="unreadNotificationsCount > 0">
+          {{ unreadNotificationsCount }}
+        </span>
+      </button>
+
+      <!-- User -->
       <div class="user-profile">
-        <div class="user-avatar">U</div>
+        <div class="user-avatar">{{ currentUserName ? currentUserName[0].toUpperCase() : 'U' }}</div>
         <div class="user-info">
-          <span class="user-name">Community User</span>
-          <span class="user-role">Member</span>
+          <span class="user-name">{{ currentUserName || 'Community User' }}</span>
+          <span class="user-role">{{ currentUserRole || 'Member' }}</span>
         </div>
         <i class="fa fa-chevron-down"></i>
       </div>
     </div>
   </div>
 
-  <!-- Notifications Panel -->
-  <div class="notifications-dropdown" *ngIf="isNotificationsOpen">
+  <!-- Notifications Dropdown -->
+  <div class="notifications-dropdown" *ngIf="isNotificationsOpen" (click)="$event.stopPropagation()">
     <div class="notif-header">
       <div>
         <h4>Notifications</h4>
-        <p>Advanced summary of your events, clubs and groups</p>
+        <p>Your groups, clubs and events activity</p>
       </div>
-      <button class="mark-read-btn" (click)="notificationService.markAllAsRead()">
-        Mark all as read
-      </button>
+      <button class="mark-read-btn" (click)="notificationService.markAllAsRead()">Mark all as read</button>
     </div>
     <div class="notif-list">
       <ng-container *ngFor="let g of notificationGroups">
         <div class="notif-group-section">
           <div class="notif-group-label">{{ g.label }}</div>
           <div class="notif-item" *ngFor="let n of g.items"
-               [class.unread]="!n.read"
-               (click)="handleNotificationClick(n)">
-            <div class="notif-icon" style="background: #198754">
-              <i class="fa fa-bell"></i>
-            </div>
+               [class.unread]="!n.read" (click)="handleNotificationClick(n)">
+            <div class="notif-icon" style="background:#198754"><i class="fa fa-bell"></i></div>
             <div class="notif-content">
               <p class="notif-message">{{ n.message }}</p>
-              <span class="notif-time">{{ n.createdAt | date: 'short' }}</span>
+              <span class="notif-time">{{ n.createdAt | date:'short' }}</span>
             </div>
           </div>
         </div>
       </ng-container>
+      <div class="notif-empty" *ngIf="notificationGroups.length === 0">
+        <i class="fa fa-bell-slash"></i>
+        <p>No notifications yet</p>
+      </div>
     </div>
   </div>
 </nav>
 
-<!-- Main Layout -->
-<div class="page-layout">
-  <!-- Sidebar -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE LAYOUT
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="page-layout" (click)="isNotificationsOpen = false">
+
+  <!-- ── Left Sidebar ──────────────────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-card">
       <h3>Communities & Clubs</h3>
@@ -77,7 +91,7 @@
         <button class="quick-link-btn active">
           <i class="fa fa-users"></i> Groups
         </button>
-        <button class="quick-link-btn" [routerLink]="['/clubs']">
+        <button class="quick-link-btn" [routerLink]="['/ClubsList']">
           <i class="fa fa-users-cog"></i> Clubs
         </button>
         <button class="quick-link-btn" (click)="navigateToEvents()">
@@ -86,104 +100,234 @@
       </div>
     </div>
 
+    <!-- Filters -->
     <div class="sidebar-card">
-      <h4>Filters</h4>
+      <h4><i class="fa fa-filter" style="color:#198754;margin-right:6px"></i>Filters</h4>
       <div class="filter-group">
         <label>Group type</label>
         <select class="filter-select" [(ngModel)]="selectedGroupType" (change)="onGroupTypeChange($event)">
-          <option value="all">All</option>
+          <option value="all">All types</option>
           <option value="PUBLIC">Public</option>
           <option value="PRIVATE">Private</option>
-          <option value="INVITE_ONLY">Invite Only</option>
+          <option value="INVITE_ONLY">Invitation only</option>
         </select>
+      </div>
+      <button class="btn-reset-filter" (click)="selectedGroupType='all'; searchTerm=''; filterGroups()">
+        <i class="fa fa-times"></i> Reset filters
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="sidebar-card stats-card">
+      <h4>Stats</h4>
+      <div class="stat-row">
+        <span class="stat-label"><i class="fa fa-users"></i> Total groups</span>
+        <span class="stat-value">{{ groups.length }}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label"><i class="fa fa-search"></i> Filtered</span>
+        <span class="stat-value">{{ filteredGroups.length }}</span>
+      </div>
+    </div>
+
+    <!-- Join Requests -->
+    <div class="sidebar-card" *ngIf="pendingJoinRequests.length > 0">
+      <h4><i class="fa fa-envelope" style="color:#198754;margin-right:6px"></i>
+        Join Requests
+        <span class="count-badge">{{ pendingJoinRequests.length }}</span>
+      </h4>
+      <div class="join-request-item" *ngFor="let req of pendingJoinRequests">
+        <div class="jr-info">
+          <span class="jr-user"><i class="fa fa-user"></i> User {{ req.userId }}</span>
+          <span class="jr-group">{{ req.group?.name || 'Group #' + req.group?.id }}</span>
+        </div>
+        <div class="jr-actions">
+          <button class="btn-accept" (click)="acceptJoinRequest(req.id)" title="Accept">
+            <i class="fa fa-check"></i>
+          </button>
+          <button class="btn-reject" (click)="rejectJoinRequest(req.id)" title="Reject">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
       </div>
     </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- ── Main Content ───────────────────────────────────────────────────── -->
   <main class="main-content">
+
+    <!-- Header -->
     <div class="content-header">
       <div>
         <h1>Communities & Clubs</h1>
         <p>Join groups, attend events and grow your network</p>
       </div>
-      <button class="btn-create" (click)="createGroup()">
+      <button class="btn-create" (click)="openCreateModal()">
         <i class="fa fa-plus"></i> Create Group
       </button>
     </div>
 
-    <!-- Recommended Groups Section -->
+    <!-- Section Header -->
     <section class="section">
       <div class="section-header">
-        <h2>Recommended groups</h2>
-        <a class="view-all-link" (click)="toggleShowAllGroups()" style="cursor: pointer;">
+        <h2>
+          Recommended groups
+          <span class="count-badge">{{ filteredGroups.length }}</span>
+        </h2>
+        <a class="view-all-link" (click)="toggleShowAllGroups()" style="cursor:pointer">
           {{ showAllGroups ? 'Show less' : 'View all' }}
         </a>
       </div>
 
-      <div class="groups-grid">
-        <div class="group-card" *ngFor="let group of filteredGroups">
-          <div class="group-banner" [style.background]="'linear-gradient(135deg, #198754 0%, #20c997 100%)'">
-          </div>
-          <div class="group-content">
-            <h3 class="group-name">{{ group.name }}</h3>
-            <p class="group-description">{{ group.description }}</p>
-            
-            <div class="group-meta">
-              <span class="meta-item">
-                <i class="fa fa-users"></i> {{ group.memberCount || 0 }} members
-              </span>
-              <span class="meta-item">
-                <i class="fa fa-calendar"></i> {{ 0 || 0 }} events this month
-              </span>
-            </div>
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading groups...</p>
+      </div>
 
-            <div class="group-badge">
-              <span class="badge" [class]="'badge-' + group.type.toLowerCase()">
+      <!-- Error -->
+      <div class="empty-state error-state" *ngIf="saveError && !loading">
+        <i class="fa fa-plug" style="color:#9ca3af; font-size:40px"></i>
+        <h3 style="color:#374151">Backend unavailable</h3>
+        <p style="color:#6b7280; font-size:13px; max-width:360px; margin:0 auto 16px">
+          The API Gateway is not reachable. Start your services then click Retry.
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+          <button class="btn-retry" (click)="loadGroups()">
+            <i class="fa fa-redo"></i> Retry
+          </button>
+          <button class="btn-retry" style="border-color:#6b7280; color:#6b7280"
+                  (click)="saveError = null">
+            <i class="fa fa-times"></i> Dismiss
+          </button>
+        </div>
+        <p style="margin-top:12px; font-size:11px; color:#d1d5db">
+          Expected: <code style="background:#f3f4f6; padding:2px 6px; border-radius:4px">http://localhost:8085</code>
+        </p>
+      </div>
+
+      <!-- Groups Grid -->
+      <div class="groups-grid" *ngIf="!loading && !saveError">
+        <div class="group-card" *ngFor="let group of paginatedGroups">
+
+          <!-- Banner -->
+          <div class="group-banner"
+               [style.background-image]="group.bannerUrl ? 'url(' + group.bannerUrl + ')' : null"
+               [class.default-banner]="!group.bannerUrl">
+            <!-- Admin actions overlay -->
+            <div class="card-admin-actions">
+              <button class="card-action-btn edit-btn" (click)="openEditModal(group, $event)" title="Edit">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="card-action-btn delete-btn" (click)="confirmDelete(group, $event)" title="Delete">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="group-content">
+            <div class="group-type-badge">
+              <span class="badge" [ngClass]="{
+                'badge-public': group.type === 'Public',
+                'badge-private': group.type === 'Private',
+                'badge-invite': group.type === 'Invitation only'
+              }">
+                <i class="fa" [ngClass]="{
+                  'fa-globe': group.type === 'Public',
+                  'fa-lock': group.type === 'Private',
+                  'fa-envelope': group.type === 'Invitation only'
+                }"></i>
                 {{ group.type }}
               </span>
             </div>
 
+            <h3 class="group-name">{{ group.name }}</h3>
+            <p class="group-description">{{ group.description }}</p>
+
+            <div class="group-meta">
+              <span class="meta-item">
+                <i class="fa fa-users"></i> {{ group.memberCount || 0 }} members
+              </span>
+            </div>
+
             <div class="group-actions">
-              <button class="btn-secondary" (click)="viewGroup(group.id)">View wall</button>
-              <button class="btn-primary" (click)="joinGroup(group, $event)" >
-                Join
+              <button class="btn-secondary" (click)="viewGroup(group.id)">
+                <i class="fa fa-eye"></i> View wall
               </button>
-              <button class="btn-joined"  disabled>
-                Joined
+
+              <!-- Not joined, public/private -->
+              <button class="btn-primary"
+                      *ngIf="!group.isJoined && !group.requestPending && group.type !== 'Invitation only'"
+                      [disabled]="group.isJoining"
+                      (click)="joinGroup(group, $event)">
+                <i class="fa" [ngClass]="group.isJoining ? 'fa-spinner fa-spin' : 'fa-user-plus'"></i>
+                {{ group.isJoining ? 'Joining...' : 'Join' }}
+              </button>
+
+              <!-- Invitation only — request -->
+              <button class="btn-invite"
+                      *ngIf="!group.isJoined && !group.requestPending && group.type === 'Invitation only'"
+                      [disabled]="group.isJoining"
+                      (click)="requestInvite(group, $event)">
+                <i class="fa" [ngClass]="group.isJoining ? 'fa-spinner fa-spin' : 'fa-envelope'"></i>
+                {{ group.isJoining ? 'Sending...' : 'Request' }}
+              </button>
+
+              <!-- Pending request -->
+              <button class="btn-pending" *ngIf="group.requestPending && !group.isJoined" disabled>
+                <i class="fa fa-clock"></i> Pending
+              </button>
+
+              <!-- Already joined -->
+              <button class="btn-joined" *ngIf="group.isJoined" disabled>
+                <i class="fa fa-check"></i> Joined
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && !saveError && filteredGroups.length === 0">
+        <i class="fa fa-users-slash"></i>
+        <h3>No groups found</h3>
+        <p>Try adjusting your search or filters, or create a new group.</p>
+        <button class="btn-create" (click)="openCreateModal()">
+          <i class="fa fa-plus"></i> Create Group
+        </button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="showAllGroups && totalPages > 1">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+          <i class="fa fa-chevron-left"></i>
+        </button>
+        <button class="page-btn" *ngFor="let p of pageNumbers"
+                [class.active]="p === currentPage" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+          <i class="fa fa-chevron-right"></i>
+        </button>
+      </div>
     </section>
-
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="filteredGroups.length === 0 && !loading">
-      <i class="fa fa-users-slash"></i>
-      <h3>No groups found</h3>
-      <p>Try adjusting your search or filters</p>
-    </div>
-
-    <!-- Loading State -->
-    <div class="loading-state" *ngIf="loading">
-      <div class="spinner"></div>
-      <p>Loading groups...</p>
-    </div>
   </main>
 
-  <!-- Right Sidebar -->
+  <!-- ── Right Sidebar ──────────────────────────────────────────────────── -->
   <aside class="right-sidebar">
+
+    <!-- Upcoming Events -->
     <div class="sidebar-card">
       <div class="card-header">
         <h4>Upcoming events</h4>
-        <a class="view-all-link">All events</a>
+        <a class="view-all-link" (click)="navigateToEvents()" style="cursor:pointer">All events</a>
       </div>
       <div class="events-list" *ngIf="upcomingEvents.length > 0">
-        <div class="event-item" *ngFor="let event of upcomingEvents">
+        <div class="event-item" *ngFor="let event of upcomingEvents" (click)="navigateToEvents()">
           <div class="event-date">
-            <span class="date-day">{{ event.startDate | date: 'd' }}</span>
-            <span class="date-month">{{ event.startDate | date: 'MMM' }}</span>
+            <span class="date-day">{{ event.startDate | date:'d' }}</span>
+            <span class="date-month">{{ event.startDate | date:'MMM' }}</span>
           </div>
           <div class="event-info">
             <h5>{{ event.title }}</h5>
@@ -194,6 +338,7 @@
       <p class="no-events" *ngIf="upcomingEvents.length === 0">No upcoming events</p>
     </div>
 
+    <!-- Calendar -->
     <div class="sidebar-card">
       <h4>Calendar</h4>
       <div class="calendar-widget">
@@ -201,15 +346,13 @@
           <button class="calendar-nav" (click)="previousMonth()">
             <i class="fa fa-chevron-left"></i>
           </button>
-          <span class="calendar-month">{{ currentMonth | date: 'MMMM yyyy' }}</span>
+          <span class="calendar-month">{{ currentMonth | date:'MMMM yyyy' }}</span>
           <button class="calendar-nav" (click)="nextMonth()">
             <i class="fa fa-chevron-right"></i>
           </button>
         </div>
         <div class="calendar-grid">
-          <div class="calendar-day-header" *ngFor="let day of ['S', 'M', 'T', 'W', 'T', 'F', 'S']">
-            {{ day }}
-          </div>
+          <div class="calendar-day-header" *ngFor="let d of ['S','M','T','W','T','F','S']">{{ d }}</div>
           <div class="calendar-day" *ngFor="let day of calendarDays"
                [class.today]="day.isToday"
                [class.has-event]="day.hasEvent"
@@ -218,19 +361,90 @@
           </div>
         </div>
         <div class="calendar-legend">
-          <span class="legend-item">
-            <span class="legend-dot event-dot"></span> Event
-          </span>
-          <span class="legend-item">
-            <span class="legend-dot today-dot"></span> Today
-          </span>
+          <span class="legend-item"><span class="legend-dot event-dot"></span> Event</span>
+          <span class="legend-item"><span class="legend-dot today-dot"></span> Today</span>
         </div>
       </div>
     </div>
   </aside>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CREATE / EDIT MODAL
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
 
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Edit Group' : 'Create New Group' }}</h3>
+      <button class="modal-close" (click)="closeModal()"><i class="fa fa-times"></i></button>
+    </div>
 
+    <div class="modal-body">
+      <div class="modal-error" *ngIf="modalError">
+        <i class="fa fa-exclamation-circle"></i> {{ modalError }}
+      </div>
 
+      <div class="form-group">
+        <label>Group Name <span class="required">*</span></label>
+        <input type="text" class="form-input" [(ngModel)]="groupForm.name"
+               placeholder="Enter group name" maxlength="100" />
+      </div>
 
+      <div class="form-group">
+        <label>Description <span class="required">*</span></label>
+        <textarea class="form-input form-textarea" [(ngModel)]="groupForm.description"
+                  placeholder="Describe your group..." rows="3" maxlength="500"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Group Type</label>
+        <select class="form-input" [(ngModel)]="groupForm.type">
+          <option value="PUBLIC">🌍 Public — Anyone can join</option>
+          <option value="PRIVATE">🔒 Private — Members only</option>
+          <option value="INVITE_ONLY">✉️ Invitation only — By invite</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Banner Image URL <span class="optional">(optional)</span></label>
+        <input type="url" class="form-input" [(ngModel)]="groupForm.bannerUrl"
+               placeholder="https://example.com/image.jpg" />
+        <div class="banner-preview" *ngIf="groupForm.bannerUrl">
+          <img [src]="groupForm.bannerUrl" alt="Banner preview"
+               onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()" [disabled]="modalLoading">Cancel</button>
+      <button class="btn-submit" (click)="submitGroupForm()" [disabled]="modalLoading">
+        <i class="fa" [ngClass]="modalLoading ? 'fa-spinner fa-spin' : (isEditMode ? 'fa-save' : 'fa-plus')"></i>
+        {{ modalLoading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Create Group') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DELETE CONFIRM MODAL
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal-box modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header danger-header">
+      <h3><i class="fa fa-trash"></i> Delete Group</h3>
+      <button class="modal-close" (click)="cancelDelete()"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong>{{ deletingGroup?.name }}</strong>?</p>
+      <p class="danger-note">This action cannot be undone. All members and posts will be lost.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="executeDelete()">
+        <i class="fa fa-trash"></i> Delete permanently
+      </button>
+    </div>
+  </div>
+</div>

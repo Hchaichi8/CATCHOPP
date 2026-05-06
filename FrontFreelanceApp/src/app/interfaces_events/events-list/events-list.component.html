@@ -1,8 +1,8 @@
 <!-- Top Navigation -->
 <nav class="top-navbar">
   <div class="nav-container">
-    <div class="nav-brand">
-      <div class="logo-circle">C</div>
+    <div class="nav-brand" (click)="navigateToGroups()" style="cursor:pointer">
+      <img src="assets/logo.png" alt="CatchOPP" style="width:36px;height:36px;object-fit:contain;border-radius:8px" />
       <span class="brand-text">CatchOPP</span>
     </div>
 
@@ -16,7 +16,7 @@
     </div>
 
     <div class="nav-actions">
-      <button class="nav-icon-btn" [routerLink]="['/groups']" title="Groups">
+      <button class="nav-icon-btn" [routerLink]="['/GroupList']" title="Groups">
         <i class="fa fa-users"></i>
       </button>
       <app-notification-bell></app-notification-bell>
@@ -110,8 +110,11 @@
             </span>
           </div>
           <div class="event-actions">
-            <button class="btn-primary" *ngIf="isUpcoming(event)" (click)="attendEvent(event.id)">
+            <button class="btn-primary" *ngIf="isUpcoming(event) && !isAttending(event.id)" (click)="attendEvent(event.id)">
               <i class="fa fa-check"></i> Join Event
+            </button>
+            <button class="btn-joined-event" *ngIf="isAttending(event.id)" disabled>
+              <i class="fa fa-check-circle"></i> Joined
             </button>
             <button class="btn-secondary" (click)="viewEventDetails(event.id)">
               View Details
@@ -156,8 +159,11 @@
                 <i class="fa fa-users"></i>
                 <span>{{ event.attendeesCount || 0 }} joining</span>
               </div>
-              <button class="btn-attend" *ngIf="isUpcoming(event)" (click)="attendEvent(event.id)">
+              <button class="btn-attend" *ngIf="isUpcoming(event) && !isAttending(event.id)" (click)="attendEvent(event.id)">
                 Join
+              </button>
+              <button class="btn-attend-joined" *ngIf="isAttending(event.id)" disabled>
+                <i class="fa fa-check"></i> Joined
               </button>
             </div>
           </div>
