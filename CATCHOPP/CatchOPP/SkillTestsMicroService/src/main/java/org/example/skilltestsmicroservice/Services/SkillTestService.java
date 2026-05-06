@@ -10,8 +10,10 @@ import org.example.skilltestsmicroservice.Repositories.SkillTestRepository;
 import org.example.skilltestsmicroservice.Repositories.TestQuestionRepository;
 import org.example.skilltestsmicroservice.Services.gamification.GamificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLEncoder;
@@ -26,6 +28,9 @@ public class SkillTestService {
     private static final int AI_QUESTION_COUNT = 5;
     private static final int AI_PASS_SCORE = 70;
     private static final int AI_DURATION_MINUTES = 15;
+
+    @Value("${ml.api.url:http://localhost:5000}")
+    private String mlApiUrl;
 
     @Autowired
     private SkillTestRepository testRepo;
@@ -223,6 +228,71 @@ public class SkillTestService {
 
     public void deleteQuestion(Long id) {
         questionRepo.deleteById(id);
+    }
+
+    // ML — tries Google Colab first, falls back to built-in model if Colab is offline
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> predictPassProbability(Map<String, Object> data) {
+        // Try Colab first if URL is configured
+        if (mlApiUrl != null && !mlApiUrl.contains("localhost:5000")) {
+            try {
+                Map result = WebClient.create(mlApiUrl)
+                        .post()
+                        .uri("/predict")
+                        .header("Content-Type", "application/json")
+                        .header("ngrok-skip-browser-warning", "true")
+                        .bodyValue(data)
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .block();
+                if (result != null) return result;
+            } catch (Exception ignored) {
+                // Colab offline — fall through to built-in model
+            }
+        }
+        // Built-in fallback model — same formula as the RandomForest training data
+        return builtInPredict(data);
+    }
+
+    // Replicates the RandomForest scoring logic directly in Java
+    // Same weights used to generate training labels in Colab:
+    //   score = avg_score*0.5 + tests_taken*1.5 + subscription*5 - difficulty*8 + time_ratio*10
+    // Threshold: score > 55 → pass
+    private Map<String, Object> builtInPredict(Map<String, Object> data) {
+        double testsTaken  = toDouble(data.get("tests_taken"));
+        double avgScore    = toDouble(data.get("avg_score"));
+        double subscription = toDouble(data.get("subscription"));
+        double difficulty  = toDouble(data.get("difficulty"));
+        double timeRatio   = toDouble(data.get("time_ratio"));
+
+        double score = avgScore * 0.5
+                + testsTaken * 1.5
+                + subscription * 5.0
+                - difficulty * 8.0
+                + timeRatio * 10.0;
+
+        // Convert raw score to a 0-100 confidence using sigmoid-like normalization
+        // score range is roughly 10-80, threshold at 55
+        double confidence = 1.0 / (1.0 + Math.exp(-(score - 55) / 8.0));
+        confidence = Math.round(confidence * 1000.0) / 10.0; // e.g. 87.3
+
+        boolean willPass = score > 55;
+        String message = willPass
+                ? "High chance of passing! Keep up the good work."
+                : "Keep practicing — improve your avg score to boost your odds.";
+
+        return Map.of(
+                "will_pass", willPass,
+                "confidence", confidence,
+                "message", message,
+                "source", "built-in-model"
+        );
+    }
+
+    private double toDouble(Object val) {
+        if (val == null) return 0.0;
+        if (val instanceof Number) return ((Number) val).doubleValue();
+        try { return Double.parseDouble(val.toString()); } catch (Exception e) { return 0.0; }
     }
 
     public Map<String, Object> getTestStatistics(Long testId) {

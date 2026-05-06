@@ -42,6 +42,9 @@ export class SkillTestsListComponent implements OnInit, OnDestroy {
   encourageText = '';
   showGifPicker = false;
 
+  mlPrediction: { will_pass: boolean; confidence: number; message: string } | null = null;
+  mlLoading = false;
+
   readonly gifSuggestions: string[] = [
     'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
     'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
@@ -67,6 +70,7 @@ export class SkillTestsListComponent implements OnInit, OnDestroy {
     this.loadAiAccess();
     this.initGamification();
     this.loadLeaguesOverview();
+    this.loadMlPrediction();
   }
 
   private loadLeaguesOverview(): void {
@@ -369,5 +373,64 @@ export class SkillTestsListComponent implements OnInit, OnDestroy {
       return;
     }
     this.router.navigate(['/AIInterviewSimulator']);
+  }
+
+  loadMlPrediction(): void {
+    this.mlLoading = true;
+
+    if (!this.currentUserId) {
+      // Not logged in — use default values to still show a demo prediction
+      this.skillTestService.predictPass({
+        tests_taken: 0,
+        avg_score: 50,
+        subscription: 0,
+        difficulty: 2,
+        time_ratio: 0.75
+      }).subscribe({
+        next: (result) => { this.mlPrediction = result; this.mlLoading = false; },
+        error: () => { this.mlLoading = false; }
+      });
+      return;
+    }
+
+    this.skillTestService.getUserCertifications(this.currentUserId).subscribe({
+      next: (certs) => {
+        const tests_taken = certs.length;
+        const avg_score = tests_taken > 0
+          ? Math.round(certs.reduce((sum, c) => sum + c.score, 0) / tests_taken)
+          : 50;
+        const subLevel = this.hasAiAccess ? 1 : 0;
+        this.skillTestService.predictPass({
+          tests_taken,
+          avg_score,
+          subscription: subLevel,
+          difficulty: 2,
+          time_ratio: 0.75
+        }).subscribe({
+          next: (result) => { this.mlPrediction = result; this.mlLoading = false; },
+          error: () => { this.mlLoading = false; }
+        });
+      },
+      error: () => {
+        // Fallback if certifications can't be fetched
+        this.skillTestService.predictPass({
+          tests_taken: 0,
+          avg_score: 50,
+          subscription: 0,
+          difficulty: 2,
+          time_ratio: 0.75
+        }).subscribe({
+          next: (result) => { this.mlPrediction = result; this.mlLoading = false; },
+          error: () => { this.mlLoading = false; }
+        });
+      }
+    });
+  }
+
+  get mlConfidencePct(): number {
+    if (!this.mlPrediction) return 0;
+    const c = this.mlPrediction.confidence;
+    // Model returns 0-100, not 0-1
+    return c > 1 ? Math.round(c) : Math.round(c * 100);
   }
 }

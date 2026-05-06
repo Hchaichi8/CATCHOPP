@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 const API = 'http://localhost:8079/SkillTests';
 
@@ -138,5 +139,18 @@ export class SkillTestService {
   // Test Statistics
   getTestStatistics(testId: number): Observable<any> {
     return this.http.get<any>(`${API}/admin/tests/${testId}/statistics`);
+  }
+
+  // ML — Skill Test Pass Predictor (Google Colab model via ngrok)
+  predictPass(data: {
+    tests_taken: number;
+    avg_score: number;
+    subscription: number;
+    difficulty: number;
+    time_ratio: number;
+  }): Observable<{ will_pass: boolean; confidence: number; message: string } | null> {
+    return this.http
+      .post<{ will_pass: boolean; confidence: number; message: string }>('http://localhost:8086/SkillTests/ml/predict-pass', data)
+      .pipe(catchError(() => of(null)));
   }
 }

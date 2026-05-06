@@ -14,6 +14,7 @@ public class TestQuestion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_test_id")
+    @JsonIgnore
     private SkillTest skillTest;
 
     private String questionText;

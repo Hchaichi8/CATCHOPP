@@ -151,4 +151,10 @@ public class SkillTestController {
         String targetDomain = request.get("targetDomain");
         return aiCvService.analyzeAndImproveCVFromImage(imageBase64, mimeType, targetDomain);
     }
+
+    // ML — Skill Test Pass Predictor (Google Colab / ngrok)
+    @PostMapping("/ml/predict-pass")
+    public Map<String, Object> predictPass(@RequestBody Map<String, Object> data) {
+        return service.predictPassProbability(data);
+    }
 }

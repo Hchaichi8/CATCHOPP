@@ -350,6 +350,23 @@
   </div>
 
   <div *ngIf="loading" class="loading">Loading tests...</div>
+
+  <!-- ML Pass Predictor Banner -->
+  <div *ngIf="mlLoading" class="ml-banner ml-loading">
+    <i class="fa fa-spinner fa-spin"></i> AI is analyzing your profile...
+  </div>
+  <div *ngIf="mlPrediction && !mlLoading" class="ml-banner" [ngClass]="mlPrediction.will_pass ? 'ml-pass' : 'ml-fail'">
+    <span class="ml-icon">{{ mlPrediction.will_pass ? '🎯' : '📚' }}</span>
+    <span class="ml-text">
+      <strong>Your pass probability: {{ mlConfidencePct }}%</strong>
+      — {{ mlPrediction.will_pass ? 'High chance of passing!' : 'Keep practicing to improve your odds.' }}
+    </span>
+    <span class="ml-badge">AI Prediction</span>
+    <button class="ml-refresh" (click)="loadMlPrediction()" title="Refresh prediction">
+      <i class="fa fa-refresh"></i>
+    </button>
+  </div>
+
   <div class="tests-grid">
     <div *ngFor="let t of filteredTests" class="test-card">
       <div class="card-badge">{{ t.category }}</div>
