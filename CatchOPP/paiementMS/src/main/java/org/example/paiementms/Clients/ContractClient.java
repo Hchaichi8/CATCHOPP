@@ -14,3 +14,4 @@ public interface ContractClient {
     @PutMapping("/Contract/{contractId}/complete")
     void markAsCompleted(@PathVariable("contractId") Long contractId);
 }
+//freeeeeee
