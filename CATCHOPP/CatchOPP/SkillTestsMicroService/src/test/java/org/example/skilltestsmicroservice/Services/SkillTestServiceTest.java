@@ -62,12 +62,12 @@ class SkillTestServiceTest {
 
         sampleQuestion = new TestQuestion();
         sampleQuestion.setId(1L);
-        sampleQuestion.setQuestion("What is JVM?");
+        sampleQuestion.setQuestionText("What is JVM?");
         sampleQuestion.setOptionA("Java Virtual Machine");
         sampleQuestion.setOptionB("Java Variable Method");
         sampleQuestion.setOptionC("Java Version Manager");
         sampleQuestion.setOptionD("None of the above");
-        sampleQuestion.setCorrectAnswer("A");
+        sampleQuestion.setCorrectOption("A");
         sampleQuestion.setSkillTest(sampleTest);
     }
 
@@ -153,7 +153,7 @@ class SkillTestServiceTest {
         List<TestQuestion> result = skillTestService.getQuestionsForTest(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getQuestion()).isEqualTo("What is JVM?");
+        assertThat(result.get(0).getQuestionText()).isEqualTo("What is JVM?");
     }
 
     // ===== COMPLEX BUSINESS LOGIC TESTS =====
@@ -283,9 +283,9 @@ class SkillTestServiceTest {
     private TestQuestion buildQuestion(Long id, String text, String correctAnswer) {
         TestQuestion q = new TestQuestion();
         q.setId(id);
-        q.setQuestion(text);
+        q.setQuestionText(text);
         q.setOptionA("A"); q.setOptionB("B"); q.setOptionC("C"); q.setOptionD("D");
-        q.setCorrectAnswer(correctAnswer);
+        q.setCorrectOption(correctAnswer);
         q.setSkillTest(sampleTest);
         return q;
     }

@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Spring Boot microservices (via Actuator)
+  - job_name: 'user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['user-service:8081']
+
+  - job_name: 'subscription-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['subscription-service:8083']
+
+  - job_name: 'referral-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['referral-service:8085']
+
+  - job_name: 'skilltests-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['skilltests-service:8086']
+
+  # Jenkins (if running locally on Windows)
+  - job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
