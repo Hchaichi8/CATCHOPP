@@ -35,10 +35,10 @@ public class ApigetwayApplication {
                         .uri("lb://PAIEMENTMS"))
 
                 .route("idroutesupport", r -> r.path("/api/tickets/**", "/ws-support/**")
-                        .uri("http://192.168.5.88:8087"))
+                        .uri("http://catchopp-support-ms:8087"))
 
                 .route("idroutechat", r -> r.path("/chat/**", "/ws/**")
-                        .uri("http://192.168.5.88:8086"))
+                        .uri("http://catchopp-communication-ms:8086"))
 
                 .build();
     }
