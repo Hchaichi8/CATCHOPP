@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-ms
+  labels:
+    app: project-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-ms
+  template:
+    metadata:
+      labels:
+        app: project-ms
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8082'
+        prometheus.io/path: '/actuator/prometheus'
+    spec:
+      containers:
+      - name: project-ms
+        image: ghassenhchaichi/catchopp-project-ms:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-service:3306/catchop_project_db?createDatabaseIfNotExist=true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-ms-service
+  labels:
+    app: project-ms
+spec:
+  selector:
+    app: project-ms
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+      name: http

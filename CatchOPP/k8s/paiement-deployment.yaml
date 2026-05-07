@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paiement-ms
+  labels:
+    app: paiement-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paiement-ms
+  template:
+    metadata:
+      labels:
+        app: paiement-ms
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8088'
+        prometheus.io/path: '/actuator/prometheus'
+    spec:
+      containers:
+      - name: paiement-ms
+        image: ghassenhchaichi/catchopp-paiement-ms:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8088
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-service:3306/catchop_paiement_db?createDatabaseIfNotExist=true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paiement-ms-service
+  labels:
+    app: paiement-ms
+spec:
+  selector:
+    app: paiement-ms
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088
+      name: http

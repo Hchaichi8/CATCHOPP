@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: competence-ms
+  labels:
+    app: competence-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: competence-ms
+  template:
+    metadata:
+      labels:
+        app: competence-ms
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8084'
+        prometheus.io/path: '/actuator/prometheus'
+    spec:
+      containers:
+      - name: competence-ms
+        image: ghassenhchaichi/catchopp-competence-ms:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8084
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-service:3306/catchop_competence_db?createDatabaseIfNotExist=true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: competence-ms-service
+  labels:
+    app: competence-ms
+spec:
+  selector:
+    app: competence-ms
+  ports:
+    - protocol: TCP
+      port: 8084
+      targetPort: 8084
+      name: http
