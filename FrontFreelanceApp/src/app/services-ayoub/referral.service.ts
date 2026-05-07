@@ -1,8 +1,8 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://192.168.110.134:8088/Referral';
+const API = 'http://192.168.65.136:30085/Referral';
 
 export interface ReferralCode {
   id?: number;
@@ -75,7 +75,7 @@ export class ReferralService {
 
   // Social media share URLs
   getTwitterShareUrl(referralUrl: string): string {
-    const text = encodeURIComponent('Join CatchOPP and find amazing freelance opportunities! 🚀');
+    const text = encodeURIComponent('Join CatchOPP and find amazing freelance opportunities! ??');
     return `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(referralUrl)}`;
   }
 

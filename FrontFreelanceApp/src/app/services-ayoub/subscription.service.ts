@@ -1,9 +1,9 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-const API = 'http://192.168.110.134:8087/Subscription';
+const API = 'http://192.168.65.136:30085/Subscription';
 
 export interface SubscriptionPlan {
   id?: number;
@@ -31,14 +31,14 @@ export class SubscriptionService {
   constructor(private http: HttpClient) {}
 
   getActiveSubscription(userId: number): Observable<UserSubscription | null> {
-    console.log('🔍 Fetching active subscription for userId:', userId);
+    console.log('?? Fetching active subscription for userId:', userId);
     return this.http.get<UserSubscription | null>(`${API}/user/${userId}/active`).pipe(
       map(sub => {
-        console.log('✅ Subscription API response:', sub);
+        console.log('? Subscription API response:', sub);
         return sub;
       }),
       catchError(err => {
-        console.error('❌ Error fetching subscription:', err);
+        console.error('? Error fetching subscription:', err);
         return of(null);
       })
     );
@@ -100,7 +100,7 @@ export class SubscriptionService {
   }
 
   recordPayment(subscriptionId: number, amount: number, paymentMethod = 'card'): Observable<{ id: number } | null> {
-    console.log('📤 Calling recordPayment API:', {
+    console.log('?? Calling recordPayment API:', {
       url: `${API}/${subscriptionId}/payment`,
       subscriptionId,
       amount,
@@ -111,12 +111,12 @@ export class SubscriptionService {
       `${API}/${subscriptionId}/payment?amount=${amount}&paymentMethod=${encodeURIComponent(paymentMethod)}`,
       {}
     ).pipe(
-      tap(response => console.log('✅ Payment API response:', response)),
+      tap(response => console.log('? Payment API response:', response)),
       catchError(error => {
-        console.error('❌ Payment API error:', error);
-        console.error('❌ Error status:', error.status);
-        console.error('❌ Error message:', error.message);
-        console.error('❌ Error body:', error.error);
+        console.error('? Payment API error:', error);
+        console.error('? Error status:', error.status);
+        console.error('? Error message:', error.message);
+        console.error('? Error body:', error.error);
         return of(null);
       })
     );

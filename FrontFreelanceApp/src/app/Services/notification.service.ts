@@ -1,4 +1,4 @@
-﻿
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://192.168.110.134:8085/Project/notifications'; 
+  private apiUrl = 'http://192.168.65.136:30085/Project/notifications'; 
 
   constructor(private http: HttpClient) { }
 

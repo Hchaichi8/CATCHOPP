@@ -1,4 +1,4 @@
-﻿import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Review } from '../models/Review';
 import { Observable } from 'rxjs';
@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ReviewService {private apiUrl = 'http://192.168.110.134:8085/Review'; 
+export class ReviewService {private apiUrl = 'http://192.168.65.136:30085/Review'; 
 
   constructor(private http: HttpClient) { }
 

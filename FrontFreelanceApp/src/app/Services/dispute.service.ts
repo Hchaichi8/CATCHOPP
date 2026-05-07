@@ -19,7 +19,7 @@ export interface Dispute {
   providedIn: 'root'
 })
 export class DisputeService {
-  private apiUrl = 'http://192.168.110.134:8085/api/disputes'; // Gateway URL
+  private apiUrl = 'http://192.168.65.136:30085/api/disputes'; // Gateway URL
 
   constructor(private http: HttpClient) {}
 

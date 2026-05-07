@@ -105,7 +105,7 @@ export class FreelancerProfilComponent implements OnInit {
 
   openConversation(event: Event) {
     event.stopPropagation();
-    const chatApiUrl = `http://192.168.110.134:8085/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.freelancerId}`;
+    const chatApiUrl = `http://192.168.65.136:30085/chat/conversation/create?user1=${this.currentViewerId}&user2=${this.freelancerId}`;
     this.http.post(chatApiUrl, null).subscribe({
       next: (res: any) => {
         this.selectedConversationUserId = this.freelancerId;

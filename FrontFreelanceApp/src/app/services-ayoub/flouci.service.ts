@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -37,7 +37,7 @@ export class FlouciService {
   private readonly APP_SECRET = 'YOUR_FLOUCI_APP_SECRET'; 
   
   // Backend proxy endpoint (recommended for security)
-  private readonly BACKEND_URL = 'http://192.168.110.134:8087/Subscription/flouci';
+  private readonly BACKEND_URL = 'http://192.168.65.136:30085/Subscription/flouci';
   private useTestMode = true; 
 
   constructor(private http: HttpClient) {
@@ -51,14 +51,14 @@ export class FlouciService {
       next: (response) => {
         this.useTestMode = !response.configured || response.testMode;
         if (this.useTestMode) {
-          console.warn('⚠️ Flouci TEST MODE: Using mock payments. Configure real credentials in backend.');
+          console.warn('?? Flouci TEST MODE: Using mock payments. Configure real credentials in backend.');
         } else {
-          console.log('✅ Flouci PRODUCTION MODE: Using real Flouci API.');
+          console.log('? Flouci PRODUCTION MODE: Using real Flouci API.');
         }
       },
       error: () => {
         this.useTestMode = true;
-        console.warn('⚠️ Flouci TEST MODE: Backend not responding. Using mock payments.');
+        console.warn('?? Flouci TEST MODE: Backend not responding. Using mock payments.');
       }
     });
   }
@@ -155,7 +155,7 @@ export class FlouciService {
    * In production, use real-time exchange rates
    */
   convertUsdToTnd(usdAmount: number): number {
-    const exchangeRate = 3.1; // 1 USD ≈ 3.1 TND (update with real rate)
+    const exchangeRate = 3.1; // 1 USD � 3.1 TND (update with real rate)
     return usdAmount * exchangeRate;
   }
 }

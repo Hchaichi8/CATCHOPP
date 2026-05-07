@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { User } from '../models/user';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,13 +9,13 @@ import { Observable } from 'rxjs';
 export class UserService {
 
 
-  private apiUrl = 'http://192.168.110.134:8085/users'; 
+  private apiUrl = 'http://192.168.65.136:30085/users'; 
 
   constructor(private http: HttpClient) { }
 
 
   getAllUsers() {
-    return this.http.get<any[]>(`${this.apiUrl}/all`); // ⚠️ N'oublie pas le /all ici !
+    return this.http.get<any[]>(`${this.apiUrl}/all`); // ?? N'oublie pas le /all ici !
   }
   register(user: User): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/register`, user);

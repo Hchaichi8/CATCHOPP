@@ -1,4 +1,4 @@
-Ôªøimport { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectServiceService } from '../../Services/project-service.service';
@@ -14,14 +14,14 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ProjectDetailsComponent implements OnInit {
 
-  // --- √âTAT GLOBAL ---
+  // --- …TAT GLOBAL ---
   project: Project | null = null;
   isLoading: boolean = true;
   activeTab: 'job' | 'proposals' | 'reviews' = 'job';
   isSaved: boolean = false;
   currentUrl: string = window.location.href;
 
-  // --- √âTAT DES OFFRES (PROPOSALS) ---
+  // --- …TAT DES OFFRES (PROPOSALS) ---
   proposals: Proposal[] = [];
   lowestBid: number = 0;
   highestBid: number = 0;
@@ -29,7 +29,7 @@ export class ProjectDetailsComponent implements OnInit {
   isProposalModalOpen: boolean = false;
   newProposal: Proposal = { bidAmount: 0, estimationEndDate: '', status: 'PENDING', freelancerId: 0 };
 
-  // --- √âTAT DES REVIEWS & IA ---
+  // --- …TAT DES REVIEWS & IA ---
   projectReviews: any[] = [];
   showReviewModal: boolean = false;
   reviewText: string = '';
@@ -37,11 +37,11 @@ export class ProjectDetailsComponent implements OnInit {
   isEnhancing: boolean = false;
   isSubmittingReview: boolean = false;
 
-  // üî¥ Rejection state
+  // ?? Rejection state
   reviewRejectionMsg: string = '';
   reviewWasRejected: boolean = false;
 
-  // --- UTILISATEUR & COMP√âTENCES ---
+  // --- UTILISATEUR & COMP…TENCES ---
   currentUser: any = null;
   currentFreelancerId: number | null = null;
   allSkills: any[] = [];
@@ -85,7 +85,7 @@ export class ProjectDetailsComponent implements OnInit {
     }
   }
 
-  // --- M√âTHODES GLOBALES ---
+  // --- M…THODES GLOBALES ---
   loadUserData() {
     const storedData = localStorage.getItem('currentUser');
     if (storedData) {
@@ -146,7 +146,7 @@ export class ProjectDetailsComponent implements OnInit {
     }
     this.projectService.submitProposal(this.project.id, this.newProposal).subscribe({
       next: () => {
-        this.showToast("Proposal submitted successfully! üöÄ", "success");
+        this.showToast("Proposal submitted successfully! ??", "success");
         this.closeModal();
         this.loadProposals(this.project!.id!);
         this.activeTab = 'proposals';
@@ -246,7 +246,7 @@ export class ProjectDetailsComponent implements OnInit {
 
   // --- LOGIQUE DES REVIEWS & IA GEMINI ---
   fetchProjectReviews(projectId: number) {
-    this.http.get<any[]>(`http://192.168.110.134:8085/Review/GetReviewsByProject/${projectId}`)
+    this.http.get<any[]>(`http://192.168.65.136:30085/Review/GetReviewsByProject/${projectId}`)
       .subscribe(res => this.projectReviews = res);
   }
 
@@ -258,14 +258,14 @@ export class ProjectDetailsComponent implements OnInit {
     this.reviewRejectionMsg = '';
     this.reviewWasRejected = false;
 
-    this.http.post<any>('http://192.168.110.134:8085/Review/enhance', { text: this.reviewText, rating: this.rating })
+    this.http.post<any>('http://192.168.65.136:30085/Review/enhance', { text: this.reviewText, rating: this.rating })
       .subscribe({
         next: (res) => {
           this.reviewText = res.enhancedText;
           this.isEnhancing = false;
         },
         error: () => {
-          this.showToast("Erreur avec l'IA. R√©essayez.", "error");
+          this.showToast("Erreur avec l'IA. RÈessayez.", "error");
           this.isEnhancing = false;
         }
       });
@@ -290,7 +290,7 @@ export class ProjectDetailsComponent implements OnInit {
       createdAt: new Date().toISOString()
     };
 
-    this.http.post('http://192.168.110.134:8085/Review/AjouterReview', reviewData).subscribe({
+    this.http.post('http://192.168.65.136:30085/Review/AjouterReview', reviewData).subscribe({
       next: () => {
         this.isSubmittingReview = false;
         this.reviewRejectionMsg = '';
@@ -302,7 +302,7 @@ export class ProjectDetailsComponent implements OnInit {
       error: (err) => {
         this.isSubmittingReview = false;
 
-        // üö´ Keep modal open ‚Äî show rejection banner instead of alert
+        // ?? Keep modal open ó show rejection banner instead of alert
         let rawMsg =
           err.error?.reason ||
           err.error?.message ||
@@ -320,7 +320,7 @@ export class ProjectDetailsComponent implements OnInit {
 
   // --- GESTION DES MODALS ET BOUTONS ---
   openModal() {
-    if (!this.currentFreelancerId) return this.showToast("Vous devez √™tre connect√©.", "error");
+    if (!this.currentFreelancerId) return this.showToast("Vous devez Ítre connectÈ.", "error");
     this.newProposal.freelancerId = this.currentFreelancerId;
     this.isProposalModalOpen = true;
     document.body.style.overflow = 'hidden';
@@ -340,7 +340,7 @@ export class ProjectDetailsComponent implements OnInit {
     this.showReviewModal = false;
     this.reviewText = '';
     this.rating = 5;
-    this.reviewRejectionMsg = '';   // ‚Üê clear rejection on close
+    this.reviewRejectionMsg = '';   // ? clear rejection on close
     this.reviewWasRejected = false;
     document.body.style.overflow = 'auto';
   }
@@ -377,6 +377,6 @@ export class ProjectDetailsComponent implements OnInit {
 
   copyLink() {
     navigator.clipboard.writeText(this.currentUrl);
-    this.showToast("Lien copi√© ! üìã", "success");
+    this.showToast("Lien copiÈ ! ??", "success");
   }
 }

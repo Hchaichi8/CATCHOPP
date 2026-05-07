@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class CompetanceService {
 
     constructor(private http:HttpClient) { }  
-    private url ='http://192.168.110.134:8085/Competance'
+    private url ='http://192.168.65.136:30085/Competance'
 
 parseCv(file: File): Observable<Competance[]> {
   const formData: FormData = new FormData();

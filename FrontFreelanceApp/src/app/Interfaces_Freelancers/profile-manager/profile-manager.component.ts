@@ -1,4 +1,4 @@
-ï»¿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Competance } from '../../models/Competance';
 import { CompetanceService } from '../../Services/competance.service';
 import { UserService } from '../../Services/user.service';
@@ -134,7 +134,7 @@ export class ProfileManagerComponent implements OnInit {
       this.uploadedCvName = file.name;
 
       this.userService.uploadCv(this.currentUserId, file).subscribe({
-        next: () => this.showNotification("CV uploadÃ© avec succÃ¨s !", 'success'),
+        next: () => this.showNotification("CV uploadé avec succès !", 'success'),
         error: (err) => this.showNotification("Erreur lors de l'upload du CV", 'error')
       });
     }
@@ -142,7 +142,7 @@ export class ProfileManagerComponent implements OnInit {
 
   downloadCv() {
     if (!this.uploadedCvName) return;
-    const backendUrl = `http://192.168.110.134:8085/users/download-cv/${this.uploadedCvName}`;
+    const backendUrl = `http://192.168.65.136:30085/users/download-cv/${this.uploadedCvName}`;
     window.open(backendUrl, '_blank');
   }
 
@@ -150,7 +150,7 @@ export class ProfileManagerComponent implements OnInit {
     if(confirm("Voulez-vous vraiment supprimer votre CV ?")) {
         this.uploadedCvName = null;
         this.selectedFile = null;
-        this.showNotification("CV retirÃ© de votre profil", 'info');
+        this.showNotification("CV retiré de votre profil", 'info');
     }
   }
 
@@ -176,7 +176,7 @@ export class ProfileManagerComponent implements OnInit {
 
     const newSkillIds = this.mySkills.map(s => s.id as number);
     this.userService.updateUserCompetences(this.currentUserId, newSkillIds).subscribe({
-      next: () => this.showNotification(`CompÃ©tence ${skill.nom} ajoutÃ©e !`, 'success'),
+      next: () => this.showNotification(`Compétence ${skill.nom} ajoutée !`, 'success'),
       error: (err) => this.showNotification("Erreur lors de la sauvegarde", 'error')
     });
   }
@@ -187,7 +187,7 @@ export class ProfileManagerComponent implements OnInit {
     const remainingIds = this.mySkills.map(s => s.id as number);
     
     this.userService.updateUserCompetences(this.currentUserId, remainingIds).subscribe({
-      next: () => this.showNotification("CompÃ©tence retirÃ©e.", 'info'),
+      next: () => this.showNotification("Compétence retirée.", 'info'),
       error: (err) => this.showNotification("Erreur lors de la suppression", 'error')
     });
   }
@@ -196,12 +196,12 @@ export class ProfileManagerComponent implements OnInit {
     const foundSkill = this.allAdminSkills.find(s => s.nom.toLowerCase() === skillName.toLowerCase());
     if (foundSkill) {
       if (this.mySkills.some(s => s.id === foundSkill.id)) {
-        this.showNotification("Vous possÃ©dez dÃ©jÃ  cette compÃ©tence.", 'info');
+        this.showNotification("Vous possédez déjà cette compétence.", 'info');
       } else {
         this.selectSkill(foundSkill);
       }
     } else {
-      this.showNotification("CompÃ©tence introuvable dans le catalogue.", 'error');
+      this.showNotification("Compétence introuvable dans le catalogue.", 'error');
     }
   }
 
@@ -213,8 +213,8 @@ export class ProfileManagerComponent implements OnInit {
 
   saveProfile() {
     this.userService.updateUser(Number(this.currentUserId), this.freelancerInfo).subscribe({
-      next: () => this.showNotification("Profil mis Ã  jour avec succÃ¨s !", 'success'),
-      error: (err) => this.showNotification("Erreur lors de la mise Ã  jour du profil.", 'error')
+      next: () => this.showNotification("Profil mis à jour avec succès !", 'success'),
+      error: (err) => this.showNotification("Erreur lors de la mise à jour du profil.", 'error')
     });
   }
 }

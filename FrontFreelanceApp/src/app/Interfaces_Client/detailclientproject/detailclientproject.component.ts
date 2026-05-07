@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Project } from '../../models/project.model';
@@ -34,7 +34,7 @@ export class DetailclientprojectComponent implements OnInit {
   isEnhancing: boolean = false;
   isSubmittingReview: boolean = false;
 
-  // 🔴 Rejection state (same as freelancer view)
+  // ?? Rejection state (same as freelancer view)
   reviewRejectionMsg: string = '';
   reviewWasRejected: boolean = false;
 
@@ -103,7 +103,7 @@ export class DetailclientprojectComponent implements OnInit {
 
   // --- REVIEWS ---
   fetchProjectReviews() {
-    this.http.get<any[]>(`http://192.168.110.134:8085/Review/GetReviewsByProject/${this.project.id}`)
+    this.http.get<any[]>(`http://192.168.65.136:30085/Review/GetReviewsByProject/${this.project.id}`)
       .subscribe(res => this.projectReviews = res);
   }
 
@@ -117,7 +117,7 @@ export class DetailclientprojectComponent implements OnInit {
     this.showReviewModal = false;
     this.reviewText = '';
     this.rating = 5;
-    this.reviewRejectionMsg = '';   // ← clear rejection on close
+    this.reviewRejectionMsg = '';   // ? clear rejection on close
     this.reviewWasRejected = false;
     document.body.style.overflow = 'auto';
   }
@@ -131,7 +131,7 @@ export class DetailclientprojectComponent implements OnInit {
     this.reviewRejectionMsg = '';
     this.reviewWasRejected = false;
 
-    this.http.post<any>('http://192.168.110.134:8085/Review/enhance', {
+    this.http.post<any>('http://192.168.65.136:30085/Review/enhance', {
       text: this.reviewText,
       rating: this.rating
     }).subscribe({
@@ -140,7 +140,7 @@ export class DetailclientprojectComponent implements OnInit {
         this.isEnhancing = false;
       },
       error: () => {
-        alert("Erreur avec l'IA. Réessayez.");
+        alert("Erreur avec l'IA. R�essayez.");
         this.isEnhancing = false;
       }
     });
@@ -166,7 +166,7 @@ export class DetailclientprojectComponent implements OnInit {
       createdAt: new Date().toISOString()
     };
 
-    this.http.post('http://192.168.110.134:8085/Review/AjouterReview', reviewData).subscribe({
+    this.http.post('http://192.168.65.136:30085/Review/AjouterReview', reviewData).subscribe({
       next: () => {
         this.isSubmittingReview = false;
         this.reviewRejectionMsg = '';
@@ -178,7 +178,7 @@ export class DetailclientprojectComponent implements OnInit {
       error: (err) => {
         this.isSubmittingReview = false;
 
-        // 🚫 Keep modal open — show rejection banner instead of alert
+        // ?? Keep modal open � show rejection banner instead of alert
         let rawMsg =
           err.error?.reason ||
           err.error?.message ||
@@ -197,7 +197,7 @@ export class DetailclientprojectComponent implements OnInit {
   // --- UTILS ---
   copyLink() {
     navigator.clipboard.writeText(this.currentUrl);
-    alert('Link copied! 📋');
+    alert('Link copied! ??');
   }
 
   formatEnumText(value: string | undefined): string {

@@ -8,7 +8,7 @@ import SockJS from 'sockjs-client';
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://192.168.110.134:8085/chat'; // Backend URL
+  private apiUrl = 'http://192.168.65.136:30085/chat'; // Backend URL
   private stompClient: Client | null = null;
   
   public messageSubject: Subject<any> = new Subject<any>();
@@ -68,7 +68,7 @@ export class ChatService {
     }
 
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://192.168.110.134:8085/ws'),
+      webSocketFactory: () => new SockJS('http://192.168.65.136:30085/ws'),
       debug: (str) => { console.log(str); },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,

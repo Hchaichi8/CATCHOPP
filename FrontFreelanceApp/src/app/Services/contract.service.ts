@@ -1,4 +1,4 @@
-ï»¿import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Contract } from '../models/contract';
 import { Observable } from 'rxjs';
@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ContractService {
 
-  private apiUrl = 'http://192.168.110.134:8085/Contract'; 
-  private proposalUrl = 'http://192.168.110.134:8085/Project';
+  private apiUrl = 'http://192.168.65.136:30085/Contract'; 
+  private proposalUrl = 'http://192.168.65.136:30085/Project';
 
   constructor(private http: HttpClient) {}
 
@@ -37,7 +37,7 @@ export class ContractService {
     return this.http.get<Contract[]>(`${this.apiUrl}/all`);
   }
 
-  // RÃ©cupÃ©rer les contrats du freelance
+  // Récupérer les contrats du freelance
   getFreelancerContracts(freelancerId: number): Observable<Contract[]> {
     return this.http.get<Contract[]>(`${this.apiUrl}/freelancer/${freelancerId}`);
   }

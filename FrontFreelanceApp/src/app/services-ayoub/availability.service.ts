@@ -1,9 +1,9 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-const API = 'http://192.168.110.134:8088/Referral/availability';
+const API = 'http://192.168.65.136:30085/Referral/availability';
 
 export type AvailabilityStatus = 'ONLINE' | 'AVAILABLE' | 'AVAILABLE_TOMORROW' | 'OFFLINE' | 'DO_NOT_DISTURB' | 'CUSTOM';
 
@@ -64,10 +64,10 @@ export class AvailabilityService {
   }
 
   getWorldView(): Observable<WorldViewItem[]> {
-    console.log('🔍 Availability Service: Fetching world view');
+    console.log('?? Availability Service: Fetching world view');
     return this.http.get<WorldViewItem[]>(`${API}/world-view`).pipe(
       catchError((error) => {
-        console.error('❌ Availability Service: Error fetching world view:', error);
+        console.error('? Availability Service: Error fetching world view:', error);
         return of([]);
       })
     );
@@ -80,10 +80,10 @@ export class AvailabilityService {
   }
 
   updateProfile(id: number, profile: Partial<AvailabilityProfile>): Observable<AvailabilityProfile> {
-    console.log('🔍 Availability Service: Updating profile', id, profile);
+    console.log('?? Availability Service: Updating profile', id, profile);
     return this.http.put<AvailabilityProfile>(`${API}/profiles/${id}`, profile).pipe(
       catchError((error) => {
-        console.error('❌ Availability Service: Error updating profile:', error);
+        console.error('? Availability Service: Error updating profile:', error);
         return of(null as any);
       })
     );

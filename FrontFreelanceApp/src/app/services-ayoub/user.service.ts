@@ -1,9 +1,9 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-const API = 'http://192.168.110.134:8085/User';
+const API = 'http://192.168.65.136:30085/User';
 
 export interface User {
   id?: number;

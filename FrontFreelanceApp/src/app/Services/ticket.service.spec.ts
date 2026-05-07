@@ -5,7 +5,7 @@ import { TicketService, Ticket, PagedTickets, TicketStats } from './ticket.servi
 describe('TicketService', () => {
   let service: TicketService;
   let httpMock: HttpTestingController;
-  const API = 'http://192.168.110.134:8085/api/tickets';
+  const API = 'http://192.168.65.136:30085/api/tickets';
 
   const mockTicket: Ticket = {
     id: 1, userId: 10, title: 'Test', description: 'Desc',

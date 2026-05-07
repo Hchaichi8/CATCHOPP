@@ -1,8 +1,8 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://192.168.110.134:8089/SkillTests';
+const API = 'http://192.168.65.136:30085/SkillTests';
 
 export interface SkillTest {
   id?: number;
